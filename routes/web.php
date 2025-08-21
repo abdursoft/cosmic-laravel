@@ -1,0 +1,81 @@
+<?php
+
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\IssueController;
+use App\Http\Controllers\PackageController;
+use App\Http\Controllers\Payment\StripeController;
+use App\Http\Controllers\SiteSettingController;
+use App\Http\Controllers\UserSubscriptionController;
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\AuthMiddleware;
+use App\Http\Middleware\UserMiddleware;
+use Illuminate\Support\Facades\Route;
+
+// page routes
+Route::get('/', [App\Http\Controllers\PageController::class,'home'])->name('home');
+Route::get('/service', [App\Http\Controllers\PageController::class,'service'])->name('service');
+
+// auth routes
+Route::get('/login', [App\Http\Controllers\PageController::class, 'login'])->name('login');
+Route::post('/login', [App\Http\Controllers\Auth\AuthController::class, 'login'])->name('auth.login');
+Route::get('/register', [App\Http\Controllers\PageController::class, 'register'])->name('register');
+Route::post('/register', [App\Http\Controllers\Auth\AuthController::class, 'register'])->name('auth.register');
+Route::get('/logout', [App\Http\Controllers\Auth\AuthController::class, 'logout'])->name('auth.logout');
+
+// forgot password routes
+Route::get('/forgot-password', [App\Http\Controllers\PageController::class, 'forgotPassword'])->name('password.forgot');
+Route::get('/reset-password', [App\Http\Controllers\PageController::class, 'resetNewPassword'])->name('password.reset');
+Route::post('/forgot-password', [App\Http\Controllers\PasswordController::class, 'sendPasswordOTP'])->name('password.forgot.submit');
+Route::post('/reset-password', [App\Http\Controllers\PasswordController::class, 'resetPassword'])->name('password.reset.submit');
+
+// dashboard route
+Route::middleware((AuthMiddleware::class))->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\PageController::class, 'dashboard'])->name('auth.dashboard');
+});
+
+// user authenticated routes
+Route::middleware(UserMiddleware::class)->prefix('user')->group(function(){
+    Route::get('subscribe/{id}', [UserSubscriptionController::class,'subscribe'])->name('user.subscribe');
+    Route::get('subscribe/cancel/{id}', [UserSubscriptionController::class,'subscribeCancel'])->name('user.subscribe.cancel');
+    Route::get('subscribe/resume/{id}', [UserSubscriptionController::class,'resumeSubscribe'])->name('user.subscribe.resume');
+});
+
+// general routes
+Route::get('/contact', [App\Http\Controllers\PageController::class, 'contact'])->name('contact');
+Route::post('/contact', [App\Http\Controllers\ContactController::class, 'submitContactForm'])->name('contact.submit');
+
+
+// admin routes
+Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){
+    Route::get('users', [AdminController::class,'users'])->name('admin.users');
+    Route::get('issues', [AdminController::class,'issues'])->name('admin.issues');
+    Route::get('contacts', [AdminController::class,'contacts'])->name('admin.contacts');
+    Route::get('transactions', [AdminController::class,'transactions'])->name('admin.transactions');
+    Route::post('contact-replay', [AdminController::class, 'replayContact'])->name('admin.contact.replay');
+
+    Route::get('settings', [SiteSettingController::class,'index'])->name('admin.site-setting');
+    Route::post('settings', [SiteSettingController::class,'store'])->name('admin.site-setting.submit');
+
+    // subscriptions package routes
+    Route::get('package',[PackageController::class, 'index'])->name('admin.package');
+    Route::post('package',[PackageController::class, 'store'])->name('admin.package.submit');
+    Route::get('package/edit/{id}',[PackageController::class, 'edit'])->name('admin.package.edit');
+    Route::post('package/update/{id}',[PackageController::class, 'update'])->name('admin.package.update');
+    Route::get('package/delete/{id}',[PackageController::class, 'destroy'])->name('admin.package.delete');
+
+    // issues routes
+    Route::get('issues', [IssueController::class,'index'])->name('admin.issues');
+    Route::post('issues', [IssueController::class,'store'])->name('admin.issues.submit');
+    Route::get('issue/edit/{id}', [IssueController::class,'edit'])->name('admin.issues.edit');
+    Route::post('issue/update/{id}', [IssueController::class,'update'])->name('admin.issues.update');
+    Route::get('issue/delete/{id}', [IssueController::class,'destroy'])->name('admin.issues.delete');
+});
+
+
+// stripe webhook
+Route::any('stripe/webhook', [StripeController::class, 'subscriptionEvents'])->name('stripe.webhook');
+
+
+// issues routes
+Route::get('issue/read/{id}', [IssueController::class, 'readIssue'])->name('issue.read');
+Route::get('issue/scan/{id}/{type}', [IssueController::class, 'scan'])->name('issue.scan');

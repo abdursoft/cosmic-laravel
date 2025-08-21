@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('issues', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->text('sub_title')->nullable();
+            $table->longText('thumbnail')->nullable();
+            $table->longText('description')->nullable();
+            $table->string('issue_path')->nullable();
+            $table->enum('type',['stander','pro','unlimited'])->default('stander');
+            $table->decimal('price')->default(0);
+
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('issues');
+    }
+};
