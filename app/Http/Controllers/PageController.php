@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
+use App\Models\GifPack;
 use App\Models\Issue;
 use App\Models\Package;
 use App\Models\User;
+use App\Models\UserGif;
 use App\Models\UserSubscription;
 
 class PageController extends Controller
@@ -39,7 +41,8 @@ class PageController extends Controller
     public function service()
     {
         $packages = Package::all();
-        return view('service', compact('packages'));
+        $gif_packs = GifPack::all();
+        return view('service', compact('packages','gif_packs'));
     }
 
     // forgot password page
@@ -63,10 +66,13 @@ class PageController extends Controller
             $issues   = Issue::count();
             $packages = Package::count();
             $contacts = ContactMessage::where('is_replied', 0)->count();
-            $prices   = UserSubscription::where('status', 'active')->orWhere('status', 'expired')->sum('price');
+            $gif_packages = GifPack::count();
+            $prices   = UserSubscription::where('status', 'active')->orWhere('status', 'expired')->sum('price') + UserGif::where('status','active')->sum('price');
+
+            $gifs = UserGif::with('users','packs')->latest()->get();
 
             $subscriptions = UserSubscription::with(['package','user'])->latest()->get();
-            return view('auth.admin.dashboard', compact('users', 'issues', 'packages', 'contacts', 'prices', 'subscriptions'));
+            return view('auth.admin.dashboard', compact('users', 'issues', 'packages', 'contacts', 'prices', 'subscriptions','gif_packages','gifs'));
         }
         $subscriptions = $user->user_subscription;
 

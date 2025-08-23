@@ -1,8 +1,8 @@
 <section>
-    <div class="w-full flex bg-[#262323] text-white min-h-screen flex-col md:flex-row py-30">
+    <div class="w-full flex bg-[#262323] text-white min-h-screen flex-col px-3 md:flex-row py-30">
         <div class="w-full md:w-1/2 flex flex-col md:flex-row items-center justify-center md:justify-end pr-0 md:pr-18">
             <img src="{{ asset('images/open.jpg') }}" alt="Hero Image"
-                class="w-full h-full max-w-[700px] rounded-[25px] shadow-lg ">
+                class="w-full h-full max-w-[700px] rounded-[25px] shadow-lg" data-aos="fade-up">
         </div>
         <div class="w-full md:w-1/2 flex items-center justify-start p-4 md:p-8">
             <div class="w-full p-2 md:p-4 max-w-[700px]">

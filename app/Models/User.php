@@ -76,4 +76,8 @@ class User extends Authenticatable
     public function user_subscription(){
         return $this->hasMany(UserSubscription::class);
     }
+
+    public function gifs(){
+        return $this->hasMany(UserGif::class);
+    }
 }

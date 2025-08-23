@@ -1,5 +1,5 @@
 {{-- Hero Section  --}}
-<section class="w-full bg-[#1B0000] text-white min-h-screen">
+<section class="w-full bg-[#1B0000] text-white min-h-screen" data-aos="fade-up">
     <div class="w-full flex bg-[#1B0000] text-white min-h-screen flex-col md:flex-row pb-30">
         <div class="w-full md:w-1/2 flex items-center justify-center p-4">
             <div class="w-full p-2 md:p-4 max-w-[700px]">
@@ -11,10 +11,12 @@
                     entwine. </p>
                 <p class="text-gray-700 dark:text-gray-300 mt-3 text-lg">Here, your deepest cravings aren’t just
                     imagined—they’re ignited, indulged, and brought vividly to life.</p>
-                <button
-                    class="mt-6 px-6 py-4 bg-white text-black rounded hover:bg-slate-200 cursor-pointer transition duration-300">
+                <div class="mt-10">
+                    <a  href="{{route('service')}}"
+                    class="mt-6 px-6 py-4 mt-10 bg-white text-black rounded hover:bg-slate-200 cursor-pointer transition duration-300">
                     Claim Your Indulegence
-                </button>
+                </a>
+                </div>
             </div>
         </div>
         <div class="w-full md:w-1/2 flex flex-col md:flex-row items-center justify-center">
@@ -22,9 +24,9 @@
         </div>
     </div>
 
-    <div class="w-full flex bg-[#1B0000] text-white min-h-screen flex-col md:flex-row pb-30">
+    <div class="w-full flex bg-[#1B0000] text-white min-h-screen flex-col md:flex-row px-3 pb-30">
         <div class="w-full md:w-1/2 flex flex-col md:flex-row items-center justify-center md:justify-end pr-0 md:pr-18">
-            <img src="{{ asset('images/8.png') }}" alt="Hero Image" class="w-full h-full max-w-[700px] rounded-[25px] shadow-lg ">
+            <img src="{{ asset('images/8.png') }}" alt="Hero Image" class="w-full h-full max-w-[700px] rounded-[25px] shadow-lg " data-aos="fade-up">
         </div>
         <div class="w-full md:w-1/2 flex items-center justify-start p-4 md:p-8">
             <div class="w-full p-2 md:p-4 max-w-[700px]">

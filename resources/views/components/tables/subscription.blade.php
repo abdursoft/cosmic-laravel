@@ -30,15 +30,18 @@
                                 <td>{{ $subscription->package->name }}</td>
                                 <td>{{ ucfirst($subscription->package->type)}}</td>
                                 <td>{{ $subscription->status }}</td>
-                                <td>{{ $subscription->price }}</td>
+                                <td>${{ $subscription->price }}</td>
                                 <td>{{ date('Y-m-d', strtotime($subscription->created_at)) }}</td>
                                 <td>
                                     <div class="flex items-center gap-3">
-                                        <a href="{{route('user.subscribe.cancel',$subscription->id)}}" class="p-3 rounded-md @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-red-600 text-white">
+                                        <a href="{{route('user.subscribe.cancel',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-red-600 text-white">
                                             Cancel
                                         </a>
-                                        <a href="{{route('user.subscribe.resume',$subscription->id)}}" class="p-3 rounded-md @php echo $subscription->status == 'suspended' ? '' : 'hidden' @endphp bg-green-600 text-white">
+                                        <a href="{{route('user.subscribe.resume',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status == 'suspended' ? '' : 'hidden' @endphp bg-green-600 text-white">
                                             Resume
+                                        </a>
+                                        <a href="{{route('user.subscribe.download',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-green-600 text-white">
+                                            Download
                                         </a>
                                     </div>
                                 </td>

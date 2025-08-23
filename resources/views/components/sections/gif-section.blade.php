@@ -1,5 +1,5 @@
 <section class="w-full text-gray-800 bg-[#FDF8ED]">
-    <div class="w-full flex flex-col md:flex-row md:justify-between">
+    <div class="w-full flex flex-col md:flex-row md:justify-between" data-aos="fade-up">
         <div class="w-full md:w-1/2 flex items-center">
             <div class="w-full px-2 md:px-20">
                 <h2 class="text-2xl md:text-4xl mb-5">Separate Add-On: GIF Packs</h2>
@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="w-full md:w-1/2 flex flex-col items-center justify-center">
-            <img src="{{ asset('images/20.png') }}" alt="" class="w-full max-h-[68vh]">
+            <img src="{{ asset('ximages/20.png') }}" alt="" class="w-full max-h-[68vh]" data-aos="fade-right">
         </div>
     </div>
 </section>

@@ -1,15 +1,21 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\GifPackController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\Payment\StripeController;
 use App\Http\Controllers\SiteSettingController;
+use App\Http\Controllers\UserGifController;
 use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\AuthMiddleware;
 use App\Http\Middleware\UserMiddleware;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/test', function(){
+    return view('welcome');
+});
 
 // page routes
 Route::get('/', [App\Http\Controllers\PageController::class,'home'])->name('home');
@@ -35,9 +41,19 @@ Route::middleware((AuthMiddleware::class))->group(function () {
 
 // user authenticated routes
 Route::middleware(UserMiddleware::class)->prefix('user')->group(function(){
+    // user subscription routes
     Route::get('subscribe/{id}', [UserSubscriptionController::class,'subscribe'])->name('user.subscribe');
     Route::get('subscribe/cancel/{id}', [UserSubscriptionController::class,'subscribeCancel'])->name('user.subscribe.cancel');
     Route::get('subscribe/resume/{id}', [UserSubscriptionController::class,'resumeSubscribe'])->name('user.subscribe.resume');
+    Route::get('subscribe/download/{id}', [UserSubscriptionController::class,'resumeDownload'])->name('user.subscribe.download');
+
+    // user purchase routes
+    Route::get('purchase/gif/{id}', [UserGifController::class,'purchaseGifPack'])->name('user.purchase.gif');
+
+    // user dashboard routes
+    Route::get('subscriptions', [UserSubscriptionController::class,'userSubscriptions'])->name('user.subscriptions');
+    Route::get('gif-packages', [UserGifController::class,'userGifPacks'])->name('user.gif-packs');
+    Route::get('gif-packs/download/{id}', [UserGifController::class, 'downloadGifPacks'])->name('user.gif-pack.download');
 });
 
 // general routes
@@ -69,11 +85,25 @@ Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){
     Route::get('issue/edit/{id}', [IssueController::class,'edit'])->name('admin.issues.edit');
     Route::post('issue/update/{id}', [IssueController::class,'update'])->name('admin.issues.update');
     Route::get('issue/delete/{id}', [IssueController::class,'destroy'])->name('admin.issues.delete');
+    Route::get('issue/read/{id}', [IssueController::class, 'adminReadIssue'])->name('admin.issues.read');
+
+    // gif packs routes
+    Route::get('gif-pack', [GifPackController::class,'index'])->name('admin.gif-packs');
+    Route::post('gif-pack', [GifPackController::class,'store'])->name('admin.gif-packs.submit');
+    Route::get('gif-pack/edit/{id}', [GifPackController::class,'edit'])->name('admin.gif-packs.edit');
+    Route::post('gif-pack/update/{id}', [GifPackController::class,'update'])->name('admin.gif-packs.update');
+    Route::get('gif-pack/delete/{id}', [GifPackController::class,'destroy'])->name('admin.gif-packs.delete');
 });
 
 
-// stripe webhook
-Route::any('stripe/webhook', [StripeController::class, 'subscriptionEvents'])->name('stripe.webhook');
+// payment routes
+Route::prefix('payment')->group(function(){
+    // stripe webhook
+    Route::any('stripe/webhook', [StripeController::class, 'subscriptionEvents'])->name('payment.stripe.webhook');
+
+    // stripe payment routes
+    Route::any('stripe/callback/{trans_id}', [StripeController::class, 'callback'])->name('payment.stripe.callback');
+});
 
 
 // issues routes

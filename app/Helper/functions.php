@@ -3,7 +3,25 @@
 // site setting function checking
 if(!function_exists('site')){
     function site(){
-        return \App\Models\SiteSetting::first();
+        return \App\Models\SiteSetting::first() ?? null;
+    }
+}
+
+// subscription package
+if(!function_exists('packages')){
+    function packages(){
+        return \App\Models\Package::latest()->get() ?? (object)[];
+    }
+}
+
+// check active package
+if (!function_exists('check_package')) {
+    function check_package($issueId, $packageId) {
+        $issue = \App\Models\Issue::find($issueId);
+        if (!$issue) {
+            return false;
+        }
+        return $issue->packages()->where('package_id', $packageId)->exists();
     }
 }
 

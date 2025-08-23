@@ -21,4 +21,9 @@ class Issue extends Model
         'issue',
         'issue_type'
     ];
+
+    public function packages()
+    {
+        return $this->belongsToMany(Package::class, 'issue_packages');
+    }
 }

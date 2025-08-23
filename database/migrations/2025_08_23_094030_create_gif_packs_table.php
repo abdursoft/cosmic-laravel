@@ -11,18 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('issues', function (Blueprint $table) {
+        Schema::create('gif_packs', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('sub_title')->nullable();
-            $table->longText('thumbnail')->nullable();
+            $table->string('thumbnail');
+            $table->string('gif_archive');
             $table->longText('description')->nullable();
-            $table->string('issue_path')->nullable();
-            $table->enum('type',['stander','pro','unlimited'])->default('stander');
             $table->decimal('price')->default(0);
-
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->enum('status',['active','inactive'])->default('active');
+            $table->timestamps();
         });
     }
 
@@ -31,7 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('issues');
+        Schema::dropIfExists('gif_packs');
     }
-    
 };

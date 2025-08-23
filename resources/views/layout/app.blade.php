@@ -48,7 +48,6 @@
         <script>
             AOS.init({
                 duration: 1000,
-                once: true,
             });
         </script>
 

@@ -2,8 +2,10 @@
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Models\UserGif;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StripeController extends Controller
 {
@@ -119,8 +121,8 @@ class StripeController extends Controller
     public function payment(string $email, int | float $amount, string $currency, string $name, array $data, $trans_id)
     {
         $checkout_session = $this->pay->checkout->sessions->create([
-            'success_url'                => env("APP_URL") . "payment/stripe/success?trans=$trans_id",
-            'cancel_url'                 => env("APP_URL") . "payment/stripe/cancel?trans=$trans_id",
+            'success_url'                => route('payment.stripe.callback',$trans_id),
+            'cancel_url'                 => route('payment.stripe.callback',$trans_id),
             'customer_email'             => $email,
             'submit_type'                => 'pay',
             'payment_method_types'       => ['card'],
@@ -192,6 +194,28 @@ class StripeController extends Controller
             'transfer_group' => 'payout_from_' . env('SITE_NAME'),
         ]);
         return $payout;
+    }
+
+    public function callback($trans_id)
+    {
+        $payment = UserGif::where('payment_id', $trans_id)->orderBy('id', 'desc')->first();
+        if ($payment) {
+            $stripe = $this->paymentRetrieve($payment->txn_id);
+            if ($stripe->payment_status === 'paid' || $stripe->payment_status === 'completed') {
+                try {
+                    $payment->update([
+                        'status' => 'active',
+                    ]);
+                    return redirect()->route('service')->with("success","Payment has been completed");
+                } catch (\Throwable $th) {
+                    return redirect()->route('service')->with("error","Payment couldn't completed");
+                }
+            } else {
+                return redirect()->route('service')->with("error","Payment has been failed");
+            }
+        } else {
+            return redirect()->route('service')->with("error","Invalid payment ID");
+        }
     }
 
     public function subscriptionEvents(Request $request)

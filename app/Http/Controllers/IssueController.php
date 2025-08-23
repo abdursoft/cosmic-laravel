@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Issue;
+use App\Models\IssuePackage;
+use App\Models\UserSubscription;
 use App\Traits\IssueHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
@@ -31,8 +34,16 @@ class IssueController extends Controller
             'sub_title'   => 'nullable|string|max:255',
             'thumbnail'   => 'required|file|mimes:jpeg,jpg,png,webp',
             'description' => 'nullable|string',
-            'issue_type'  => 'required|in:free,premium'
+            'issue_type'  => 'required|in:free,premium',
         ]);
+
+        $issue_status = false;
+        if ($request->issue_type == 'premium') {
+            if (empty($request->packages)) {
+                return back()->with('error', 'Please select some subscription package for premium issue');
+            }
+            $issue_status = true;
+        }
 
         try {
             if ($request->hasFile('thumbnail')) {
@@ -40,17 +51,29 @@ class IssueController extends Controller
                 $validated['thumbnail'] = $thumbnail;
             }
             if ($request->hasFile('issue')) {
-                $issue_path              = $this->uploadIssue($request);
-                if(is_array($issue_path)){
+                $issue_path = $this->uploadIssue($request);
+                if (is_array($issue_path)) {
                     $validated['issue_path'] = $issue_path['issue'];
                     $validated['issue']      = $issue_path['archive'];
                 }
             }
-            Issue::create($validated);
+            DB::beginTransaction();
+            $issue = Issue::create($validated);
+
+            if ($issue_status) {
+                foreach ($request->packages as $package) {
+                    IssuePackage::create([
+                        'issue_id'   => $issue->id,
+                        'package_id' => $package,
+                    ]);
+                }
+            }
+
+            DB::commit();
             return back()->with('success', 'Issue successfully created');
         } catch (\Throwable $th) {
-            dd($th->getMessage());
-            return back()->withErrors(['error' => 'Issue couldn\'t created']);
+            DB::rollBack();
+            return back()->with('error', 'Issue couldn\'t created ' . $th->getMessage());
         }
     }
 
@@ -85,8 +108,16 @@ class IssueController extends Controller
             'issue'       => 'sometimes|file:mimes:zip',
             'type'        => 'sometimes|in:stander,pro,unlimited',
             'price'       => 'sometimes|numeric|min:0',
-            'issue_type'  => 'sometimes|in:free,premium'
+            'issue_type'  => 'sometimes|in:free,premium',
         ]);
+
+        $issue_status = false;
+        if ($request->issue_type == 'premium') {
+            if (empty($request->packages)) {
+                return back()->with('error', 'Please select some subscription package for premium issue');
+            }
+            $issue_status = true;
+        }
 
         try {
             $issue = Issue::findOrFail($id);
@@ -95,8 +126,8 @@ class IssueController extends Controller
                 $validated['thumbnail'] = Storage::disk('public')->put('thumbnail', $request->file('thumbnail'));
             }
             if ($request->hasFile('issue')) {
-                $issue_path              = $this->uploadIssue($request);
-                if(is_array($issue_path)){
+                $issue_path = $this->uploadIssue($request);
+                if (is_array($issue_path)) {
                     $validated['issue_path'] = $issue_path['issue'];
                     $validated['issue']      = $issue_path['archive'];
                     File::deleteDirectory(storage_path($issue->issue_path));
@@ -104,11 +135,24 @@ class IssueController extends Controller
                 }
             }
 
+            DB::beginTransaction();
             $issue->update($validated);
 
+            if ($issue_status) {
+                IssuePackage::where('issue_id', $request->id)->delete();
+                foreach ($request->packages as $package) {
+                    IssuePackage::create([
+                        'issue_id'   => $issue->id,
+                        'package_id' => $package,
+                    ]);
+                }
+            }
+
+            DB::commit();
             return back()->with('success', 'Issue successfully updated');
         } catch (\Throwable $th) {
-            return back()->withErrors(['error' => 'Issue couldn\'t updated']);
+            DB::rollBack();
+            return back()->with('error', 'Issue couldn\'t update ' . $th->getMessage());
         }
     }
 
@@ -118,10 +162,10 @@ class IssueController extends Controller
     public function destroy($id)
     {
         $issue = Issue::findOrFail($id);
-        if(!empty($issue->issue_path)){
+        if (! empty($issue->issue_path)) {
             File::deleteDirectory(storage_path($issue->issue_path));
         }
-        if(!empty($issue->issue)){
+        if (! empty($issue->issue)) {
             File::delete(public_path($issue->issue));
         }
         $issue->delete();
@@ -129,55 +173,93 @@ class IssueController extends Controller
     }
 
     // IssueController.php
-    public function scan($id, $type,$return=false)
+    public function scan($id, $type, $return = false)
     {
         $issue = Issue::findOrFail($id);
-        if($issue->issue_type == 'premium'){
-            return back()->with('error','This issue is not public to read');
+        if ($issue->issue_type == 'premium' && auth()->user()->role !== 'admin') {
+            return back()->with('error', 'This issue is not public to read');
         }
-        $basePath = storage_path($issue->issue_path);
-        $directory = explode('/',$issue->issue_path);
-        $dir = end($directory);
-        $patterns = [
-            'pages' => ['dir' => 'pages', 'regex' => '/^(\d+)\.(jpg|png|gif)$/i', 'formatter' => fn($m,$f,$d)=>[
-                'page'=>(int)$m[1],'file'=>$f,'url'=>asset("storage/issues/$d/pages/$f")
+        $basePath  = storage_path($issue->issue_path);
+        $directory = explode('/', $issue->issue_path);
+        $dir       = end($directory);
+        $patterns  = [
+            'pages' => ['dir' => 'pages', 'regex' => '/^(\d+)\.(jpg|png|gif)$/i', 'formatter' => fn($m, $f, $d) => [
+                'page' => (int) $m[1],
+                'file' => $f,
+                'url'  => asset("storage/issues/$d/pages/$f"),
             ]],
-            'audio' => ['dir' => 'audio', 'regex' => '/^bgm(\d+)_(\d+)_([^.]+)\.(mp3|wav)$/i', 'formatter' => fn($m,$f,$d)=>[
-                'page'=>[(int)$m[1],(int)$m[2]],'description'=>$m[3],'file'=>$f,'url'=>asset("storage/issues/$d/audio/$f")
+            'audio' => ['dir' => 'audio', 'regex' => '/^bgm(\d+)_(\d+)_([^.]+)\.(mp3|wav)$/i', 'formatter' => fn($m, $f, $d) => [
+                'page'        => [(int) $m[1], (int) $m[2]],
+                'description' => $m[3],
+                'file'        => $f,
+                'url'         => asset("storage/issues/$d/audio/$f"),
             ]],
-            'sfx'   => ['dir' => 'sfx',   'regex' => '/^sfx(\d+)_(\d+)_([^.]+)\.(mp3|wav)$/i', 'formatter' => fn($m,$f,$d)=>[
-                'page'=>[(int)$m[1],(int)$m[2]],'event'=>$m[3],'file'=>$f,'url'=>asset("storage/issues/$d/sfx/$f")
-            ]],
+            'sfx'   => [
+                'dir'       => 'sfx',
+                'regex'     => '/^sfx(\d+)_(\d+)_([^.]+)\.(mp3|wav)$/i',
+                'formatter' => fn($m, $f, $d) => [
+                    'page'  => array_filter([
+                        (int) $m[1],
+                        (int) $m[2],
+                        is_numeric($m[3]) ? (int) $m[3] : null,
+                    ]),
+                    'event' => is_numeric($m[3]) ? null : $m[3],
+                    'file'  => $f,
+                    'url'   => asset("storage/issues/$d/sfx/$f"),
+                ],
+            ],
         ];
 
-        if (!isset($patterns[$type])) {
+        if (! isset($patterns[$type])) {
             return response()->json(['error' => 'Invalid type'], 400);
         }
 
-        $p = $patterns[$type];
+        $p      = $patterns[$type];
         $result = [];
-        foreach (scandir($basePath.'/'.$p['dir']) as $file) {
+        foreach (scandir($basePath . '/' . $p['dir']) as $file) {
             if (preg_match($p['regex'], $file, $matches)) {
-                $result[] = $p['formatter']($matches, $file,$dir);
+                $result[] = $p['formatter']($matches, $file, $dir);
             }
         }
 
-        if(!$return){
+        if (! $return) {
             return response()->json($result);
         }
         return $result;
-
     }
 
     // read issues
-    public function readIssue($id){
-        $issue = Issue::findOrFail($id);
-        $sfxs = $this->scan($id,'sfx',true);
-        $pages = $this->scan($id,'pages',true);
-        $audios = $this->scan($id,'audio',true);
-        $path = explode('/',$issue->issue_path);
-        $path = end($path);
-        return view('issue',compact('issue','sfxs','pages','audios','path'));
+    public function readIssue($id)
+    {
+        $package  = null;
+        $issue    = Issue::findOrFail($id);
+        $packages = UserSubscription::latest()->get();
+        foreach ($packages as $key => $pack) {
+            if ($pack->status == 'active') {
+                $package = check_package($issue->id, $pack->package_id);
+            }
+        }
+
+        if ($package || $issue->issue_type == 'free') {
+            $sfxs   = $this->scan($id, 'sfx', true);
+            $pages  = $this->scan($id, 'pages', true);
+            $audios = $this->scan($id, 'audio', true);
+            $path   = explode('/', $issue->issue_path);
+            $path   = end($path);
+            return view('issue', compact('issue', 'sfxs', 'pages', 'audios', 'path'));
+        }
+        return back()->with('error', 'Your are not able to see this magazine');
     }
 
+    // read issues
+    public function adminReadIssue($id)
+    {
+        $issue  = Issue::findOrFail($id);
+        $sfxs   = $this->scan($id, 'sfx', true);
+        $pages  = $this->scan($id, 'pages', true);
+        $audios = $this->scan($id, 'audio', true);
+        $path   = explode('/', $issue->issue_path);
+        $path   = end($path);
+        return view('issue', compact('issue', 'sfxs', 'pages', 'audios', 'path'));
+    }
 }

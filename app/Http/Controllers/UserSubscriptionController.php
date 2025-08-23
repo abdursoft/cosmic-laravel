@@ -150,4 +150,20 @@ class UserSubscriptionController extends Controller
             return back()->with('error', 'Subscription couldn\'t resume, Please contact with admin');
         }
     }
+
+
+    // download subscription packages and issues
+    public function resumeDownload($id){
+        $subscribe = UserSubscription::findOrFail($id);
+
+        if($subscribe->status !== 'active'){
+            return back()->with('error','You don\'t have permission to access this page');
+        }
+    }
+
+    // user subscription page
+    public function userSubscriptions(){
+        $subscriptions = UserSubscription::with('package')->where('user_id',auth()->user()->id)->latest()->get();
+        return view('auth.users.subscription',compact('subscriptions'));
+    }
 }

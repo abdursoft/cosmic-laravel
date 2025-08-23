@@ -23,6 +23,8 @@
         <div class="page-wrap" id="viewport">
             <div class="index" id="idx"><span class="currentPage"></span> / <span class="totalPage"></span></div>
             <div class="relative" id="bookContainer">
+                <div id="magazine">
+                </div>
             </div>
         </div>
         <div class="bottombar">
@@ -56,9 +58,13 @@
         let images = ["{{ asset('storage/issues/' . $path . '/cover.jpg') }}"];
         let pageFlip = undefined;
         let viewport = undefined;
+        let dWidth=dHeight = 0;
+        let isStart = false;
 
         fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'pages']) }}").then((res) => res.json()).then((
             data) => {
+
+            let magazine = '';
 
             data.forEach((page, i) => {
                 images.push(page.url);
@@ -69,34 +75,62 @@
                 })
                 document.querySelector('.currentPage').textContent = 1;
                 document.querySelector('.totalPage').textContent = images.length;
-            });
 
-            pageFlip = new St.PageFlip(
-                document.getElementById("bookContainer"), {
-                    width: 550,
-                    height: 733,
-                    size: "stretch",
-                    minWidth: 315,
-                    maxWidth: 1000,
-                    minHeight: 420,
-                    maxHeight: 1350,
-                    maxShadowOpacity: 0.5,
-                    showCover: true,
-                    mobileScrollSupport: false,
-                    usePortrait: true
+                magazine += `<div class='cover'><img src='${page.url}' /></div>`;
+            });
+            document.getElementById('magazine').innerHTML = magazine;
+
+            $('#magazine').turn({
+                display: 'single',
+                acceleration: true,
+                gradients: !$.isTouch,
+                elevation: 50,
+                duration:1000,
+                when: {
+                    turned: function(e, page) {
+                        current = page;
+                        if(isStart){
+                            playAudioByPage(current);
+                            playSFXByPage(current);
+                        }
+                        document.querySelector('.currentPage').textContent = current;
+                    }
                 }
-            );
-
-
-            pageFlip.loadFromImages(images);
-            viewport = document.querySelector('.stf__canvas');
-
-            pageFlip.on("flip", (e) => {
-                current = pageFlip.getCurrentPageIndex();
-                playAudioByPage(current);
-                playSFXByPage(current);
-                document.querySelector('.currentPage').textContent = current + 1;
             });
+
+            $(window).bind('keydown', function(e) {
+                if (e.keyCode == 37)
+                    $('#magazine').turn('previous');
+                else if (e.keyCode == 39)
+                    $('#magazine').turn('next');
+            });
+            // Get initial size of magazine (before fullscreen)
+            let mag = document.getElementById("magazine");
+            let dWidth = mag.offsetWidth;
+            let dHeight = mag.offsetHeight;
+
+            // Listen for fullscreen change
+            document.addEventListener("fullscreenchange", () => {
+                if (document.fullscreenElement) {
+                    // Fullscreen → fit to window
+                    let w = window.innerWidth;
+                    let h = window.innerHeight;
+                    $('#magazine').turn('size', w, h);
+                } else {
+                    // Exit fullscreen → restore original size
+                    $('#magazine').turn('size', dWidth, dHeight);
+                }
+            });
+
+            // Handle resizing inside fullscreen
+            window.addEventListener("resize", () => {
+                if (document.fullscreenElement) {
+                    let w = window.innerWidth;
+                    let h = window.innerHeight;
+                    $('#magazine').turn('size', w, h);
+                }
+            });
+
 
             PAGES.forEach((p) => {
                 const link = document.createElement("link");
@@ -142,6 +176,7 @@
         startBtn.addEventListener("click", async () => {
             gate.style.display = "none";
             book.classList.add("ready");
+            isStart = true;
             playAudioByPage(1);
             let pageTurnSrc = "{{ asset('storage/issues/' . $path . '/sfx/pageturn.mp3') }}";
 
@@ -155,10 +190,10 @@
         });
 
         nextBtn.addEventListener("click", () => {
-            pageFlip.flipNext();
+            $('#magazine').turn('next');
         });
         prevBtn.addEventListener("click", () => {
-            pageFlip.flipPrev();
+            $('#magazine').turn('previous');
         });
 
         function playAudioByPage(page) {
@@ -193,11 +228,33 @@
         }
 
         function playSFXByPage(page) {
-            let audioData = sfxList.find(ad => {
-                if (!Array.isArray(ad.page)) return !1;
-                const [start, end] = ad.page;
-                return page >= start && page <= end
+            let audioData = null;
+
+            // First try to find exact page matches (including the 3rd number case)
+            audioData = sfxList.find(ad => {
+                if (!Array.isArray(ad.page)) return false;
+
+                // If ad.page has 3 numbers, the third is an exact page
+                if (ad.page.length === 3) {
+                    const [start, end, exact] = ad.page;
+                    return page >= start && page <= end || page === exact;
+                }
+
+                // If it's a single-page range [x, x]
+                if (ad.page.length === 2 && ad.page[0] === ad.page[1]) {
+                    return page === ad.page[0];
+                }
+                return false;
             });
+
+            // If no exact match found, fallback to normal range
+            if (!audioData) {
+                audioData = sfxList.find(ad => {
+                    if (!Array.isArray(ad.page)) return false;
+                    const [start, end] = ad.page;
+                    return page >= start && page <= end;
+                });
+            }
 
             if (!audioData) {
                 audioData = {
@@ -251,11 +308,11 @@
             window.addEventListener("keydown", (e) => {
                 if (e.key === "ArrowRight") {
                     e.preventDefault();
-                    pageFlip.flipNext();
+                    $('#magazine').turn('next');
                 };
                 if (e.key === "ArrowLeft") {
                     e.preventDefault();
-                    pageFlip.flipPrev();
+                    $('#magazine').turn('previous');
                 };
             });
 

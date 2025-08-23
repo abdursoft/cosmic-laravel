@@ -8,34 +8,25 @@
 
       <!--Container-->
       <div class="w-full text-slate-800">
-        <h2 class="text-xl md:text-3xl my-3">Subscription packages</h2>
+        <h2 class="text-xl md:text-3xl my-3">Gif Package List</h2>
 			<!--Card-->
 			 <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow bg-white">
-				<table id="example" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
+				<table id="purchase" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
 					<thead>
 						<tr>
-                            <th data-priority="1">SL. no</th>
+                            <th data-priority="1">Package</th>
 							<th data-priority="2">Name</th>
-							<th data-priority="3">Type</th>
+							<th data-priority="3">Price</th>
 							<th data-priority="4">Status</th>
-							<th data-priority="6">Price</th>
-							<th data-priority="6">Action</th>
 						</tr>
 					</thead>
 					<tbody>
-                        @foreach($packages as $key=>$package)
+                        @foreach($gifs as $key=>$gif)
                             <tr>
-                                <td>{{$key+1}}</td>
-                                <td>{{$package->name}}</td>
-                                <td>{{$package->type}}</td>
-                                <td>{{$package->status}}</td>
-                                <td>${{$package->price}}</td>
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <a href="{{ route('admin.package.edit',$package->id) }}" class="p-3 rounded-md bg-green-600 text-white">Edit</a>
-                                        <a href="{{ route('admin.package.delete',$package->id) }}" class="p-3 bg-red-600 text-white rounded-md">Delete</a>
-                                    </div>
-                                </td>
+                                <td>{{$gif->packs->title}}</td>
+                                <td>{{$gif->users->name}}</td>
+                                <td>${{$gif->packs->price}}</td>
+                                <td>{{$gif->status}}</td>
                             </tr>
                         @endforeach
 					</tbody>
@@ -54,11 +45,18 @@
 	<script>
 		$(document).ready(function() {
 
-			var table = $('#example').DataTable( {
+			var table = $('#purchase').DataTable( {
 					responsive: true
 				} )
 				.columns.adjust()
 				.responsive.recalc();
 		} );
+
+        function setUser(name,email,subject,id){
+            $('#id').val(id);
+            $('#name').val(name);
+            $('#email').val(email);
+            $('#subject').val(subject);
+        }
 
 	</script>

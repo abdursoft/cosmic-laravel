@@ -37,6 +37,8 @@
     <div class="flex justify-center w-full min-h-[84vh]">
         <div class="w-full flex flex-col md:flex-row p-3 max-w-[1550px]">
             <div class="w-full md:w-1/4 lg:w-1/5">
+                {{-- load user nav bar  --}}
+                @include('components.headers.user')
                 {{-- load overview card component  --}}
                 @include('components.cards.user-service')
             </div>

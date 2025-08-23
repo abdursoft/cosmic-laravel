@@ -8,33 +8,29 @@
 
       <!--Container-->
       <div class="w-full text-slate-800">
-        <h2 class="text-xl md:text-3xl my-3">Issues list</h2>
+        <h2 class="text-xl md:text-3xl my-3">Gif Package List</h2>
 			<!--Card-->
 			 <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow bg-white">
 				<table id="example" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
 					<thead>
 						<tr>
                             <th data-priority="1">SL. no</th>
-							<th data-priority="2">Title</th>
-							<th data-priority="3">Sub title</th>
-							<th data-priority="3">Status</th>
-							<th data-priority="3">Created at</th>
-							<th data-priority="6">Action</th>
+							<th data-priority="2">Name</th>
+							<th data-priority="3">Price</th>
+							<th data-priority="4">Status</th>
+							<th data-priority="5">Action</th>
 						</tr>
 					</thead>
 					<tbody>
-                        @foreach($issues as $key=>$issue)
+                        @foreach($gifs as $key=>$gif)
                             <tr>
-                                <td>{{$issue->id}}</td>
-                                <td>{{$issue->title}}</td>
-                                <td>{{$issue->sub_title}}</td>
-                                <td>{{ucfirst($issue->issue_type)}}</td>
-                                <td>{{date('Y-m-d', strtotime($issue->created_at))}}</td>
+                                <td>{{$key+1}}</td>
+                                <td>{{$gif->packs->title}}</td>
+                                <td>${{$gif->price}}</td>
+                                <td>{{$gif->status}}</td>
                                 <td>
                                     <div class="flex items-center gap-3">
-                                        <a href="{{ route('admin.issues.edit',$issue->id) }}" class="p-3 rounded-md bg-green-600 text-white">Edit</a>
-                                        <a href="{{ route('admin.issues.delete',$issue->id) }}" class="p-3 bg-red-600 text-white rounded-md">Delete</a>
-                                        <a href="{{ route('admin.issues.read',$issue->id) }}" class="p-3 bg-gray-600 text-white rounded-md">Read</a>
+                                        <a href="{{ route('user.gif-pack.download',$gif->id) }}" class="p-2 bg-red-600 text-white rounded-md">Download</a>
                                     </div>
                                 </td>
                             </tr>
@@ -61,5 +57,12 @@
 				.columns.adjust()
 				.responsive.recalc();
 		} );
+
+        function setUser(name,email,subject,id){
+            $('#id').val(id);
+            $('#name').val(name);
+            $('#email').val(email);
+            $('#subject').val(subject);
+        }
 
 	</script>

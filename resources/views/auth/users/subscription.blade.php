@@ -1,6 +1,6 @@
 @extends('layout.user')
 
-@section('title','User Dashboard')
+@section('title','User Subscriptions')
 
 @section('content')
     <div class="flex items-center justify-center w-full bg-[#ddd]">

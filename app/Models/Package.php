@@ -17,7 +17,7 @@ class Package extends Model
         'status',
         'price',
         'price_id',
-        'product_id'
+        'product_id',
     ];
 
     /**
@@ -26,5 +26,10 @@ class Package extends Model
     public function userSubscription()
     {
         return $this->hasMany(UserSubscription::class);
+    }
+
+    public function issues()
+    {
+        return $this->belongsToMany(Issue::class, 'issue_packages');
     }
 }
