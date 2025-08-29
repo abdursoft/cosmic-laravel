@@ -8,7 +8,7 @@
 
       <!--Container-->
       <div class="w-full text-slate-800">
-        <h2 class="text-xl md:text-3xl my-3">Gif Package List</h2>
+        <h2 class="text-xl md:text-3xl my-3">Gif Purchased</h2>
 			<!--Card-->
 			 <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow bg-white">
 				<table id="purchase" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">

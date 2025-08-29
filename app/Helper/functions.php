@@ -33,3 +33,11 @@ if(!function_exists('issue_path')){
         return end($ex) ?? null;
     }
 }
+
+
+// get pages
+if(!function_exists('pages')){
+    function pages(){
+        return \App\Models\Page::where('status','active')->get() ?? (object)[];
+    }
+}

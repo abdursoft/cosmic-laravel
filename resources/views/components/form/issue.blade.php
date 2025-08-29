@@ -1,17 +1,17 @@
 <!-- Include stylesheet -->
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 
-<div class="flex items-center justify-center min-h-[600px] mb-8 bg-gray-100 w-full p-3">
+<div class="flex items-center justify-center min-h-[600px] mb-8 w-full p-3">
     <div class="w-full max-w-2xl p-8 bg-white rounded-lg shadow-md">
         <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">Create a magazine</h2>
-        <form method="POST"
-            action="@php echo !empty($issue) ? route('admin.issues.update',$issue->id) : route('admin.issues.submit') @endphp"
-            enctype="multipart/form-data">
+            <form id="issueForm" method="POST"
+                action="@php echo !empty($issue) ? route('admin.issues.update',$issue->id) : route('admin.issues.submit') @endphp"
+                enctype="multipart/form-data">
             @csrf
             <div class="flex justify-between my-1 gap-3">
                 <div class="w-full md:w-1/2">
                     <label for="title" class="block text-sm font-medium text-gray-700"> Magazine title</label>
-                    <input type="title" id="title" name="title" required autofocus
+                    <input type="title" id="title" placeholder="Magazine name" name="title" required autofocus
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('title') border-red-500 @enderror text-slate-800"
                         value="{{ old('title') ?? ($issue->title ?? '') }}">
                     @error('title')
@@ -20,7 +20,7 @@
                 </div>
                 <div class=" w-full md:w-1/2">
                     <label for="sub_title" class="block text-sm font-medium text-gray-700"> Sub title</label>
-                    <input type="text" id="sub_title" name="sub_title"
+                    <input type="text" id="sub_title" placeholder="Magazine short description" name="sub_title"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('sub_title') border-red-500 @enderror text-slate-800"
                         value="{{ old('sub_title') ?? ($issue->sub_title ?? '') }}">
                     @error('sub_title')
@@ -95,6 +95,13 @@
                     {{ !empty($issue) ? 'Save' : 'Create' }}
                 </button>
             </div>
+
+            <div id="progressWrapper" class="hidden w-full mt-4">
+                <div class="w-full bg-gray-200 rounded-full h-3">
+                    <div id="progressBar" class="bg-indigo-600 h-3 rounded-full" style="width: 0%"></div>
+                </div>
+                <p id="progressText" class="text-sm text-gray-600 mt-1">0%</p>
+            </div>
         </form>
     </div>
 </div>
@@ -104,7 +111,7 @@
 <!-- Initialize Quill editor -->
 <script>
     const quill = new Quill('#description', {
-        placeholder: 'Issues description',
+        placeholder: 'Magazine description',
         theme: 'snow',
     });
 
@@ -131,5 +138,54 @@
         const value = $('#issue_type').val();
         premiumChange(value);
     }
+
+
+    const form = document.getElementById('issueForm');
+    const progressWrapper = document.getElementById('progressWrapper');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const url = form.getAttribute('action');
+        const formData = new FormData(form);
+
+        // Show progress bar
+        progressWrapper.classList.remove('hidden');
+        progressBar.style.width = '0%';
+        progressText.innerText = '0%';
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("X-CSRF-TOKEN", "{{ csrf_token() }}");
+
+        // Track upload progress
+        xhr.upload.addEventListener("progress", function (e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = percent + "%";
+                progressText.innerText = percent + "%";
+            }
+        });
+
+        // On success
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                alert("Upload successful!");
+                window.location.reload(); // or redirect if needed
+            } else {
+                alert("Upload failed: " + xhr.statusText);
+            }
+        };
+
+        // On error
+        xhr.onerror = function () {
+            alert("Something went wrong!");
+        };
+
+        xhr.send(formData);
+    });
+
 
 </script>

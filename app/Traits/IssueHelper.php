@@ -27,7 +27,7 @@ trait IssueHelper
             File::deleteDirectory($extractPath);
         }
 
-        $zip = new ZipArchive;
+        $zip = new ZipArchive();
         if ($zip->open($savedZipPath) === true) {
             $zip->extractTo($extractPath);
             $zip->close();

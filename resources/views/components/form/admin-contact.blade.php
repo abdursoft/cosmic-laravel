@@ -1,4 +1,4 @@
-<div class="flex items-center justify-center">
+<div class="flex items-center justify-center py-8">
     <div class="w-full max-w-3xl p-8 bg-white rounded-md shadow-md">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-600">Replay to contact user</h2>
         <form method="POST" class="text-gray-600" action="{{ route('admin.contact.replay') }}">
@@ -6,7 +6,7 @@
             <div class="flex flex-col md:justify-between md:flex-row w-full mb-4 gap-3">
                 <div class="w-full md:w-1/2">
                     <label for="name" class="block text-sm font-medium text-gray-600"> Name</label>
-                    <input type="text" id="name" name="name" required
+                    <input type="text" id="name" placeholder="Jhon Doe" name="name" required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('name') border-red-500 @enderror"
                         value="{{ old('name') }}">
                     @error('name')
@@ -15,7 +15,7 @@
                 </div>
                 <div class="w-full md:w-1/2">
                     <label for="email" class="block text-sm font-medium text-gray-600"> Email</label>
-                    <input type="email" id="email" name="email" required
+                    <input type="email" id="email" placeholder="jhon_doe@gmail.com" name="email" required
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('email') border-red-500 @enderror"
                         value="{{ old('email') }}">
                     @error('email')
@@ -26,7 +26,7 @@
             </div>
             <div class="mb-4">
                 <label for="subject" class="block text-sm font-medium text-gray-600"> Subject</label>
-                <input type="text" id="subject" name="subject" required
+                <input type="text" id="subject" placeholder="Replay magazine" name="subject" required
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('subject') border-red-500 @enderror"
                     value="{{ old('subject') }}">
                 @error('subject')
@@ -35,7 +35,7 @@
             </div>
             <div class="mb-4">
                 <label for="message" class="block text-sm font-medium text-gray-600"> Message</label>
-                <textarea id="message" name="message" required
+                <textarea id="message" name="message" placeholder="Message description..." required
                     rows="4"
                     class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('message') border-red-500 @enderror">{{ old('message') }}</textarea>
                 @error('message')

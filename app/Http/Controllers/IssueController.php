@@ -70,10 +70,10 @@ class IssueController extends Controller
             }
 
             DB::commit();
-            return back()->with('success', 'Issue successfully created');
+            return response()->json(['status' => 'upload successfull'],200);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return back()->with('error', 'Issue couldn\'t created ' . $th->getMessage());
+            return response()->json(['status' => 'upload failed', 'error' => $th->getmessage()],400);
         }
     }
 
@@ -188,7 +188,7 @@ class IssueController extends Controller
                 'file' => $f,
                 'url'  => asset("storage/issues/$d/pages/$f"),
             ]],
-            'audio' => ['dir' => 'audio', 'regex' => '/^bgm(\d+)_(\d+)_([^.]+)\.(mp3|wav)$/i', 'formatter' => fn($m, $f, $d) => [
+            'audio' => ['dir' => 'audio', 'regex' => '/^bgm(\d+)_(\d+)_([^.]+)\.(mp3|wav|aac)$/i', 'formatter' => fn($m, $f, $d) => [
                 'page'        => [(int) $m[1], (int) $m[2]],
                 'description' => $m[3],
                 'file'        => $f,
@@ -196,7 +196,7 @@ class IssueController extends Controller
             ]],
             'sfx'   => [
                 'dir'       => 'sfx',
-                'regex'     => '/^sfx(\d+)_(\d+)_([^.]+)\.(mp3|wav)$/i',
+                'regex'     => '/^sfx(\d+)_(\d+)_([^.]+)\.(mp3|wav|aac)$/i',
                 'formatter' => fn($m, $f, $d) => [
                     'page'  => array_filter([
                         (int) $m[1],

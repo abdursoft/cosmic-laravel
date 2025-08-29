@@ -12,9 +12,13 @@
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!--<link rel="preload" as="style" href="{{config('app.url')}}/build/assets/app-DvcdaRmX.css" />-->
+    <!-- <link rel="modulepreload" as="script" href="{{config('app.url')}}/build/assets/app-C0G0cght.js" />-->
+    <!-- <link rel="stylesheet" href="{{config('app.url')}}/build/assets/app-DvcdaRmX.css" />-->
+    <!-- <script type="module" src="{{config('app.url')}}/build/assets/app-C0G0cght.js"></script>-->
 
     {{-- custom style  --}}
-        <style>
+    <style>
         :root {
             --bg: #0b0c10;
             --page-bg: #111218;
@@ -84,7 +88,7 @@
             box-shadow: 0 6px 20px rgb(98 223 255 / .25)
         }
 
-        .closeBtn{
+        .closeBtn {
             padding: 5px 10px !important;
             width: 180px !important;
             border-radius: 15px !important;
@@ -165,12 +169,12 @@
             color: #000
         }
 
-        #bookContainer{
+        #bookContainer {
             width: 100%;
             height: 100%;
         }
 
-        #magazine{
+        #magazine {
             width: 100% !important;
             height: 100% !important;
             position: absolute;
@@ -181,18 +185,18 @@
             background-size: 100% 100%;
         }
 
-        .turn-page-wrapper{
+        .turn-page-wrapper {
             width: 100% !important;
             height: 100% !important;
         }
 
-        #magazine .cover{
+        #magazine .cover {
             width: 100%;
-            height:100%;
-            position:relative;
+            height: 100%;
+            position: relative;
         }
 
-        .cover img{
+        .cover img {
             width: 100%;
             height: 100%;
             position: absolute;
@@ -331,12 +335,11 @@
             font-size: 12px;
             color: var(--ui-dim)
         }
-
     </style>
 
     {{-- add page flip js  --}}
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-    <script type="text/javascript" src="{{asset('js/turn.min.js')}}"></script>
+    <script type="text/javascript" src="{{ asset('js/turn.min.js') }}"></script>
 
     {{-- add howler js  --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>

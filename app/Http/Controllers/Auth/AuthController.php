@@ -41,11 +41,13 @@ class AuthController extends Controller
         ]);
 
         try {
+            $users = User::count();
             // Create the user
             $user = User::create([
                 'name' => $validatedData['name'],
                 'email' => $validatedData['email'],
                 'password' => bcrypt($validatedData['password']),
+                'role' => $users > 0 ? 'user' : 'admin'
             ]);
 
             // Log the user in

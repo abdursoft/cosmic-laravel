@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="w-full md:w-1/2 flex flex-col items-center justify-center">
-            <img src="{{ asset('ximages/20.png') }}" alt="" class="w-full max-h-[68vh]" data-aos="fade-right">
+            <img src="{{ asset('images/20.png') }}" alt="" class="w-full max-h-[68vh]" data-aos="fade-right">
         </div>
     </div>
 </section>

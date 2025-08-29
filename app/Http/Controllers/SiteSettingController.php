@@ -52,11 +52,13 @@ class SiteSettingController extends Controller
             $logo = $icon = null;
             $exists = SiteSetting::first();
 
-            if($request->hasFile('logo') && $request->hasFile('favicon')){
+            if($request->hasFile('logo')){
                 $logo = Storage::disk('public')->put('images',$request->file('logo'));
-                $icon = Storage::disk('public')->put('images',$request->file('favicon'));
             }
 
+            if($request->hasFile('logo') && $request->hasFile('favicon')){
+                $icon = Storage::disk('public')->put('images',$request->file('favicon'));
+            }
 
 
             if($exists){
@@ -71,7 +73,7 @@ class SiteSettingController extends Controller
             SiteSetting::create($validate);
             return back()->with('success', 'Site settings successfully created');
         } catch (\Throwable $th) {
-            return back()->withErrors(['error' => 'Site sittings couldn\'t created']);
+            return back()->with('error', 'Site sittings couldn\'t created '.$th->getMessage());
         }
     }
 

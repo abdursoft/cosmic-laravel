@@ -12,6 +12,10 @@
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!--<link rel="preload" as="style" href="{{config('app.url')}}/build/assets/app-DvcdaRmX.css" />-->
+    <!-- <link rel="modulepreload" as="script" href="{{config('app.url')}}/build/assets/app-C0G0cght.js" />-->
+    <!-- <link rel="stylesheet" href="{{config('app.url')}}/build/assets/app-DvcdaRmX.css" />-->
+    <!-- <script type="module" src="{{config('app.url')}}/build/assets/app-C0G0cght.js"></script>-->
 
     {{-- custom style  --}}
         <style>

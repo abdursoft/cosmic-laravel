@@ -38,6 +38,10 @@
                 class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.users') ? 'bg-gray-200 font-semibold' : '' }}">
                 Users management
             </a>
+            <a href="{{ route('admin.pages.index') }}"
+                class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.pages.index') ? 'bg-gray-200 font-semibold' : '' }}">
+                Dynamic Pages
+            </a>
             <a href="{{ route('auth.logout') }}"
                 class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('settings') ? 'bg-gray-200 font-semibold' : '' }}">
                 Sign out

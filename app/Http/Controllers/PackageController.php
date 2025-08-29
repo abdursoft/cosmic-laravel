@@ -77,7 +77,7 @@ class PackageController extends Controller
     {
         $validated = $request->validate([
             'name'        => 'sometimes|string|max:255',
-            'thumbnail'   => 'sometimes|string',
+            'thumbnail'   => 'sometimes|file|mimes:jpeg,jpg,png,webp,gif',
             'type'        => 'sometimes|in:weekly,monthly,yearly,lifetime',
             'description' => 'sometimes|string',
             'status'      => 'sometimes|in:active,inactive',
@@ -101,12 +101,11 @@ class PackageController extends Controller
     /**
      * Remove the specified package from storage.
      */
-    public function destroy(Package $package)
+    public function destroy($id)
     {
+        $package = Package::fineOrFail($id);
         $package->delete();
 
-        return response()->json([
-            'message' => 'Package deleted successfully',
-        ]);
+        return back()->with('success','Package deleted successfully');
     }
 }

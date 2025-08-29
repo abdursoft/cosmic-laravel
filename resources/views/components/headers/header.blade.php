@@ -6,7 +6,7 @@
     </div>
     <nav class="flex space-x-4">
         <a href="{{ route('home') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Home</a>
-        <a href="{{ route('service') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Services</a>
+        <a href="{{ route('service') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Pricing</a>
         @if(auth()->check())
             <a href="{{ route('auth.dashboard') }}" class="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Dashboard</a>
         @else

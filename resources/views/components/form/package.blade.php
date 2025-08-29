@@ -1,7 +1,7 @@
 <!-- Include stylesheet -->
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 
-<div class="flex items-center justify-center min-h-[600px] mb-8 p-3 bg-gray-100 w-full">
+<div class="flex items-center justify-center min-h-[600px] mb-8 p-3 w-full">
     <div class="w-full max-w-2xl p-8 bg-white rounded-lg shadow-md">
         <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">Subscription package</h2>
         <form method="POST" action="@php echo !empty($package) ? route('admin.package.update',$package->id) : route('admin.package.submit') @endphp" enctype="multipart/form-data">
@@ -9,7 +9,7 @@
             <div class="flex justify-between my-1 gap-3">
                 <div class="w-full md:w-1/2">
                     <label for="name" class="block text-sm font-medium text-gray-700"> Package Name</label>
-                    <input type="name" id="name" name="name" required autofocus
+                    <input type="name" id="name" placeholder="Subscription package name" name="name" required autofocus
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('name') border-red-500 @enderror text-slate-800"
                         value="{{ old('name') ?? ($package->name ?? '') }}">
                     @error('name')
@@ -18,7 +18,7 @@
                 </div>
                 <div class=" w-full md:w-1/2">
                     <label for="price" class="block text-sm font-medium text-gray-700"> Price amount</label>
-                    <input type="number" step="0.01" min="1" id="price" name="price"
+                    <input type="number" step="0.01" placeholder="20.99" min="1" id="price" name="price"
                         value="{{ old('price') ?? ($package->price ?? '') }}"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('price') border-red-500 @enderror text-slate-800">
                     @error('price')

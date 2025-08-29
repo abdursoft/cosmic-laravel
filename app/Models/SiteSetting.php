@@ -19,6 +19,7 @@ class SiteSetting extends Model
         'reddit',
         'youtube',
         'favicon',
+        'tiktok',
         'description'
     ];
 }

@@ -7,12 +7,13 @@
     </button>
     <div class="container mx-auto px-4 py-6">
         <div class="flex flex-col md:flex-row justify-between items-center">
-            <div class="text-center md:text-left mb-4 md:mb-0">
+            <div class="text-center md:text-left mb-4 md:mb-0 order-2 md:order-1">
                 <p class="text-sm text-gray-600 dark:text-gray-400">&copy; {{ date('Y') }} Cosmic Laravel. All rights reserved.</p>
             </div>
-            <div class="flex space-x-4">
-                <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Privacy Policy</a>
-                <a href="#" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Terms of Service</a>
+            <div class="flex space-x-4 flex-wrap items-center justify-center gap-2 order-1 md:order-2 mb-10 md:mb-0">
+                @foreach(pages() as $page)
+                    <a href="{{route('public.page',[$page->id,$page->slug])}}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{$page->title}}</a>
+                @endforeach
             </div>
         </div>
     </div>

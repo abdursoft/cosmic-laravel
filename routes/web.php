@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\GifPackController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\PackageController;
@@ -19,7 +20,7 @@ Route::get('/test', function(){
 
 // page routes
 Route::get('/', [App\Http\Controllers\PageController::class,'home'])->name('home');
-Route::get('/service', [App\Http\Controllers\PageController::class,'service'])->name('service');
+Route::get('/pricing', [App\Http\Controllers\PageController::class,'service'])->name('service');
 
 // auth routes
 Route::get('/login', [App\Http\Controllers\PageController::class, 'login'])->name('login');
@@ -93,6 +94,13 @@ Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){
     Route::get('gif-pack/edit/{id}', [GifPackController::class,'edit'])->name('admin.gif-packs.edit');
     Route::post('gif-pack/update/{id}', [GifPackController::class,'update'])->name('admin.gif-packs.update');
     Route::get('gif-pack/delete/{id}', [GifPackController::class,'destroy'])->name('admin.gif-packs.delete');
+
+    // page routes
+    Route::get('pages/{id?}', [PageController::class,'index'])->name('admin.pages.index');
+    Route::post('pages', [PageController::class,'store'])->name('admin.pages.store');
+    Route::get('pages/edit/{id}', [PageController::class,'edit'])->name('admin.pages.edit');
+    Route::post('pages/update/{id}', [PageController::class,'update'])->name('admin.pages.update');
+    Route::get('gif-pack/delete/{id}', [PageController::class,'destroy'])->name('admin.pages.destroy');
 });
 
 
@@ -109,3 +117,6 @@ Route::prefix('payment')->group(function(){
 // issues routes
 Route::get('issue/read/{id}', [IssueController::class, 'readIssue'])->name('issue.read');
 Route::get('issue/scan/{id}/{type}', [IssueController::class, 'scan'])->name('issue.scan');
+
+// page routes
+Route::get('page/{id}/{slug}', [PageController::class, 'publicPage'])->name('public.page');

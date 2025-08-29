@@ -2,3 +2,12 @@
 .description p{
     margin: 10px 0px;
 }
+
+.prose h2{
+    font-size: 22px;
+    font-weight: bold;
+}
+
+html{
+    scroll-behavior: smooth;
+}

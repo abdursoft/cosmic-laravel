@@ -1,6 +1,6 @@
 @extends('layout.app')
 
-@section('title', 'Cosmic Laravel')
+@section('title', 'The Guilded vice')
 
 @section('content')
     @include('components.sections.hero-section')
