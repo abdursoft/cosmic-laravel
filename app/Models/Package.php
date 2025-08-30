@@ -16,6 +16,7 @@ class Package extends Model
         'description',
         'status',
         'price',
+        'cta_text',
         'price_id',
         'product_id',
     ];

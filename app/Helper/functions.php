@@ -41,3 +41,17 @@ if(!function_exists('pages')){
         return \App\Models\Page::where('status','active')->get() ?? (object)[];
     }
 }
+
+
+// button title
+if(!function_exists('cta_button')){
+    function cta_button($index){
+        if($index == '0'){
+            return 'Claim the First Taste';
+        }elseif($index == '1'){
+            return "Expand My Domain";
+        }else{
+            return "Command Everything";
+        }
+    }
+}

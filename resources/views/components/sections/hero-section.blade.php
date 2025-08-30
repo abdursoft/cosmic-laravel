@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="w-full md:w-1/2 flex flex-col md:flex-row items-center justify-center">
-            <img src="{{ asset('images/14.png') }}" alt="Hero Image" class="w-full h-full">
+            <img src="{{ asset('images/14.png') }}" loading="lazy" alt="Hero Image" class="w-full h-full">
         </div>
     </div>
 

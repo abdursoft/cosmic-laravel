@@ -338,7 +338,7 @@
     </style>
 
     {{-- add page flip js  --}}
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="text/javascript" src="{{ asset('js/turn.min.js') }}"></script>
 
     {{-- add howler js  --}}

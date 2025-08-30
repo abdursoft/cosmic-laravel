@@ -74,6 +74,15 @@
                     @enderror
                 </div>
             </div>
+            <div class=" w-full my-1">
+                    <label for="cta" class="block text-sm font-medium text-gray-700">Button Title</label>
+                    <input type="text" placeholder="Subscribe" id="cta" name="cta_text"
+                        value="{{ old('cta_text') ?? ($package->cta_text ?? '') }}"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('price') border-red-500 @enderror text-slate-800">
+                    @error('cta_text')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
             <div class="flex justify-between my-1 gap-3 mb-20">
                 <div class=" w-full">
                     <label for="description" class="block text-sm font-medium text-gray-700"> Description</label>

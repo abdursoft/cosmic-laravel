@@ -21,4 +21,6 @@
         @endforeach
 
     </div>
+    <div class="h3 text-xl md:text-3xl mt-15">Beneath All Three Boxes</div>
+    <p class="text-base mt-1 md:text-xl">“GIFs are more than extras. They’re rare pieces of your Vice collection—bundled, displayed, and owned by those who refuse to settle.”</p>
 </section>

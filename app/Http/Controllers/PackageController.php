@@ -28,6 +28,7 @@ class PackageController extends Controller
             'thumbnail'   => 'required|file|mimes:jpg,jpeg,png,webp',
             'type'        => 'required|in:weekly,monthly,yearly,lifetime',
             'description' => 'required|string',
+            'cta_text'    => 'required|string',
             'status'      => 'required|in:active,inactive',
             'price'       => 'required|numeric|min:0',
         ]);
@@ -80,6 +81,7 @@ class PackageController extends Controller
             'thumbnail'   => 'sometimes|file|mimes:jpeg,jpg,png,webp,gif',
             'type'        => 'sometimes|in:weekly,monthly,yearly,lifetime',
             'description' => 'sometimes|string',
+            'cta_text'    => 'sometimes|string',
             'status'      => 'sometimes|in:active,inactive',
             'price'       => 'sometimes|numeric|min:0',
         ]);
@@ -103,7 +105,7 @@ class PackageController extends Controller
      */
     public function destroy($id)
     {
-        $package = Package::fineOrFail($id);
+        $package = Package::findOrFail($id);
         $package->delete();
 
         return back()->with('success','Package deleted successfully');

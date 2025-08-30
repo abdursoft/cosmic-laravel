@@ -100,7 +100,7 @@ Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){
     Route::post('pages', [PageController::class,'store'])->name('admin.pages.store');
     Route::get('pages/edit/{id}', [PageController::class,'edit'])->name('admin.pages.edit');
     Route::post('pages/update/{id}', [PageController::class,'update'])->name('admin.pages.update');
-    Route::get('gif-pack/delete/{id}', [PageController::class,'destroy'])->name('admin.pages.destroy');
+    Route::get('pages/delete/{id}', [PageController::class,'destroy'])->name('admin.pages.destroy');
 });
 
 

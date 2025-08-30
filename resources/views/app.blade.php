@@ -1,6 +1,6 @@
 @extends('layout.app')
 
-@section('title', 'The Guilded vice')
+@section('title', 'The Guilded Vice')
 
 @section('content')
     @include('components.sections.hero-section')
