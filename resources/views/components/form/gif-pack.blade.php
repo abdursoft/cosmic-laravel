@@ -39,10 +39,10 @@
                     @enderror
                 </div>
                 <div class="w-full md:w-1/2">
-                    <label for="gif_archive" class="block text-sm font-medium text-gray-700"> Gif files (zip)</label>
-                    <input type="file" accept=".zip" id="gif_archive" name="gif_archive"
+                    <label for="gif_archive" class="block text-sm font-medium text-gray-700"> Files from (public/storage/gif_packs/archive)</label>
+                    <input type="text" placeholder="gif.zip" id="gif_archive" name="gif_archive"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('gif_archive') border-red-500 @enderror text-slate-800"
-                        value="{{ old('gif_archive') }}">
+                        value="{{ old('gif_archive') ?? ((explode('/',$gif_pack->gif_archive ?? '')[2]) ?? '') }}">
                     @error('gif_archive')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror

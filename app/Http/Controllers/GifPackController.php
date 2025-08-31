@@ -32,8 +32,8 @@ class GifPackController extends Controller
     {
         $request->validate([
             'title'       => 'required|string|max:255',
-            'thumbnail'   => 'required|image|mimes:jpg,jpeg,png,gif|max:2048',
-            'gif_archive' => 'required|mimes:zip,gif|max:100240',
+            'thumbnail'   => 'required|image|mimes:jpg,jpeg,png,gif|max:10048',
+            'gif_archive' => 'required|string',
             'description' => 'nullable|string',
             'price'       => 'nullable|numeric|min:0',
             'status'      => 'in:active,inactive',
@@ -42,7 +42,13 @@ class GifPackController extends Controller
         try {
             // Upload files
             $thumbnailPath = $request->file('thumbnail')->store('gif_packs/thumbnails', 'public');
-            $archivePath   = $request->file('gif_archive')->store('gif_packs/archives', 'public');
+
+            // check file exist or not
+            if(Storage::disk('public')->exists('gif_packs/archives/'.$request->gif_archive)){
+               $archivePath = 'gif_packs/archives/'.$request->gif_archive;
+            }else{
+                return back()->with('error', Storage::url('gif_packs/archives/'.$request->gif_archive). " file doesn't exists");
+            }
 
             // Save record
             GifPack::create([
@@ -78,7 +84,7 @@ class GifPackController extends Controller
         $request->validate([
             'title'       => 'required|string|max:255',
             'thumbnail'   => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
-            'gif_archive' => 'nullable|mimes:zip,gif|max:100240',
+            'gif_archive' => 'nullable|string',
             'description' => 'nullable|string',
             'price'       => 'nullable|numeric|min:0',
             'status'      => 'in:active,inactive',
@@ -90,12 +96,6 @@ class GifPackController extends Controller
             if ($request->hasFile('thumbnail')) {
                 Storage::disk('public')->delete($gifPack->thumbnail);
                 $gifPack->thumbnail = $request->file('thumbnail')->store('gif_packs/thumbnails', 'public');
-            }
-
-            // Update archive if new uploaded
-            if ($request->hasFile('gif_archive')) {
-                Storage::disk('public')->delete($gifPack->gif_archive);
-                $gifPack->gif_archive = $request->file('gif_archive')->store('gif_packs/archives', 'public');
             }
 
             $gifPack->title =  $request->title;

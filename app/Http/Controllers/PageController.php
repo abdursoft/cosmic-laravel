@@ -40,8 +40,8 @@ class PageController extends Controller
     // service page
     public function service()
     {
-        $packages = Package::all();
-        $gif_packs = GifPack::all();
+        $packages = Package::where('status','active')->get();
+        $gif_packs = GifPack::where('status','active')->get();
         return view('service', compact('packages','gif_packs'));
     }
 

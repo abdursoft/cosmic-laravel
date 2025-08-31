@@ -194,12 +194,14 @@
             width: 100%;
             height: 100%;
             position: relative;
+            background: #000;
         }
 
         .cover img {
             width: 100%;
             height: 100%;
             position: absolute;
+            object-fit: contain;
         }
 
         @media (max-width:600px) {

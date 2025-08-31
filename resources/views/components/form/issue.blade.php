@@ -39,7 +39,7 @@
                     @enderror
                 </div>
                 <div class="w-full md:w-1/2">
-                    <label for="issue" class="block text-sm font-medium text-gray-700"> Issue file (zip)</label>
+                    <label for="issue" class="block text-sm font-medium text-gray-700"> Magazine file (zip)</label>
                     <input type="file" accept=".zip" id="issue" name="issue"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('thumbnail') border-red-500 @enderror text-slate-800"
                         value="{{ old('issue') }}">

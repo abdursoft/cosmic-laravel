@@ -30,12 +30,12 @@
             <div class="hint">Keyboard: ← / → • Touch: swipe • Click: arrows</div>
             <div class="nav">
                 <button id="prevBtn" class="relative" aria-label="Previous">⟵</button>
-                <button class="btn closeBtn relative" onclick="window.location.href='{{ route('home') }}'">
+                <button class="btn closeBtn relative" onclick="closeBook()">
                     Close
                     book</button>
                 <button id="nextBtn" aria-label="Next">⟶</button>
             </div>
-            <div class="pill"><a href="{{ route('home') }}" class="btn topClose"
+            <div class="pill"><a href="javascript:void(0);" onclick="closeBook()" class="btn topClose"
                     style="text-decoration:none;background:rgba(255,255,255,.06);color:#fff;padding:8px;border-radius:14px;text-align:center;font-size:13px;font-weight:400">Close
                     book</a>
                 <div id="sceneLabel">Scene: default</div>
@@ -72,7 +72,7 @@
                 sfx: i === 0 ? ["wind.wav"] : [],
             })
             document.querySelector('.currentPage').textContent = 1;
-            document.querySelector('.totalPage').textContent = images.length;
+            document.querySelector('.totalPage').textContent = images.length - 1;
 
             magazine += `<div class='cover'><img src='${page.url}' /></div>`;
         });
@@ -361,5 +361,9 @@
             }
             muteAll.textContent = nowMute ? "Unmute" : "Mute"
         })
+    }
+
+    function closeBook(){
+        $("#magazine").turn("page", 1);
     }
 </script>
