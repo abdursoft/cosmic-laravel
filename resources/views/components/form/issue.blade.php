@@ -149,6 +149,7 @@
         e.preventDefault();
 
         const url = form.getAttribute('action');
+        console.log(url);
         const formData = new FormData(form);
 
         // Show progress bar
@@ -173,7 +174,7 @@
         xhr.onload = function () {
             if (xhr.status === 200) {
                 alert("Upload successful!");
-                window.location.reload(); // or redirect if needed
+                // window.location.reload(); // or redirect if needed
             } else {
                 alert("Upload failed: " + xhr.statusText);
             }

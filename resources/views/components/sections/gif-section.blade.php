@@ -1,4 +1,4 @@
-<section class="w-full text-gray-800 bg-[#FDF8ED]">
+<section class="w-full text-gray-800 bg-[#FDF8ED] px-4 lg:px-45 md:px-10">
     <div class="w-full flex flex-col md:flex-row md:justify-between" data-aos="fade-up">
         <div class="w-full md:w-1/2 flex items-center">
             <div class="w-full px-2 md:px-20">

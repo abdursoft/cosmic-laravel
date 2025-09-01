@@ -33,7 +33,7 @@
         @yield('styles')
 
     </head>
-    <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] dark:text-[#fdfdfc]">
+    <body class="bg-[#262323]">
         {{-- load header component --}}
         @include('components.headers.header')
 

@@ -3,7 +3,7 @@
 @section('title', 'Contact Us')
 
 @section('content')
-    <div class="min-h-[83vh]">
+    <div class="min-h-[84vh] flex items-center justify-center">
         @include('components.sections.contact-section')
     </div>
 @endsection

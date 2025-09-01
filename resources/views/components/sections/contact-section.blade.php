@@ -1,6 +1,6 @@
 <section class="w-full text-white py-20 px-4 md:px-15 lg:px-45">
-    <div class="w-full flex flex-col md:flex-row md:justify-between" data-aos="fade-up">
-        <div class="w-full md:w-1/2 flex flex-col items-center justify-center">
+    <div class="w-full flex flex-col lg:flex-row lg:justify-between" data-aos="fade-up">
+        <div class="w-full lg:w-1/2 flex flex-col items-center justify-center">
             <div class="w-full">
                 <div class="text-center md:text-left">
                     <h2 class="text-xl md:text-4xl">Contact the Guild</h2>
@@ -22,7 +22,7 @@
                 </div>
             </div>
         </div>
-        <div class="w-full md:w-1/2">
+        <div class="w-full lg:w-1/2">
             @include('components.form.contact')
         </div>
     </div>

@@ -70,7 +70,7 @@ class IssueController extends Controller
             }
 
             DB::commit();
-            return response()->json(['status' => 'upload successfull'],200);
+            return response()->json(['status' => 'upload successful'],200);
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json(['status' => 'upload failed', 'error' => $th->getmessage()],400);
@@ -103,9 +103,7 @@ class IssueController extends Controller
         $validated = $request->validate([
             'title'       => 'sometimes|string|max:255',
             'sub_title'   => 'nullable|string|max:255',
-            'thumbnail'   => 'sometimes|file|mimes:jpeg,jpg,png',
             'description' => 'nullable|string',
-            'issue'       => 'sometimes|file:mimes:zip',
             'type'        => 'sometimes|in:stander,pro,unlimited',
             'price'       => 'sometimes|numeric|min:0',
             'issue_type'  => 'sometimes|in:free,premium',
@@ -149,10 +147,10 @@ class IssueController extends Controller
             }
 
             DB::commit();
-            return back()->with('success', 'Issue successfully updated');
+            return response()->json(['status' => 'upload successful'],200);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return back()->with('error', 'Issue couldn\'t update ' . $th->getMessage());
+            return response()->json(['error' => $th->getMessage()],400);
         }
     }
 

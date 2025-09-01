@@ -1,19 +1,23 @@
-<section class="w-full bg-[#1D0501] text-white min-h-[77vh] py-20 ">
-    <div class="mx-auto w-full  flex flex-col gap-4">
-        <h1 class="text-2xl md:text-4xl font-bold mb-3">The First Taste Is Always the Most Dangerouse</h1>
-        <p class="text-lg font-lg">This is the threshold. One look, one sound, and the door to your most intoxicating desires swings open. Beyond this point, there’s no turning back.</p>
-    </div>
-    @include('components.sections.item-section')
-    <div class="flex mt-5 w-full flex-col md:flex-row flex-wrap">
-        @foreach($issues as $key=>$issue)
-            <div class="w-full h-[330px] md:w-1/2 md:h-[700px] p-3" data-aos="zoom-in">
-                <div class="w-full h-full rounded-[22px] shadow-md h-md bg-white relative">
-                    <img src="{{Storage::url($issue->thumbnail)}}" loading="lazy" alt="" class="w-full h-full rounded-[22px]">
-                    <div class="w-full h-full absolute rounded-md top-0 left-0 items-center flex justify-center flex-col group hover:bg-[rgba(105,192,140,0.5)] transform transition duration-30">
-                        <a href="{{route('issue.read',$issue->id)}}" class="bg-red-400 md:bg-gray-600 md:hidden text-white rounded-lg cursor-pointer mb-4 px-3 py-2 group-hover:flex absolute top-3 right-2 md:relative md:top-0 md:right-0">Read Issue</a>
+<section
+    class="w-full flex flex-col items-center justify-center bg-[#1D0501] text-white min-h-[77vh] py-20 px-4 lg:px-20 md:px-10">
+    <div class="w-full max-w-[1500px]">
+        <div class="mx-auto w-full  flex flex-col gap-4">
+            <h1 class="text-2xl md:text-4xl font-bold mb-3">The First Taste Is Always the Most Dangerouse</h1>
+            <p class="text-lg font-lg pb-10">This is the threshold. One look, one sound, and the door to your most
+                intoxicating desires swings open. Beyond this point, there’s no turning back.</p>
+        </div>
+        @include('components.sections.item-section')
+        <div
+            class="flex mt-5 w-full flex-col items-center justify-center lg:items-start lg:justify-start lg:flex-row flex-wrap">
+            @foreach ($issues as $key => $issue)
+                <div class="w-full h-[50vh] lg:w-1/2 h-[50vh] md:h-[55vh] lg:h-[65vh] lg:p-3 max-w-[700px]"
+                    data-aos="zoom-in">
+                    <div class="w-full h-full rounded-[22px] shadow-md h-md bg-white relative">
+                        <img src="{{ Storage::url($issue->thumbnail) }}" loading="lazy" alt=""
+                            class="w-full h-full rounded-[22px]">
                     </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+        </div>
     </div>
 </section>

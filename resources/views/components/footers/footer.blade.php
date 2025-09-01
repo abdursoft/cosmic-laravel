@@ -5,10 +5,10 @@
             <path fill="#fbfbfb" d="m142.319 241.027l22.628 22.627L240 188.602V376h32V188.602l75.053 75.052l22.628-22.627L256 127.347z" />
         </svg>
     </button>
-    <div class="container mx-auto px-4 py-6">
+    <div class="container mx-auto py-6">
         <div class="flex flex-col md:flex-row justify-between items-center">
             <div class="text-center md:text-left mb-4 md:mb-0 order-2 md:order-1">
-                <p class="text-sm text-gray-600 dark:text-gray-400">&copy; {{ date('Y') }} Cosmic Laravel. All rights reserved.</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400">&copy; {{ date('Y') }} The Guilded vice. All rights reserved.</p>
             </div>
             <div class="flex space-x-4 flex-wrap items-center justify-center gap-2 order-1 md:order-2 mb-10 md:mb-0">
                 @foreach(pages() as $page)
