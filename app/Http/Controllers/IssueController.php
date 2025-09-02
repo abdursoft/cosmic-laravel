@@ -249,6 +249,14 @@ class IssueController extends Controller
         return back()->with('error', 'Your are not able to see this magazine');
     }
 
+    // user magazines
+    public function userMagazine($package_id){
+        $subscriptions = UserSubscription::with(['package' => function($package){
+            $package->with('issues')->where('status','active')->get();
+        }])->where('package_id',$package_id)->where('user_id',auth()->user()->id)->where('status','active')->get();
+        return view('auth.users.magazines',compact('subscriptions'));
+    }
+
     // read issues
     public function adminReadIssue($id)
     {

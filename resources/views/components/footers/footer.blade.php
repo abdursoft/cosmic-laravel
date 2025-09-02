@@ -1,4 +1,4 @@
-<footer class="bg-white dark:bg-gray-800 shadow-lg">
+<footer class="bg-[#191515] shadow-lg">
     <button onclick="scrollToTop()" class="text-center bg-red-400 text-white rounded-[8px] shadow-md w-[40px] h-[40px] flex items-center justify-center fixed bottom-[80px] right-[20px] topUpButton cursor-pointer" data-aos='fade-up'>
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512">
             <path fill="#fbfbfb" d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240s240-107.452 240-240S388.548 16 256 16m147.078 387.078a207.253 207.253 0 1 1 44.589-66.125a207.3 207.3 0 0 1-44.589 66.125" />

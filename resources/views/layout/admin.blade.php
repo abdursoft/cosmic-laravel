@@ -26,7 +26,7 @@
         @yield('styles')
 
     </head>
-    <body class="bg-[#FDFDFC] dark:bg-[#0a0a0a] text-[#1b1b18] dark:text-[#fdfdfc]">
+    <body class="bg-[#FDFDFC]">
 
         {{-- load flash message component --}}
         @include('components.message.flash-message')

@@ -15,7 +15,7 @@ use App\Http\Middleware\UserMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/test', function(){
-    return view('welcome');
+    return view('demo');
 });
 
 // page routes
@@ -55,6 +55,10 @@ Route::middleware(UserMiddleware::class)->prefix('user')->group(function(){
     Route::get('subscriptions', [UserSubscriptionController::class,'userSubscriptions'])->name('user.subscriptions');
     Route::get('gif-packages', [UserGifController::class,'userGifPacks'])->name('user.gif-packs');
     Route::get('gif-packs/download/{id}', [UserGifController::class, 'downloadGifPacks'])->name('user.gif-pack.download');
+
+    // magazine routes
+    Route::get('magazines/{package_id}',[ IssueController::class, 'userMagazine'])->name('user.magazines');
+    Route::get('read/magazine/{id}', [IssueController::class, 'readIssue'])->name('user.magazine.read');
 });
 
 // general routes
@@ -115,7 +119,6 @@ Route::prefix('payment')->group(function(){
 
 
 // issues routes
-Route::get('issue/read/{id}', [IssueController::class, 'readIssue'])->name('issue.read');
 Route::get('issue/scan/{id}/{type}', [IssueController::class, 'scan'])->name('issue.scan');
 
 // page routes
