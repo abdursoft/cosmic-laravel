@@ -20,7 +20,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         if (auth()->attempt($credentials)) {
             // Authentication passed
-            return redirect()->route('home')->with('success', 'Login successful!');
+            return redirect()->route('auth.dashboard')->with('success', 'Login successful!');
         }
         return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
     }
@@ -53,7 +53,7 @@ class AuthController extends Controller
             // Log the user in
             auth()->login($user);
 
-            return redirect()->route('home')->with('success', 'Registration successful!');
+            return redirect()->route('auth.dashboard')->with('success', 'Registration successful!');
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Registration failed. Please try again.']);
         }

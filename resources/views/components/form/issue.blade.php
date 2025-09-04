@@ -1,3 +1,5 @@
+<!-- magazine package upload form  -->
+
 <!-- Include stylesheet -->
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 
@@ -174,7 +176,7 @@
         xhr.onload = function () {
             if (xhr.status === 200) {
                 alert("Upload successful!");
-                // window.location.reload(); // or redirect if needed
+                window.location.reload(); // or redirect if needed
             } else {
                 alert("Upload failed: " + xhr.statusText);
             }

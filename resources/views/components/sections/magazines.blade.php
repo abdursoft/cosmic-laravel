@@ -1,3 +1,4 @@
+<!-- user magazine section  -->
 <section class="w-full text-white px-5 min-h-screen h-auto">
     <div class="flex mt-5 w-full flex-col md:flex-row flex-wrap mb-8 h-auto">
         @foreach ($subscriptions as $subscription)

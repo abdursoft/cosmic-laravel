@@ -1,3 +1,4 @@
+<!-- user contact form  -->
 <div class="flex items-center justify-center">
     <div class="w-full max-w-3xl p-8 bg-transparent">
         <form method="POST" class="text-white" action="{{ route('contact.submit') }}">

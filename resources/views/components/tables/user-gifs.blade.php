@@ -29,7 +29,7 @@
                                 <td>${{$gif->price}}</td>
                                 <td>{{$gif->status}}</td>
                                 <td>
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-3 {{ $gif->status != 'active' ? 'hidden' : 'block' }}">
                                         <a href="{{ route('user.gif-pack.download',$gif->id) }}" class="p-2 bg-red-600 text-white rounded-md">Download</a>
                                     </div>
                                 </td>

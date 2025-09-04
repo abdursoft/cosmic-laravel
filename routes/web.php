@@ -120,6 +120,7 @@ Route::prefix('payment')->group(function(){
 
 // issues routes
 Route::get('issue/scan/{id}/{type}', [IssueController::class, 'scan'])->name('issue.scan');
+Route::get('magazines', [IssueController::class, 'showMagazines'])->name('issue.list');
 
 // page routes
 Route::get('page/{id}/{slug}', [PageController::class, 'publicPage'])->name('public.page');

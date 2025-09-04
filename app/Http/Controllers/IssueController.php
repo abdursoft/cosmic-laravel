@@ -95,6 +95,12 @@ class IssueController extends Controller
         return response()->json($issue);
     }
 
+    // show magazines
+    public function showMagazines(){
+        $magazines = Issue::where('status','active')->get();
+        return view('magazines',compact('magazines'));
+    }
+
     /**
      * Update an issue.
      */
@@ -174,8 +180,8 @@ class IssueController extends Controller
     public function scan($id, $type, $return = false)
     {
         $issue = Issue::findOrFail($id);
-        if ($issue->issue_type == 'premium' && auth()->user()->role !== 'admin') {
-            return back()->with('error', 'This issue is not public to read');
+        if ($issue->issue_type == 'premium' && !auth()->user()->id) {
+            return [];
         }
         $basePath  = storage_path($issue->issue_path);
         $directory = explode('/', $issue->issue_path);
@@ -220,9 +226,6 @@ class IssueController extends Controller
             }
         }
 
-        if (! $return) {
-            return response()->json($result);
-        }
         return $result;
     }
 

@@ -1,4 +1,4 @@
-{{-- users, earnings, issues, contacts card  --}}
+<!-- admin service cards  -->
 <h1 class="text-xl md:text-4xl text-slate-800 line-clamp-1 font-bold">Overview</h1>
 <div class="w-full flex items-center justify-start flex-wrap pt-5 pb-10">
     <div class="w-1/2 md:w-1/4 lg:w-1/6 p-2">

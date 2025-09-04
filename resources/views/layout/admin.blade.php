@@ -26,15 +26,16 @@
         @yield('styles')
 
     </head>
-    <body class="bg-[#FDFDFC]">
+    <body class="bg-[#FDFDFC] flex flex-col md:flex-row">
 
         {{-- load flash message component --}}
         @include('components.message.flash-message')
 
         {{-- load body components --}}
-        <div class="flex flex-col md:flex-row w-full">
-            {{-- load sidebar component  --}}
-            @include('components.sidebar.admin')
+        {{-- load sidebar component  --}}
+        @include('components.sidebar.admin')
+
+        <div class="flex flex-col md:flex-row w-full max-h-screen overflow-y-auto">
 
             {{-- load body content  --}}
             <div class="flex-1 flex flex-col w-full bg-[#ddd]">

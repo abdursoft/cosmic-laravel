@@ -1,3 +1,4 @@
+<!-- obbey magazine section  -->
 <section>
     <div class="w-full flex bg-[#262323] text-white min-h-screen flex-col px-3 md:px-6 lg:px-11 lg:flex-row py-30">
         <div class="w-full lg:w-1/2 flex flex-col lg:flex-row items-center justify-center lg:justify-end pr-0 lg:pr-12">

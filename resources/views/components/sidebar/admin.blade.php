@@ -1,7 +1,7 @@
 {{-- admin sidebar component  --}}
-<div class="hidden lg:flex h-screen bg-gray-100 lg:w-[260px] !text-sm">
+<div class="hidden lg:flex h-screen bg-gray-100 lg:w-[260px] !text-sm overflow-hidden">
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-lg fixed h-full">
+    <aside class="w-64 bg-white shadow-lg fixed h-full relative overflow-y-auto">
         <div class="p-4 text-xl font-bold text-gray-800 border-b-[0.6px] border-gray-400">
             Cosmic
         </div>
@@ -42,10 +42,12 @@
                 class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.pages.index') ? 'bg-gray-200 font-semibold' : '' }}">
                 Dynamic Pages
             </a>
+        </nav>
+        <div class="p-3 text-center w-full bottom-0 left-0 absolute border-t-2 border-gray-200">
             <a href="{{ route('auth.logout') }}"
-                class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('settings') ? 'bg-gray-200 font-semibold' : '' }}">
+                class="block px-4 py-2 rounded hover:bg-gray-200 bg-gray-400  text-slate-800">
                 Sign out
             </a>
-        </nav>
+        </div>
     </aside>
 </div>

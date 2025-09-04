@@ -1,7 +1,7 @@
 <!-- content body  -->
 <div class="app">
     <div class="gate" id="gate">
-        <h1>Issue <?php echo $issue->id; ?></h1>
+        <h1 class="text-2xl md:text-3xl">Issue <?php echo $issue->id; ?></h1>
         <p>Tap “Start” to enable sound. Swipe or use arrows to turn pages.</p><button class="btn"
             id="startBtn">Start</button>
         <p class="hint">Replace images in /pages and sounds in /audio &amp; /sfx.</p>
@@ -196,19 +196,21 @@
         });
 
         if (!audioData) {
-            audioData = {
-                url: "{{ asset('storage/issues/' . $path . '/audio/default_music.mp3') }}",
-                description: "",
-                page: [0]
+            if (musicHowl instanceof Howl) {
+                musicHowl.stop();
+                return;
             }
         }
-        if (currentAudioData && currentAudioData.url === audioData.url && musicHowl && musicHowl.playing()) {
+        console.log('bgm',audioData)
+
+        if (audioData && currentAudioData && currentAudioData.url === audioData?.url && musicHowl && musicHowl.playing()) {
             console.log("Audio already playing for this range, skipping restart.");
             return
         }
         if (musicHowl instanceof Howl) {
-            musicHowl.stop()
+            musicHowl.stop();
         }
+
         musicHowl = new Howl({
             src: [audioData.url],
             loop: CONTINUOUS_MUSIC,
@@ -244,8 +246,6 @@
             return false;
         });
 
-        console.log(audioData,'3x')
-
         // If no exact match found, fallback to normal range
         if (!audioData) {
             let audioData = sfxList.find(ad => {
@@ -261,22 +261,29 @@
                     const [start, end] = ad.page;
                     return page >= start && page <= end;
                 }
-
-                return false;
             });
-            console.log(audioData, '2x')
         }
 
-        if (currentSFXData && currentSFXData.url === audioData?.url && sfxHowls && sfxHowls.playing()) {
-            console.log("SFX Audio already playing for this range, skipping restart.");
-            return
+        if (!audioData) {
+            if (sfxHowls instanceof Howl) {
+                sfxHowls.stop();
+                return;
+            }
         }
-        if(audioData){
+
+        console.log('sfx',audioData)
+
+        if (audioData && currentSFXData && currentSFXData.url === audioData?.url && sfxHowls && sfxHowls.playing()) {
+            console.log("SFX Audio already playing for this range, skipping restart.");
+            return;
+        }
+        if (audioData) {
             if (sfxHowls instanceof Howl) {
                 sfxHowls.stop()
             }
             sfxHowls = new Howl({
                 src: [audioData?.url],
+                loop: CONTINUOUS_MUSIC,
                 volume: parseFloat(musicVol.value),
                 html5: !0,
             });
@@ -285,7 +292,7 @@
         }
     }
 
-    function  setPageTurn(){
+    function setPageTurn() {
         let pageTurnSrc = "{{ asset('storage/issues/' . $path . '/sfx/pageturn.mp3') }}";
 
         if (pageTurnSrc) {
@@ -363,7 +370,7 @@
         })
     }
 
-    function closeBook(){
-        $("#magazine").turn("page", 1);
+    function closeBook() {
+        window.location.href="{{route('issue.list')}}";
     }
 </script>

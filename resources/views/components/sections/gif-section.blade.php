@@ -1,3 +1,4 @@
+<!-- gif overview section  -->
 <section class="w-full text-gray-800 bg-[#FDF8ED] px-4 lg:px-45 md:px-10">
     <div class="w-full flex flex-col md:flex-row md:justify-between" data-aos="fade-up">
         <div class="w-full md:w-1/2 flex items-center">
@@ -12,7 +13,7 @@
             </div>
         </div>
         <div class="w-full md:w-1/2 flex flex-col items-center justify-center">
-            <img src="{{ asset('images/20.png') }}" loading="lazy" alt="" class="w-full max-h-[68vh]" data-aos="fade-right">
+            <img src="{{ asset('images/20.png') }}" loading="lazy" alt="" class="w-full h-full" data-aos="fade-right">
         </div>
     </div>
 </section>

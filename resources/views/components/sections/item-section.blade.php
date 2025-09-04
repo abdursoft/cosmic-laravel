@@ -1,3 +1,4 @@
+<!-- magazine overview section  -->
 <div class="flex flex-col lg:flex-row items-center justify-center text-center transition-all duration-300 gap-6 md:gap-10 mb-6 md:mb-10 h-full">
     <div class=" w-full lg:w-1/3 relative overflow-hidden transition-all duration-300 inline-edit-inset aspect-w-1 aspect-h-1 h-[60vh] md:h-[65vh] lg:h-[45vh] max-w-[700px]"
         data-aos="zoom-in">

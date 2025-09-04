@@ -1,3 +1,4 @@
+<!-- admin secondary header section  -->
 <nav class="p-4 space-y-2 flex items-center justify-center flex-wrap gap-1 lg:hidden">
     <a href="{{ route('auth.dashboard') }}"
         class="block px-4 py-2 rounded hover:bg-gray-200 text-slate-800 {{ request()->routeIs('auth.dashboard') ? 'bg-gray-200 font-semibold' : '' }}">

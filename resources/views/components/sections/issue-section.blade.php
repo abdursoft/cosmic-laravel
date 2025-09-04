@@ -1,3 +1,4 @@
+<!-- magazine section  -->
 <section
     class="w-full flex flex-col items-center justify-center bg-[#1D0501] text-white min-h-[77vh] py-20 px-4 lg:px-20 md:px-10">
     <div class="w-full max-w-[1500px]">
@@ -10,7 +11,7 @@
         </div>
         @include('components.sections.item-section')
         <div
-            class="flex mt-5 w-full flex-col items-center justify-center lg:items-start lg:justify-start lg:flex-row flex-wrap">
+            class="flex mt-5 w-full flex-col items-center justify-center lg:flex-row flex-wrap">
             @foreach ($issues as $key => $issue)
                 <div class="w-full h-[50vh] lg:w-1/2 h-[60vh] md:h-[65vh] lg:h-[75vh] lg:p-3 max-w-[700px]"
                     data-aos="zoom-in">

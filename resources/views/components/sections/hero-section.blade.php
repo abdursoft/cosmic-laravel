@@ -1,4 +1,4 @@
-{{-- Hero Section  --}}
+<!-- hero section  -->
 <section class="w-full bg-[#1B0000] text-white min-h-[70%]" data-aos="fade-up" >
     <div class="w-full flex bg-[#1B0000] h-auto lg:h-screen lg:overflow-y-auto text-white flex-col lg:flex-row pb-15">
         <div class="w-full lg:w-1/2 flex items-center justify-center pl-0 md:pl-6 lg:pl-8">
