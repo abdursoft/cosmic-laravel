@@ -50,6 +50,7 @@
     let musicHowl = null;
     let pageTurnHowl = null;
     let sfxHowls = [];
+    let gfxHowls = [];
     let musicMuted = !1,
         sfxMuted = !1;
     let PAGES = [];
@@ -88,9 +89,12 @@
                 turned: function(e, page) {
                     current = page;
                     if (isStart) {
+                        console.log(`\n Current page ${current}`)
                         setPageTurn();
                         playAudioByPage(current);
                         playSFXByPage(current);
+                        playGFXByPage(current);
+                        console.log(`Page ${current} end \n`)
                     }
                     document.querySelector('.currentPage').textContent = current;
                 }
@@ -144,12 +148,16 @@
     };
     const CONTINUOUS_MUSIC = !0;
     let audioList = sfxList = [];
+    let gfxList = [];
     fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'audio']) }}").then((res) => res.json()).then((
         data) => {
         audioList = data;
     }).catch((err) => console.error("Error fetching audio list:", err));
     fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'sfx']) }}").then((res) => res.json()).then((data) => {
         sfxList = data;
+    });
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'gfx']) }}").then((res) => res.json()).then((data) => {
+        gfxList = data;
     });
     const gate = document.getElementById("gate");
     const startBtn = document.getElementById("startBtn");
@@ -165,6 +173,7 @@
     let swiperSlides = "";
     let currentAudioData = null;
     let currentSFXData = null;
+    let currentGFXData = null;
     let isFullScreen = !1;
 
     const icons = {
@@ -196,14 +205,16 @@
         });
 
         if (!audioData) {
-            if (musicHowl instanceof Howl) {
-                musicHowl.stop();
-                return;
+            audioData = {
+                url: "{{ asset('storage/issues/' . $path . '/audio/default.mp3') }}",
+                description: "",
+                page: [0]
             }
         }
+        console.log(currentAudioData?.url)
         console.log('bgm',audioData)
 
-        if (audioData && currentAudioData && currentAudioData.url === audioData?.url && musicHowl && musicHowl.playing()) {
+        if (audioData && currentAudioData && currentAudioData.url == audioData?.url && musicHowl && musicHowl.playing()) {
             console.log("Audio already playing for this range, skipping restart.");
             return
         }
@@ -228,41 +239,18 @@
         audioData = sfxList.find(ad => {
             if (!Array.isArray(ad.page)) return false;
 
-            // If ad.page has 3 numbers, the third is an exact page
-            if (ad.page.length === 3) {
-                const [start, end, exact] = ad.page;
-                return page >= start && page <= end || page === exact;
-            }
-
-            // If it's a single-page range [x, x]
-            if (ad.page.length === 2 && ad.page[0] === ad.page[1]) {
-                return page === ad.page[0];
-            }
-
             // First priority: check if array explicitly contains the page
             if (ad.page.includes(page)) {
                 return true;
             }
+            if (ad.page.length >= 2) {
+                const [start, end] = ad.page;
+                return page >= start && page <= end;
+            }
             return false;
         });
 
-        // If no exact match found, fallback to normal range
-        if (!audioData) {
-            let audioData = sfxList.find(ad => {
-                if (!Array.isArray(ad.page)) return false;
-
-                // First priority: check if array explicitly contains the page
-                if (ad.page.includes(page)) {
-                    return true;
-                }
-
-                // Second priority: treat as a range if it has at least 2 elements
-                if (ad.page.length >= 2) {
-                    const [start, end] = ad.page;
-                    return page >= start && page <= end;
-                }
-            });
-        }
+        console.log('sfx',audioData)
 
         if (!audioData) {
             if (sfxHowls instanceof Howl) {
@@ -271,7 +259,6 @@
             }
         }
 
-        console.log('sfx',audioData)
 
         if (audioData && currentSFXData && currentSFXData.url === audioData?.url && sfxHowls && sfxHowls.playing()) {
             console.log("SFX Audio already playing for this range, skipping restart.");
@@ -289,6 +276,53 @@
             });
             sfxHowls.play();
             currentSFXData = audioData
+        }
+    }
+
+    function playGFXByPage(page) {
+        let audioData = null;
+
+        // First try to find exact page matches (including the 3rd number case)
+        audioData = gfxList.find(ad => {
+            if (!Array.isArray(ad.page)) return false;
+
+            // First priority: check if array explicitly contains the page
+            if (ad.page.includes(page)) {
+                return true;
+            }
+
+            if (ad.page.length == 2) {
+                const [start, end] = ad.page;
+                return page >= start && page <= end;
+            }
+            return false;
+        });
+
+        console.log('gfx',audioData)
+
+        if (!audioData) {
+            if (gfxHowls instanceof Howl) {
+                gfxHowls.stop();
+                return;
+            }
+        }
+
+        if (audioData && currentGFXData && currentGFXData.url === audioData?.url && gfxHowls && gfxHowls.playing()) {
+            console.log("GFX Audio already playing for this range, skipping restart.");
+            return;
+        }
+        if (audioData) {
+            if (gfxHowls instanceof Howl) {
+                gfxHowls.stop()
+            }
+            gfxHowls = new Howl({
+                src: [audioData?.url],
+                loop: CONTINUOUS_MUSIC,
+                volume: parseFloat(musicVol.value),
+                html5: !0,
+            });
+            gfxHowls.play();
+            currentGFXData = audioData
         }
     }
 

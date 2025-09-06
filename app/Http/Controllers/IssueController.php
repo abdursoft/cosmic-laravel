@@ -212,6 +212,20 @@ class IssueController extends Controller
                     'url'   => asset("storage/issues/$d/sfx/$f"),
                 ],
             ],
+            'gfx'   => [
+                'dir'       => 'gfx',
+                'regex'     => '/^gfx(\d+)_(\d+)_([^.]+)\.(mp3|wav|aac)$/i',
+                'formatter' => fn($m, $f, $d) => [
+                    'page'  => array_filter([
+                        (int) $m[1],
+                        (int) $m[2],
+                        is_numeric($m[3]) ? (int) $m[3] : null,
+                    ]),
+                    'event' => is_numeric($m[3]) ? null : $m[3],
+                    'file'  => $f,
+                    'url'   => asset("storage/issues/$d/gfx/$f"),
+                ],
+            ],
         ];
 
         if (! isset($patterns[$type])) {
