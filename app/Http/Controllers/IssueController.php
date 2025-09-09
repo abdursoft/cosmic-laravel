@@ -70,10 +70,10 @@ class IssueController extends Controller
             }
 
             DB::commit();
-            return response()->json(['status' => 'upload successful'],200);
+            return response()->json(['status' => 'upload successful'], 200);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return response()->json(['status' => 'upload failed', 'error' => $th->getmessage()],400);
+            return response()->json(['status' => 'upload failed', 'error' => $th->getmessage()], 400);
         }
     }
 
@@ -96,9 +96,10 @@ class IssueController extends Controller
     }
 
     // show magazines
-    public function showMagazines(){
-        $magazines = Issue::where('status','active')->get();
-        return view('magazines',compact('magazines'));
+    public function showMagazines()
+    {
+        $magazines = Issue::where('status', 'active')->get();
+        return view('magazines', compact('magazines'));
     }
 
     /**
@@ -153,10 +154,10 @@ class IssueController extends Controller
             }
 
             DB::commit();
-            return response()->json(['status' => 'upload successful'],200);
+            return response()->json(['status' => 'upload successful'], 200);
         } catch (\Throwable $th) {
             DB::rollBack();
-            return response()->json(['error' => $th->getMessage()],400);
+            return response()->json(['error' => $th->getMessage()], 400);
         }
     }
 
@@ -180,50 +181,61 @@ class IssueController extends Controller
     public function scan($id, $type, $return = false)
     {
         $issue = Issue::findOrFail($id);
-        if ($issue->issue_type == 'premium' && !auth()->user()->id) {
+        if ($issue->issue_type == 'premium' && ! auth()->user()?->id) {
             return [];
         }
+
         $basePath  = storage_path($issue->issue_path);
         $directory = explode('/', $issue->issue_path);
         $dir       = end($directory);
-        $patterns  = [
-            'pages' => ['dir' => 'pages', 'regex' => '/^(\d+)\.(jpg|png|gif)$/i', 'formatter' => fn($m, $f, $d) => [
-                'page' => (int) $m[1],
-                'file' => $f,
-                'url'  => asset("storage/issues/$d/pages/$f"),
-            ]],
-            'audio' => ['dir' => 'audio', 'regex' => '/^bgm(\d+)_(\d+)_([^.]+)\.(mp3|wav|aac)$/i', 'formatter' => fn($m, $f, $d) => [
-                'page'        => [(int) $m[1], (int) $m[2]],
-                'description' => $m[3],
-                'file'        => $f,
-                'url'         => asset("storage/issues/$d/audio/$f"),
-            ]],
+
+        // Helper: build URL
+        $makeUrl = fn($folder, $file, $dir) => asset("storage/issues/$dir/$folder/$file");
+
+        // Helper: extract all numbers from filename
+        $extractNumbers = function ($file) {
+            preg_match_all('/\d+/', $file, $matches);
+            return array_map('intval', $matches[0]);
+        };
+
+        $patterns = [
+            'pages' => [
+                'dir'       => 'pages',
+                'regex'     => '/^\d+\.(jpg|png|gif)$/i',
+                'formatter' => fn($m, $f, $d) => [
+                    'page' => (int) preg_replace('/\D/', '', pathinfo($f, PATHINFO_FILENAME)),
+                    'file' => $f,
+                    'url'  => $makeUrl('pages', $f, $d),
+                ],
+            ],
+            'audio' => [
+                'dir'       => 'audio',
+                'regex'     => '/^bgm.*\.(mp3|wav|aac)$/i',
+                'formatter' => fn($m, $f, $d) => [
+                    'pages'       => $extractNumbers($f), // e.g. [12, 15]
+                    'description' => preg_replace('/\d+|bgm|\.mp3|\.wav|\.aac/i', '', pathinfo($f, PATHINFO_FILENAME)),
+                    'file'        => $f,
+                    'url'         => $makeUrl('audio', $f, $d),
+                ],
+            ],
             'sfx'   => [
                 'dir'       => 'sfx',
-                'regex'     => '/^sfx(\d+)_(\d+)_([^.]+)\.(mp3|wav|aac)$/i',
+                'regex'     => '/^sfx.*\.(mp3|wav|aac)$/i',
                 'formatter' => fn($m, $f, $d) => [
-                    'page'  => array_filter([
-                        (int) $m[1],
-                        (int) $m[2],
-                        is_numeric($m[3]) ? (int) $m[3] : null,
-                    ]),
-                    'event' => is_numeric($m[3]) ? null : $m[3],
+                    'pages' => $extractNumbers($f), // e.g. [5, 10, 12]
+                    'event' => preg_replace('/\d+|sfx|\.mp3|\.wav|\.aac/i', '', pathinfo($f, PATHINFO_FILENAME)) ?: null,
                     'file'  => $f,
-                    'url'   => asset("storage/issues/$d/sfx/$f"),
+                    'url'   => $makeUrl('sfx', $f, $d),
                 ],
             ],
             'gfx'   => [
                 'dir'       => 'gfx',
-                'regex'     => '/^gfx(\d+)_(\d+)_([^.]+)\.(mp3|wav|aac)$/i',
+                'regex'     => '/^gfx.*\.(mp3|wav|aac)$/i',
                 'formatter' => fn($m, $f, $d) => [
-                    'page'  => array_filter([
-                        (int) $m[1],
-                        (int) $m[2],
-                        is_numeric($m[3]) ? (int) $m[3] : null,
-                    ]),
-                    'event' => is_numeric($m[3]) ? null : $m[3],
+                    'pages' => $extractNumbers($f), // e.g. [16, 19, 21, 23]
+                    'event' => preg_replace('/\d+|gfx|\.mp3|\.wav|\.aac/i', '', pathinfo($f, PATHINFO_FILENAME)) ?: null,
                     'file'  => $f,
-                    'url'   => asset("storage/issues/$d/gfx/$f"),
+                    'url'   => $makeUrl('gfx', $f, $d),
                 ],
             ],
         ];
@@ -234,9 +246,10 @@ class IssueController extends Controller
 
         $p      = $patterns[$type];
         $result = [];
+
         foreach (scandir($basePath . '/' . $p['dir']) as $file) {
-            if (preg_match($p['regex'], $file, $matches)) {
-                $result[] = $p['formatter']($matches, $file, $dir);
+            if (preg_match($p['regex'], $file)) {
+                $result[] = $p['formatter']([], $file, $dir);
             }
         }
 
@@ -267,11 +280,12 @@ class IssueController extends Controller
     }
 
     // user magazines
-    public function userMagazine($package_id){
-        $subscriptions = UserSubscription::with(['package' => function($package){
-            $package->with('issues')->where('status','active')->get();
-        }])->where('package_id',$package_id)->where('user_id',auth()->user()->id)->where('status','active')->get();
-        return view('auth.users.magazines',compact('subscriptions'));
+    public function userMagazine($package_id)
+    {
+        $subscriptions = UserSubscription::with(['package' => function ($package) {
+            $package->with('issues')->where('status', 'active')->get();
+        }])->where('package_id', $package_id)->where('user_id', auth()->user()->id)->where('status', 'active')->get();
+        return view('auth.users.magazines', compact('subscriptions'));
     }
 
     // read issues

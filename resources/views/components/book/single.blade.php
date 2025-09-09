@@ -243,7 +243,7 @@
             if (ad.page.includes(page)) {
                 return true;
             }
-            if (ad.page.length >= 2) {
+            if (ad.page.length == 2) {
                 const [start, end] = ad.page;
                 return page >= start && page <= end;
             }
