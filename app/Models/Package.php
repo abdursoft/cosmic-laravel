@@ -29,8 +29,10 @@ class Package extends Model
         return $this->hasMany(UserSubscription::class);
     }
 
-    public function issues()
-    {
-        return $this->belongsToMany(Issue::class, 'issue_packages');
+    /**
+     * Relationship: Package has to magazines
+     */
+    public function magazines(){
+        return $this->hasMany(Magazine::class);
     }
 }

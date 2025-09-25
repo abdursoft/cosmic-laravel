@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\GifPackController;
 use App\Http\Controllers\IssueController;
+use App\Http\Controllers\MagazineController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\Payment\StripeController;
 use App\Http\Controllers\SiteSettingController;
@@ -58,6 +59,7 @@ Route::middleware(UserMiddleware::class)->prefix('user')->group(function(){
 
     // magazine routes
     Route::get('magazines/{package_id}',[ IssueController::class, 'userMagazine'])->name('user.magazines');
+    Route::get('magazines/{id}/show', [IssueController::class, 'openIssues'])->name('user.magazine.view');
     Route::get('read/magazine/{id}', [IssueController::class, 'readIssue'])->name('user.magazine.read');
 });
 
@@ -83,6 +85,13 @@ Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){
     Route::get('package/edit/{id}',[PackageController::class, 'edit'])->name('admin.package.edit');
     Route::post('package/update/{id}',[PackageController::class, 'update'])->name('admin.package.update');
     Route::get('package/delete/{id}',[PackageController::class, 'destroy'])->name('admin.package.delete');
+
+    // magazine routes
+    Route::get('magazine',[MagazineController::class, 'index'])->name('admin.magazine');
+    Route::post('magazine',[MagazineController::class, 'store'])->name('admin.magazine.submit');
+    Route::get('magazine/edit/{id}',[MagazineController::class, 'edit'])->name('admin.magazine.edit');
+    Route::post('magazine/update/{id}',[MagazineController::class, 'update'])->name('admin.magazine.update');
+    Route::get('magazine/delete/{id}',[MagazineController::class, 'destroy'])->name('admin.magazine.delete');
 
     // issues routes
     Route::get('issues', [IssueController::class,'index'])->name('admin.issues');
@@ -120,7 +129,8 @@ Route::prefix('payment')->group(function(){
 
 // issues routes
 Route::get('issue/scan/{id}/{type}', [IssueController::class, 'scan'])->name('issue.scan');
-Route::get('magazines', [IssueController::class, 'showMagazines'])->name('issue.list');
+Route::get('magazines', [IssueController::class, 'showMagazines'])->name('magazine.list');
+Route::get('magazines/{magazine}/issues', [IssueController::class, 'showIssues'])->name('issue.list');
 
 // page routes
 Route::get('page/{id}/{slug}', [PageController::class, 'publicPage'])->name('public.page');

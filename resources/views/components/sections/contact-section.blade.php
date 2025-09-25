@@ -1,5 +1,5 @@
 <!-- contact section  -->
-<section class="w-full bg-[#250c04] text-white py-20 px-4 md:px-15 lg:px-45">
+<section class="w-full bg-[#262323] text-white py-20 px-4 md:px-15 lg:px-45">
     <div class="w-full flex flex-col lg:flex-row lg:justify-between" data-aos="fade-up">
         <div class="w-full lg:w-1/2 flex flex-col items-center justify-center">
             <div class="w-full">

@@ -8,7 +8,7 @@
 
       <!--Container-->
       <div class="w-full text-slate-800">
-        <h2 class="text-xl md:text-3xl my-3">Issues list</h2>
+        <h2 class="text-xl md:text-3xl my-3">Magazine list</h2>
 			<!--Card-->
 			 <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow bg-white">
 				<table id="example" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
@@ -17,24 +17,24 @@
                             <th data-priority="1">SL. no</th>
 							<th data-priority="2">Title</th>
 							<th data-priority="3">Sub title</th>
-							<th data-priority="3">Magazine</th>
-							<th data-priority="3">Created at</th>
+							<th data-priority="3">Status</th>
+							<th data-priority="3">Issues</th>
 							<th data-priority="6">Action</th>
 						</tr>
 					</thead>
 					<tbody>
-                        @foreach($issues as $key=>$issue)
+                        @foreach($magazines as $key=>$magazine)
                             <tr>
-                                <td>{{$issue->id}}</td>
-                                <td>{{$issue->title}}</td>
-                                <td>{{$issue->sub_title}}</td>
-                                <td>{{ucfirst($issue->magazines->title ?? '')}}</td>
-                                <td>{{date('Y-m-d', strtotime($issue->created_at))}}</td>
+                                <td>{{$magazine->id}}</td>
+                                <td>{{$magazine->title}}</td>
+                                <td>{{$magazine->sub_title}}</td>
+                                <td>{{ucfirst($magazine->magazine_type)}}</td>
+                                <td>{{count($magazine->issues)}}</td>
                                 <td>
                                     <div class="flex items-center gap-3">
-                                        <a href="{{ route('admin.issues.edit',$issue->id) }}" class="p-3 rounded-md bg-green-600 text-white">Edit</a>
-                                        <a href="{{ route('admin.issues.delete',$issue->id) }}" class="p-3 bg-red-600 text-white rounded-md">Delete</a>
-                                        <a href="{{ route('admin.issues.read',$issue->id) }}" class="p-3 bg-gray-600 text-white rounded-md">Read</a>
+                                        <a href="{{ route('admin.magazine.edit',$magazine->id) }}" class="p-3 rounded-md bg-green-600 text-white">Edit</a>
+                                        <a href="{{ route('admin.magazine.delete',$magazine->id) }}" class="p-3 bg-red-600 text-white rounded-md">Delete</a>
+                                        <a href="{{ route('issue.list',$magazine->id) }}" class="p-3 bg-gray-600 text-white rounded-md">View Issues</a>
                                     </div>
                                 </td>
                             </tr>

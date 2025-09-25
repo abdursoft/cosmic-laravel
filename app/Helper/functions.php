@@ -14,14 +14,21 @@ if(!function_exists('packages')){
     }
 }
 
+// magazines
+if(!function_exists('magazines')){
+    function magazines(){
+        return \App\Models\Magazine::latest()->get() ?? (object)[];
+    }
+}
+
 // check active package
 if (!function_exists('check_package')) {
     function check_package($issueId, $packageId) {
-        $issue = \App\Models\Issue::find($issueId);
+        $issue = \App\Models\Magazine::find($packageId);
         if (!$issue) {
             return false;
         }
-        return $issue->packages()->where('package_id', $packageId)->exists();
+        return $issue->issues()->where('id', $issueId)->exists();
     }
 }
 
@@ -53,5 +60,16 @@ if(!function_exists('cta_button')){
         }else{
             return "Command Everything";
         }
+    }
+}
+
+
+// magazine option selection
+if(!function_exists('selection')){
+    function selection($key,$select){
+        if($key == $select){
+            return 'selected';
+        }
+        return '';
     }
 }

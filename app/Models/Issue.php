@@ -19,11 +19,14 @@ class Issue extends Model
         'price',
         'status',
         'issue',
-        'issue_type'
+        'issue_type',
+        'magazine_id'
     ];
 
-    public function packages()
-    {
-        return $this->belongsToMany(Package::class, 'issue_packages');
+    /**
+     * Relationship: Issues belongs to a Magazine
+     */
+    public function magazines(){
+        return $this->belongsTo(Magazine::class, 'magazine_id');
     }
 }

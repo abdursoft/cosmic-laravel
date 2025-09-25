@@ -5,9 +5,9 @@
 
 <div class="flex items-center justify-center min-h-[600px] mb-8 w-full p-3">
     <div class="w-full max-w-2xl p-8 bg-white rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">Create an Issue</h2>
-            <form id="issueForm" method="POST"
-                action="@php echo !empty($issue) ? route('admin.issues.update',$issue->id) : route('admin.issues.submit') @endphp"
+        <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">Create a magazine</h2>
+            <form id="magazineForm" method="POST"
+                action="@php echo !empty($magazine) ? route('admin.magazine.update',$magazine->id) : route('admin.magazine.submit') @endphp"
                 enctype="multipart/form-data">
             @csrf
             <div class="flex justify-between my-1 gap-3">
@@ -15,7 +15,7 @@
                     <label for="title" class="block text-sm font-medium text-gray-700"> Magazine title</label>
                     <input type="title" id="title" placeholder="Magazine name" name="title" required autofocus
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('title') border-red-500 @enderror text-slate-800"
-                        value="{{ old('title') ?? ($issue->title ?? '') }}">
+                        value="{{ old('title') ?? ($magazine->title ?? '') }}">
                     @error('title')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
@@ -24,7 +24,7 @@
                     <label for="sub_title" class="block text-sm font-medium text-gray-700"> Sub title</label>
                     <input type="text" id="sub_title" placeholder="Magazine short description" name="sub_title"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('sub_title') border-red-500 @enderror text-slate-800"
-                        value="{{ old('sub_title') ?? ($issue->sub_title ?? '') }}">
+                        value="{{ old('sub_title') ?? ($magazine->sub_title ?? '') }}">
                     @error('sub_title')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
@@ -40,36 +40,26 @@
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="w-full md:w-1/2">
-                    <label for="issue" class="block text-sm font-medium text-gray-700"> Issue files (zip)</label>
-                    <input type="file" accept=".zip" id="issue" name="issue"
-                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('thumbnail') border-red-500 @enderror text-slate-800"
-                        value="{{ old('issue') }}">
-                    @error('issue')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
-            </div>
-            <div class="my-1 flex">
-                <div class=" w-full">
-                    <label for="magazine_id" class="block text-sm font-medium text-gray-700">Select a Magazine</label>
-                    <select id="magazine_id" value=" {{ old('magazine_id') ?? ($magazine->magazine_id ?? '') }}"
-                        name="magazine_id" required
-                        class="mt-1 block w-full px-3 py-[10px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('magazine_id') border-red-500 @enderror text-slate-800">
-                        <option value="" disabled>Select a magazine</option>
-                        @if(!empty(magazines()))
-                        @foreach(magazines() as $magazine)
+                <div class=" w-full md:w-1/2">
+                    <label for="magazine_type" class="block text-sm font-medium text-gray-700">Subscription Package</label>
+                    <select id="magazine_type" value=" {{ old('magazine_type') ?? ($magazine->magazine_type ?? '') }}"
+                        name="magazine_type" required
+                        class="mt-1 block w-full px-3 py-[10px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('magazine_type') border-red-500 @enderror text-slate-800">
+                        <option value="" disabled>Select a status</option>
+                        @if(!empty(packages()))
+                        @foreach(packages() as $package)
                             <div class="w-full flex items-center gap-2 md:w-1/4">
-                                <option value="{{$magazine->id}}" {{ selection($issue->magazine_id ?? null,$magazine->id) }}>{{$magazine->title}}</option>
+                                <option value="{{$package->id}}" {{ selection($magazine->package_id ?? null,$package->id) }}>{{$package->name}} <small class="text-sm text-black">({{$package->type}})</small></option>
                             </div>
                         @endforeach
                     @endif
                     </select>
-                    @error('magazine_id')
+                    @error('magazine_type')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
             </div>
+
 
             <div class="flex justify-between my-1 gap-3 mb-20">
                 <div class=" w-full">
@@ -84,7 +74,7 @@
             <div>
                 <button type="submit"
                     class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5">
-                    {{ !empty($issue) ? 'Save' : 'Create' }}
+                    {{ !empty($magazine) ? 'Save' : 'Create' }}
                 </button>
             </div>
 
@@ -107,7 +97,7 @@
         theme: 'snow',
     });
 
-    quill.clipboard.dangerouslyPasteHTML(`{!! $issue->description ?? '' !!}`);
+    quill.clipboard.dangerouslyPasteHTML(`{!! $magazine->description ?? '' !!}`);
 
     const hiddenInput = document.getElementById('hiddenContent');
 
@@ -127,58 +117,8 @@
     }
 
     window.onload = () => {
-        const value = $('#issue_type').val();
+        const value = $('#magazine_type').val();
         premiumChange(value);
     }
-
-
-    const form = document.getElementById('issueForm');
-    const progressWrapper = document.getElementById('progressWrapper');
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const url = form.getAttribute('action');
-        console.log(url);
-        const formData = new FormData(form);
-
-        // Show progress bar
-        progressWrapper.classList.remove('hidden');
-        progressBar.style.width = '0%';
-        progressText.innerText = '0%';
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader("X-CSRF-TOKEN", "{{ csrf_token() }}");
-
-        // Track upload progress
-        xhr.upload.addEventListener("progress", function (e) {
-            if (e.lengthComputable) {
-                const percent = Math.round((e.loaded / e.total) * 100);
-                progressBar.style.width = percent + "%";
-                progressText.innerText = percent + "%";
-            }
-        });
-
-        // On success
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                alert("Upload successful!");
-                window.location.reload(); // or redirect if needed
-            } else {
-                alert("Upload failed: " + xhr.statusText);
-            }
-        };
-
-        // On error
-        xhr.onerror = function () {
-            alert("Something went wrong!");
-        };
-
-        xhr.send(formData);
-    });
-
 
 </script>

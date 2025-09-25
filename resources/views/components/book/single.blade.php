@@ -49,6 +49,7 @@
     let current = 0;
     let musicHowl = null;
     let pageTurnHowl = null;
+    let bmgHowl=null;
     let sfxHowls = [];
     let gfxHowls = [];
     let musicMuted = !1,
@@ -91,6 +92,7 @@
                     if (isStart) {
                         console.log(`\n Current page ${current}`)
                         setPageTurn();
+                        playAudioByBMG(current);
                         playAudioByPage(current);
                         playSFXByPage(current);
                         playGFXByPage(current);
@@ -148,7 +150,7 @@
     };
     const CONTINUOUS_MUSIC = !0;
     let audioList = sfxList = [];
-    let gfxList = [];
+    let gfxList = bmgList = [];
     fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'audio']) }}").then((res) => res.json()).then((
         data) => {
         audioList = data;
@@ -158,6 +160,9 @@
     });
     fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'gfx']) }}").then((res) => res.json()).then((data) => {
         gfxList = data;
+    });
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'bmg']) }}").then((res) => res.json()).then((data) => {
+        bmgList = data;
     });
     const gate = document.getElementById("gate");
     const startBtn = document.getElementById("startBtn");
@@ -174,6 +179,7 @@
     let currentAudioData = null;
     let currentSFXData = null;
     let currentGFXData = null;
+    let currentBMGAudioData = null;
     let isFullScreen = !1;
 
     const icons = {
@@ -197,11 +203,59 @@
         $('#magazine').turn('previous');
     });
 
+    function playAudioByBMG(page) {
+        let audioData = bmgList.find(ad => {
+            if (!Array.isArray(ad.pages)) return false;
+
+            // First priority: check if array explicitly contains the page
+            if (ad.pages.includes(page)) {
+                return true;
+            }else if (ad.pages.length == 2) {
+                const [start, end] = ad.pages;
+                return page >= start && page <= end;
+            }
+            return false;
+        });
+
+        if (!audioData) {
+            if (bmgHowl instanceof Howl) {
+                bmgHowl.stop();
+            }
+            return;
+        }
+
+        console.log('bmg',audioData)
+
+        if (audioData && currentBMGAudioData && currentBMGAudioData.url == audioData?.url && bmgHowl && bmgHowl.playing()) {
+            console.log("Audio already playing for this range, skipping restart.");
+            return
+        }
+        if (bmgHowl instanceof Howl) {
+            bmgHowl.stop();
+        }
+
+        bmgHowl = new Howl({
+            src: [audioData.url],
+            loop: CONTINUOUS_MUSIC,
+            volume: parseFloat(musicVol.value),
+            html5: !0,
+        });
+        bmgHowl.play();
+        currentBMGAudioData = audioData
+    }
+
     function playAudioByPage(page) {
         let audioData = audioList.find(ad => {
-            if (!Array.isArray(ad.page)) return !1;
-            const [start, end] = ad.page;
-            return page >= start && page <= end
+            if (!Array.isArray(ad.pages)) return false;
+
+            // First priority: check if array explicitly contains the page
+            if (ad.pages.includes(page)) {
+                return true;
+            }else if (ad.pages.length == 2) {
+                const [start, end] = ad.pages;
+                return page >= start && page <= end;
+            }
+            return false;
         });
 
         if (!audioData) {
@@ -211,7 +265,7 @@
                 page: [0]
             }
         }
-        console.log(currentAudioData?.url)
+
         console.log('bgm',audioData)
 
         if (audioData && currentAudioData && currentAudioData.url == audioData?.url && musicHowl && musicHowl.playing()) {
@@ -237,14 +291,14 @@
 
         // First try to find exact page matches (including the 3rd number case)
         audioData = sfxList.find(ad => {
-            if (!Array.isArray(ad.page)) return false;
+            if (!Array.isArray(ad.pages)) return false;
 
             // First priority: check if array explicitly contains the page
-            if (ad.page.includes(page)) {
+            if (ad.pages.includes(page)) {
                 return true;
             }
-            if (ad.page.length == 2) {
-                const [start, end] = ad.page;
+            if (ad.pages.length == 2) {
+                const [start, end] = ad.pages;
                 return page >= start && page <= end;
             }
             return false;
@@ -255,6 +309,7 @@
         if (!audioData) {
             if (sfxHowls instanceof Howl) {
                 sfxHowls.stop();
+                console.log('Sfx stop')
                 return;
             }
         }
@@ -284,15 +339,15 @@
 
         // First try to find exact page matches (including the 3rd number case)
         audioData = gfxList.find(ad => {
-            if (!Array.isArray(ad.page)) return false;
+            if (!Array.isArray(ad.pages)) return false;
 
             // First priority: check if array explicitly contains the page
-            if (ad.page.includes(page)) {
+            if (ad.pages.includes(page)) {
                 return true;
             }
 
-            if (ad.page.length == 2) {
-                const [start, end] = ad.page;
+            if (ad.pages.length == 2) {
+                const [start, end] = ad.pages;
                 return page >= start && page <= end;
             }
             return false;
@@ -303,6 +358,7 @@
         if (!audioData) {
             if (gfxHowls instanceof Howl) {
                 gfxHowls.stop();
+                console.log('Gfx stop')
                 return;
             }
         }
@@ -378,26 +434,40 @@
             if (musicHowl) {
                 musicHowl.volume(musicMuted ? 0 : parseFloat(musicVol.value))
             }
+            if (gfxHowls instanceof Howl) gfxHowls.volume(v);
         });
         sfxVol.addEventListener("input", () => {
             const v = sfxMuted ? 0 : parseFloat(sfxVol.value);
             if (sfxHowls) {
                 if (Array.isArray(sfxHowls)) {
                     sfxHowls.forEach((h) => h.volume(v))
+                }else{
+                    if (sfxHowls instanceof Howl) sfxHowls.volume(v);
                 }
             }
             if (pageTurnHowl instanceof Howl) pageTurnHowl.volume(v);
+
         });
         muteAll.addEventListener("click", () => {
             const nowMute = !(musicMuted && sfxMuted);
             musicMuted = nowMute;
             sfxMuted = nowMute;
-            if (musicHowl) musicHowl.mute(nowMute);
-            if (pageTurnHowl) pageTurnHowl.mute(nowMute);
+            if (musicHowl instanceof Howl) musicHowl.mute(nowMute);
+            if (pageTurnHowl instanceof Howl) pageTurnHowl.mute(nowMute);
+            if (bmgHowl instanceof Howl) bmgHowl.mute(nowMute);
+            if (gfxHowls) {
+                if (Array.isArray(gfxHowls)) {
+                    gfxHowls.forEach((h) => h.volume(v))
+                }else{
+                    gfxHowls.mute(nowMute);
+                }
+            }
 
             if (sfxHowls) {
                 if (Array.isArray(sfxHowls)) {
                     sfxHowls.forEach((h) => h.volume(v))
+                }else{
+                    sfxHowls.mute(nowMute);
                 }
             }
             muteAll.textContent = nowMute ? "Unmute" : "Mute"
@@ -405,6 +475,6 @@
     }
 
     function closeBook() {
-        window.location.href="{{route('issue.list')}}";
+        window.history.back();
     }
 </script>

@@ -8,9 +8,13 @@
         class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.package') ? 'bg-gray-200 font-semibold' : '' }}">
         Packages
     </a>
+    <a href="{{ route('admin.magazine') }}"
+        class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.magazine') ? 'bg-gray-200 font-semibold' : '' }}">
+        Magazines
+    </a>
     <a href="{{ route('admin.issues') }}"
         class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.issues') ? 'bg-gray-200 font-semibold' : '' }}">
-        Magazines
+        Issues
     </a>
     <a href="{{ route('admin.transactions') }}"
         class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.transactions') ? 'bg-gray-200 font-semibold' : '' }}">

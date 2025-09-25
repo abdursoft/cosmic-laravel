@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Issue;
 use App\Models\IssuePackage;
+use App\Models\Magazine;
 use App\Models\UserSubscription;
 use App\Traits\IssueHelper;
 use Illuminate\Http\Request;
@@ -20,7 +21,9 @@ class IssueController extends Controller
      */
     public function index()
     {
-        $issues = Issue::latest()->get();
+        $issues = Issue::with(['magazines' => function($m){
+            $m->select('title','sub_title','id');
+        }])->latest()->get();
         return view('auth.admin.issue', compact('issues'));
     }
 
@@ -34,7 +37,7 @@ class IssueController extends Controller
             'sub_title'   => 'nullable|string|max:255',
             'thumbnail'   => 'required|file|mimes:jpeg,jpg,png,webp',
             'description' => 'nullable|string',
-            'issue_type'  => 'required|in:free,premium',
+            'magazine_id' => 'required|exists:magazines,id'
         ]);
 
         $issue_status = false;
@@ -59,15 +62,6 @@ class IssueController extends Controller
             }
             DB::beginTransaction();
             $issue = Issue::create($validated);
-
-            if ($issue_status) {
-                foreach ($request->packages as $package) {
-                    IssuePackage::create([
-                        'issue_id'   => $issue->id,
-                        'package_id' => $package,
-                    ]);
-                }
-            }
 
             DB::commit();
             return response()->json(['status' => 'upload successful'], 200);
@@ -98,8 +92,17 @@ class IssueController extends Controller
     // show magazines
     public function showMagazines()
     {
-        $magazines = Issue::where('status', 'active')->get();
+        $magazines = Magazine::where('status', 'active')->get();
         return view('magazines', compact('magazines'));
+    }
+
+    // show issues
+    public function showIssues($id)
+    {
+        $magazine = Magazine::with(['issues' => function($issue){
+            $issue->where('status','active')->get();
+        }])->find($id);
+        return view('issues', compact('magazine'));
     }
 
     /**
@@ -114,6 +117,7 @@ class IssueController extends Controller
             'type'        => 'sometimes|in:stander,pro,unlimited',
             'price'       => 'sometimes|numeric|min:0',
             'issue_type'  => 'sometimes|in:free,premium',
+            'magazine_id' => 'required|exists:magazines,id'
         ]);
 
         $issue_status = false;
@@ -142,16 +146,6 @@ class IssueController extends Controller
 
             DB::beginTransaction();
             $issue->update($validated);
-
-            if ($issue_status) {
-                IssuePackage::where('issue_id', $request->id)->delete();
-                foreach ($request->packages as $package) {
-                    IssuePackage::create([
-                        'issue_id'   => $issue->id,
-                        'package_id' => $package,
-                    ]);
-                }
-            }
 
             DB::commit();
             return response()->json(['status' => 'upload successful'], 200);
@@ -194,7 +188,8 @@ class IssueController extends Controller
 
         // Helper: extract all numbers from filename
         $extractNumbers = function ($file) {
-            preg_match_all('/\d+/', $file, $matches);
+            $name = pathinfo($file, PATHINFO_FILENAME); // removes .mp3/.wav/.aac
+            preg_match_all('/\d+/', $name, $matches);
             return array_map('intval', $matches[0]);
         };
 
@@ -216,6 +211,16 @@ class IssueController extends Controller
                     'description' => preg_replace('/\d+|bgm|\.mp3|\.wav|\.aac/i', '', pathinfo($f, PATHINFO_FILENAME)),
                     'file'        => $f,
                     'url'         => $makeUrl('audio', $f, $d),
+                ],
+            ],
+            'bmg' => [
+                'dir'       => 'bmg',
+                'regex'     => '/^bmg.*\.(mp3|wav|aac)$/i',
+                'formatter' => fn($m, $f, $d) => [
+                    'pages'       => $extractNumbers($f), // e.g. [12, 15]
+                    'description' => preg_replace('/\d+|bmg|\.mp3|\.wav|\.aac/i', '', pathinfo($f, PATHINFO_FILENAME)),
+                    'file'        => $f,
+                    'url'         => $makeUrl('bmg', $f, $d),
                 ],
             ],
             'sfx'   => [
@@ -261,20 +266,20 @@ class IssueController extends Controller
     {
         $package  = null;
         $issue    = Issue::findOrFail($id);
-        $packages = UserSubscription::latest()->get();
+        $packages = UserSubscription::with('package')->latest()->get();
         foreach ($packages as $key => $pack) {
             if ($pack->status == 'active') {
-                $package = check_package($issue->id, $pack->package_id);
+                foreach($pack->package->magazines as $magazine){
+                    $package = check_package($issue->id, $magazine->id);
+                    if($package) break;
+                }
             }
         }
 
-        if ($package || $issue->issue_type == 'free') {
-            $sfxs   = $this->scan($id, 'sfx', true);
-            $pages  = $this->scan($id, 'pages', true);
-            $audios = $this->scan($id, 'audio', true);
+        if ($package) {
             $path   = explode('/', $issue->issue_path);
             $path   = end($path);
-            return view('issue', compact('issue', 'sfxs', 'pages', 'audios', 'path'));
+            return view('issue', compact('issue', 'path'));
         }
         return back()->with('error', 'Your are not able to see this magazine');
     }
@@ -282,21 +287,23 @@ class IssueController extends Controller
     // user magazines
     public function userMagazine($package_id)
     {
-        $subscriptions = UserSubscription::with(['package' => function ($package) {
-            $package->with('issues')->where('status', 'active')->get();
-        }])->where('package_id', $package_id)->where('user_id', auth()->user()->id)->where('status', 'active')->get();
+        $subscriptions = UserSubscription::where('package_id', $package_id)->where('user_id', auth()->user()->id)->where('status', 'active')->get();
+
         return view('auth.users.magazines', compact('subscriptions'));
+    }
+
+    // open issues according the magazine id
+    public function openIssues(Request $request, $id){
+        $magazines = Magazine::with('issues')->find($id);
+        return view('auth.users.issues',compact('magazines'));
     }
 
     // read issues
     public function adminReadIssue($id)
     {
         $issue  = Issue::findOrFail($id);
-        $sfxs   = $this->scan($id, 'sfx', true);
-        $pages  = $this->scan($id, 'pages', true);
-        $audios = $this->scan($id, 'audio', true);
         $path   = explode('/', $issue->issue_path);
         $path   = end($path);
-        return view('issue', compact('issue', 'sfxs', 'pages', 'audios', 'path'));
+        return view('issue', compact('issue', 'path'));
     }
 }

@@ -1,5 +1,5 @@
 <!-- footer section  -->
-<footer class="bg-[#100f0f] shadow-lg">
+<footer class="bg-black shadow-lg">
     <button onclick="scrollToTop()"
         class="text-center bg-red-400 text-white rounded-[8px] shadow-md w-[40px] h-[40px] flex items-center justify-center fixed bottom-[80px] right-[20px] topUpButton cursor-pointer"
         data-aos='fade-up'>
