@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <div class="flex items-center justify-center">
-                    <a href="{{ route('user.subscribe', $package->id) }}"
+                    <a href="{{ route('magazine.selection', $package->id) }}"
                         class="text-center p-3 bg-[gold] text-black rounded-md mt-5 w-full">
                         {{ $package->cta_text }}
                     </a>

@@ -3,8 +3,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Payment\StripeController;
 use App\Models\Package;
+use App\Models\UserMagazine;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserSubscriptionController extends Controller
 {
@@ -76,11 +78,17 @@ class UserSubscriptionController extends Controller
     }
 
     // make subscription request
-    public function subscribe(Request $request, $id)
+    public function subscribe(Request $request)
     {
         $stripe  = new StripeController();
-        $package = Package::findOrFail($id);
+        $package = Package::find($request->package);
         $user    = auth()->user();
+
+        $magazine = count($request->magazine);
+
+        if($magazine > $package->allowed_magazine){
+            return back()->with('error', "You can't select more that {$package->allowed_magazine} magazines");
+        }
 
         if (empty($user->customer_id)) {
             $customer = $stripe->customerCreate($user->name, $user->email);
@@ -94,17 +102,34 @@ class UserSubscriptionController extends Controller
             return back()->with('error', 'Subscription couldn\'t proceed');
         }
 
-        $subscribe = $stripe->productSubscription($user->customer_id, $package->price_id);
+        try {
+            $subscribe = $stripe->productSubscription($user->customer_id, $package->price_id);
 
-        $subscription = UserSubscription::create([
-            'user_id'         => $user->id,
-            'package_id'      => $package->id,
-            'status'          => 'pending',
-            'price'           => $package->price,
-            'subscription_id' => $subscribe->id,
-        ]);
+            DB::beginTransaction();
+            $subscription = UserSubscription::create([
+                'user_id'         => $user->id,
+                'package_id'      => $package->id,
+                'status'          => 'pending',
+                'price'           => $package->price,
+                'subscription_id' => $subscribe->id,
+            ]);
 
-        return redirect()->away($subscribe->latest_invoice->hosted_invoice_url);
+            foreach($request->magazine as $magazine){
+                UserMagazine::create([
+                    'user_id' => $user->id,
+                    'magazine_id' => $magazine,
+                    'user_subscription_id' => $subscription->id,
+                    'status' => 'inactive'
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->away($subscribe->latest_invoice->hosted_invoice_url);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return back()->with('error', "Subscription system couldn't proceed!");
+        }
     }
 
     // cancel subscription

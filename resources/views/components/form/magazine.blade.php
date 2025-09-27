@@ -24,7 +24,7 @@
                     <label for="sub_title" class="block text-sm font-medium text-gray-700"> Sub title</label>
                     <input type="text" id="sub_title" placeholder="Magazine short description" name="sub_title"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('sub_title') border-red-500 @enderror text-slate-800"
-                        value="{{ old('sub_title') ?? ($magazine->sub_title ?? '') }}">
+                        value="{{ old('sub_title') ?? ($magazine->title ?? '') }}">
                     @error('sub_title')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
@@ -41,25 +41,41 @@
                     @enderror
                 </div>
                 <div class=" w-full md:w-1/2">
-                    <label for="magazine_type" class="block text-sm font-medium text-gray-700">Subscription Package</label>
-                    <select id="magazine_type" value=" {{ old('magazine_type') ?? ($magazine->magazine_type ?? '') }}"
-                        name="magazine_type" required
-                        class="mt-1 block w-full px-3 py-[10px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('magazine_type') border-red-500 @enderror text-slate-800">
-                        <option value="" disabled>Select a status</option>
-                        @if(!empty(packages()))
-                        @foreach(packages() as $package)
-                            <div class="w-full flex items-center gap-2 md:w-1/4">
-                                <option value="{{$package->id}}" {{ selection($magazine->package_id ?? null,$package->id) }}>{{$package->name}} <small class="text-sm text-black">({{$package->type}})</small></option>
-                            </div>
-                        @endforeach
-                    @endif
+                    <label for="archive_access" class="block text-sm font-medium text-gray-700">Archive access</label>
+                    <select id="archive_access" value=" {{ old('archive_access') ?? ($magazine->archive_access ?? '') }}"
+                        name="archive_access" required
+                        class="mt-1 block w-full px-3 py-[10px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('archive_access') border-red-500 @enderror text-slate-800">
+                        <option value="0">Select an access</option>
+                        <option value="1" @isset($magazine)@if($magazine->archive_access == '1') ? 'selected' : '' @endif @endisset>Yes</option>
+                        <option value="0" @isset($magazine) @if($magazine->archive_access == '0') ? 'selected' : '' @endif @endisset>No</option>
+
                     </select>
-                    @error('magazine_type')
+                    @error('archive_access')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
             </div>
 
+            <div class="flex justify-between my-1 gap-3">
+                <div class=" w-full md:w-1/2">
+                    <label for="archive_days" class="block text-sm font-medium text-gray-700"> Archive in (Days)</label>
+                    <input type="number" min="1" max="90" id="archive_days" placeholder="Magazine short description" name="archive_days"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('sub_title') border-red-500 @enderror text-slate-800"
+                        value="{{ old('archive_days') ?? ($magazine->archive_days ?? '90') }}">
+                    @error('archive_days')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="w-full md:w-1/2">
+                    <label for="publish_date" class="block text-sm font-medium text-gray-700"> Publishable Date</label>
+                    <input type="date" id="publish_date" name="publish_date" required autofocus
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('title') border-red-500 @enderror text-slate-800"
+                        value="{{ old('publish_date') ?? (date('Y-m-d',strtotime(isset($magazine) ? $magazine->publish_date : '+7 days')) ?? '+7 days') }}">
+                    @error('title')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
 
             <div class="flex justify-between my-1 gap-3 mb-20">
                 <div class=" w-full">
@@ -105,20 +121,5 @@
     quill.on('text-change', function() {
         hiddenInput.value = quill.root.innerHTML;
     });
-
-    function premiumChange(e) {
-        const box = $(".premiumBox");
-        if (e === 'premium') {
-            box.removeClass('hidden');
-        } else {
-            $('input[type="checkbox"]').prop('checked', false);
-            box.addClass('hidden');
-        }
-    }
-
-    window.onload = () => {
-        const value = $('#magazine_type').val();
-        premiumChange(value);
-    }
 
 </script>

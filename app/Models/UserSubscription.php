@@ -37,4 +37,11 @@ class UserSubscription extends Model
     {
         return $this->belongsTo(Package::class,'package_id');
     }
+
+    /**
+     * Get the magazine associated with subscription
+     */
+    public function userMagazine(){
+        return $this->hasMany(UserMagazine::class);
+    }
 }

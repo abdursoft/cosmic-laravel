@@ -50,8 +50,8 @@
                     @enderror
                 </div>
             </div>
-            <div class="my-1 flex">
-                <div class=" w-full">
+            <div class="my-1 flex justify-between gap-3">
+                <div class=" w-full md:w-1/2">
                     <label for="magazine_id" class="block text-sm font-medium text-gray-700">Select a Magazine</label>
                     <select id="magazine_id" value=" {{ old('magazine_id') ?? ($magazine->magazine_id ?? '') }}"
                         name="magazine_id" required
@@ -66,6 +66,16 @@
                     @endif
                     </select>
                     @error('magazine_id')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="w-full md:w-1/2">
+                    <label for="issue_index" class="block text-sm font-medium text-gray-700"> Issue Number</label>
+                    <input type="number" min="1" id="issue_index" name="issue_index"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('issue_index') border-red-500 @enderror text-slate-800"
+                        value="{{ old('issue_index') }}">
+                    @error('issue_index')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>

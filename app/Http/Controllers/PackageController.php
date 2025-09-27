@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Payment\StripeController;
@@ -15,7 +14,7 @@ class PackageController extends Controller
     public function index()
     {
         $packages = Package::latest()->get();
-        return view('auth.admin.package',compact('packages'));
+        return view('auth.admin.package', compact('packages'));
     }
 
     /**
@@ -24,43 +23,44 @@ class PackageController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'thumbnail'   => 'required|file|mimes:jpg,jpeg,png,webp',
-            'type'        => 'required|in:weekly,monthly,yearly,lifetime',
-            'description' => 'required|string',
-            'cta_text'    => 'required|string',
-            'status'      => 'required|in:active,inactive',
-            'price'       => 'required|numeric|min:0',
+            'name'             => 'required|string|max:255',
+            'thumbnail'        => 'required|file|mimes:jpg,jpeg,png,webp',
+            'type'             => 'required|in:weekly,monthly,yearly,lifetime',
+            'description'      => 'required|string',
+            'cta_text'         => 'required|string',
+            'status'           => 'required|in:active,inactive',
+            'price'            => 'required|numeric|min:0',
+            'allowed_magazine' => 'sometimes|numeric|min:1',
         ]);
 
-        if($request->hasFile('thumbnail')){
-            $thumbnail = Storage::disk('public')->put('thumbnail',$request->file('thumbnail'));
+        if ($request->hasFile('thumbnail')) {
+            $thumbnail              = Storage::disk('public')->put('thumbnail', $request->file('thumbnail'));
             $validated['thumbnail'] = $thumbnail;
         }
 
+        $stripe  = new StripeController();
+        $product = $stripe->productCreate($request->name, $request->description, $request->price);
 
-        $stripe = new StripeController();
-        $product = $stripe->productCreate($request->name,$request->description,$request->price);
-
-        if($product->id ?? $product['id']){
+        if ($product->id ?? $product['id']) {
             $validated['product_id'] = $product->id ?? $product['id'];
-            $price = $stripe->productPrice($product->id ?? $product['id'], $request->price,'USD',substr($request->type,0,-2));
-            $validated['price_id'] = $price['id'] ?? $price->id;
-        }else{
-            return back()->withErrors('error','Product couldn\'t create in stripe store');
+            $price                   = $stripe->productPrice($product->id ?? $product['id'], $request->price, 'USD', substr($request->type, 0, -2));
+            $validated['price_id']   = $price['id'] ?? $price->id;
+        } else {
+            return back()->withErrors('error', 'Product couldn\'t create in stripe store');
         }
 
         Package::create($validated);
 
-        return back()->with('success','Product successfully created');
+        return back()->with('success', 'Product successfully created');
     }
 
     // edit packages
-    public function edit($id){
-        $package = Package::findOrFail($id);
+    public function edit($id)
+    {
+        $package  = Package::findOrFail($id);
         $packages = Package::latest()->get();
 
-        return view('auth.admin.package',compact('package','packages'));
+        return view('auth.admin.package', compact('package', 'packages'));
     }
 
     /**
@@ -77,20 +77,21 @@ class PackageController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'name'        => 'sometimes|string|max:255',
-            'thumbnail'   => 'sometimes|file|mimes:jpeg,jpg,png,webp,gif',
-            'type'        => 'sometimes|in:weekly,monthly,yearly,lifetime',
-            'description' => 'sometimes|string',
-            'cta_text'    => 'sometimes|string',
-            'status'      => 'sometimes|in:active,inactive',
-            'price'       => 'sometimes|numeric|min:0',
+            'name'             => 'sometimes|string|max:255',
+            'thumbnail'        => 'sometimes|file|mimes:jpeg,jpg,png,webp,gif',
+            'type'             => 'sometimes|in:weekly,monthly,yearly,lifetime',
+            'description'      => 'sometimes|string',
+            'cta_text'         => 'sometimes|string',
+            'status'           => 'sometimes|in:active,inactive',
+            'price'            => 'sometimes|numeric|min:0',
+            'allowed_magazine' => 'sometimes|numeric|min:1',
         ]);
 
         try {
             $package = Package::findOrFail($id);
 
-            if($request->hasFile('thumbnail')){
-                $validated['thumbnail'] = Storage::disk('public')->put('thumbnail',$request->file('thumbnail'));
+            if ($request->hasFile('thumbnail')) {
+                $validated['thumbnail'] = Storage::disk('public')->put('thumbnail', $request->file('thumbnail'));
                 Storage::disk('public')->delete($package->thumbnail);
             }
             $package->update($validated);
@@ -108,6 +109,6 @@ class PackageController extends Controller
         $package = Package::findOrFail($id);
         $package->delete();
 
-        return back()->with('success','Package deleted successfully');
+        return back()->with('success', 'Package deleted successfully');
     }
 }

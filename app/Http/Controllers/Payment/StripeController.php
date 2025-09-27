@@ -3,6 +3,7 @@ namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserGif;
+use App\Models\UserMagazine;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -246,10 +247,16 @@ class StripeController extends Controller
                 UserSubscription::where('subscription_id', $subscription->id)->update([
                     'status' => 'active',
                 ]);
+                UserMagazine::where('user_subscription_id',$subscription->id)->update([
+                    'status' => 'active'
+                ]);
             case 'customer.subscription.updated':
                 $subscription = $event->data->object;
                 UserSubscription::where('subscription_id', $subscription->id)->update([
                     'status' => 'active',
+                ]);
+                UserMagazine::where('user_subscription_id',$subscription->id)->update([
+                    'status' => 'active'
                 ]);
             default:
                 true;

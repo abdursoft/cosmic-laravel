@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('magazines', function (Blueprint $table) {
             $table->after('thumbnail',function($table){
-                $table->bigInteger('is_archive')->default(0);
                 $table->bigInteger('archive_days')->default(90);
                 $table->bigInteger('archive_access')->default(0);
                 $table->timestamp('publish_date');

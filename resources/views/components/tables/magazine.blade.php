@@ -14,9 +14,9 @@
 				<table id="example" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
 					<thead>
 						<tr>
-                            <th data-priority="1">SL. no</th>
+                            <th data-priority="1">ID</th>
 							<th data-priority="2">Title</th>
-							<th data-priority="3">Sub title</th>
+							<th data-priority="3">Archive access</th>
 							<th data-priority="3">Status</th>
 							<th data-priority="3">Issues</th>
 							<th data-priority="6">Action</th>
@@ -27,14 +27,14 @@
                             <tr>
                                 <td>{{$magazine->id}}</td>
                                 <td>{{$magazine->title}}</td>
-                                <td>{{$magazine->sub_title}}</td>
-                                <td>{{ucfirst($magazine->magazine_type)}}</td>
+                                <td>{{$magazine->archive_access == '0' ? 'No' : 'Yes'}}</td>
+                                <td>{{ucfirst($magazine->status)}}</td>
                                 <td>{{count($magazine->issues)}}</td>
                                 <td>
                                     <div class="flex items-center gap-3">
                                         <a href="{{ route('admin.magazine.edit',$magazine->id) }}" class="p-3 rounded-md bg-green-600 text-white">Edit</a>
                                         <a href="{{ route('admin.magazine.delete',$magazine->id) }}" class="p-3 bg-red-600 text-white rounded-md">Delete</a>
-                                        <a href="{{ route('issue.list',$magazine->id) }}" class="p-3 bg-gray-600 text-white rounded-md">View Issues</a>
+                                        <a href="{{ route('issue.list',$magazine->id) }}" class="p-3 bg-gray-600 text-white rounded-md">Issues</a>
                                     </div>
                                 </td>
                             </tr>

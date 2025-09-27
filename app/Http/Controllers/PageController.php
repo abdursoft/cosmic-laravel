@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ContactMessage;
 use App\Models\GifPack;
 use App\Models\Issue;
+use App\Models\Magazine;
 use App\Models\Package;
 use App\Models\User;
 use App\Models\UserGif;
@@ -63,6 +64,7 @@ class PageController extends Controller
         $user = auth()->user();
         if ($user->isAdmin()) {
             $users    = User::where('role', 'user')->count();
+            $magazines = Magazine::count();
             $issues   = Issue::count();
             $packages = Package::count();
             $contacts = ContactMessage::where('is_replied', 0)->count();
@@ -72,7 +74,7 @@ class PageController extends Controller
             $gifs = UserGif::with('users','packs')->latest()->get();
 
             $subscriptions = UserSubscription::with(['package','user'])->latest()->get();
-            return view('auth.admin.dashboard', compact('users', 'issues', 'packages', 'contacts', 'prices', 'subscriptions','gif_packages','gifs'));
+            return view('auth.admin.dashboard', compact('users', 'magazines', 'issues', 'packages', 'contacts', 'prices', 'subscriptions','gif_packages','gifs'));
         }
         $subscriptions = $user->user_subscription;
 

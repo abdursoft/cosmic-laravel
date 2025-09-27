@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Magazine;
@@ -25,16 +24,19 @@ class MagazineController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'       => 'required|string|max:255|unique:magazines',
-            'sub_title'   => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'status'      => 'nullable|in:active,inactive',
-            'thumbnail'   => 'nullable|file|mimes:jpg,jpeg,png,webp',
-            'package_id'  => 'nullable|exists:packages,id',
+            'title'          => 'required|string|max:255|unique:magazines',
+            'sub_title'      => 'nullable|string|max:255',
+            'description'    => 'nullable|string',
+            'thumbnail'      => 'nullable|file|mimes:jpg,jpeg,png,webp',
+            'package_id'     => 'nullable|exists:packages,id',
+            'archive_access' => 'nullable',
+            'archive_days'   => 'nullable',
+            'publish_date'   => 'required',
+            'is_archive'     => 'nullable',
         ]);
 
         if ($request->hasFile('thumbnail')) {
-            $thumbnail = Storage::disk('public')->put('magazines', $request->file('thumbnail'));
+            $thumbnail              = Storage::disk('public')->put('magazines', $request->file('thumbnail'));
             $validated['thumbnail'] = $thumbnail;
         }
 
@@ -62,12 +64,16 @@ class MagazineController extends Controller
     {
         $validated = $request->validate([
             'title'       => 'sometimes|string|max:255|unique:magazines,title,' . $id,
-            'sub_title'   => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'status'      => 'nullable|in:active,inactive',
-            'thumbnail'   => 'sometimes|file|mimes:jpeg,jpg,png,webp,gif',
-            'package_id'  => 'nullable|exists:packages,id',
+            'sub_title'      => 'sometimes|string|max:255',
+            'description'    => 'nullable|string',
+            'thumbnail'      => 'nullable|file|mimes:jpg,jpeg,png,webp',
+            'package_id'     => 'nullable|exists:packages,id',
+            'archive_access' => 'nullable',
+            'archive_days'   => 'nullable',
+            'publish_date'   => 'required',
+            'is_archive'     => 'nullable',
         ]);
+
 
         try {
             $magazine = Magazine::findOrFail($id);
@@ -109,5 +115,13 @@ class MagazineController extends Controller
     public function show($magazine)
     {
         return response()->json($magazine->load('package'));
+    }
+
+    /**
+     * Show magazine for user selection
+     */
+    public function showMagazineSelect($package){
+        $package = Package::find($package);
+        return view ('magazine-selection',compact('package'));
     }
 }

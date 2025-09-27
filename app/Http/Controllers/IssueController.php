@@ -37,7 +37,8 @@ class IssueController extends Controller
             'sub_title'   => 'nullable|string|max:255',
             'thumbnail'   => 'required|file|mimes:jpeg,jpg,png,webp',
             'description' => 'nullable|string',
-            'magazine_id' => 'required|exists:magazines,id'
+            'magazine_id' => 'required|exists:magazines,id',
+            'issue_index' => 'required|numeric'
         ]);
 
         $issue_status = false;
@@ -117,7 +118,8 @@ class IssueController extends Controller
             'type'        => 'sometimes|in:stander,pro,unlimited',
             'price'       => 'sometimes|numeric|min:0',
             'issue_type'  => 'sometimes|in:free,premium',
-            'magazine_id' => 'required|exists:magazines,id'
+            'magazine_id' => 'required|exists:magazines,id',
+            'issue_index' => 'required|numeric'
         ]);
 
         $issue_status = false;
@@ -262,11 +264,16 @@ class IssueController extends Controller
     }
 
     // read issues
-    public function readIssue($id)
+    public function readIssue(Request $request, $id)
     {
         $package  = null;
         $issue    = Issue::findOrFail($id);
         $packages = UserSubscription::with('package')->latest()->get();
+
+        if($request->user()->role == 'user' && $issue->is_archive && !$issue->magazines->accessible()){
+            return back()->with('error', 'Your are not able to see this magazine');
+        }
+
         foreach ($packages as $key => $pack) {
             if ($pack->status == 'active') {
                 foreach($pack->package->magazines as $magazine){
@@ -285,17 +292,20 @@ class IssueController extends Controller
     }
 
     // user magazines
-    public function userMagazine($package_id)
+    public function userMagazine($subscription)
     {
-        $subscriptions = UserSubscription::where('package_id', $package_id)->where('user_id', auth()->user()->id)->where('status', 'active')->get();
+        $subscription = UserSubscription::where('user_id', auth()->user()->id)->where('status', 'active')->find($subscription);
 
-        return view('auth.users.magazines', compact('subscriptions'));
+        return view('auth.users.magazines', compact('subscription'));
     }
 
     // open issues according the magazine id
     public function openIssues(Request $request, $id){
         $magazines = Magazine::with('issues')->find($id);
-        return view('auth.users.issues',compact('magazines'));
+        if($magazines){
+            return view('auth.users.issues',compact('magazines'));
+        }
+        return back()->with('error', "There are no issues according the magazine {$id}");
     }
 
     // read issues

@@ -23,6 +23,11 @@ Route::get('/test', function(){
 Route::get('/', [App\Http\Controllers\PageController::class,'home'])->name('home');
 Route::get('/pricing', [App\Http\Controllers\PageController::class,'service'])->name('service');
 
+// general routes
+Route::get('/contact', [App\Http\Controllers\PageController::class, 'contact'])->name('contact');
+Route::post('/contact', [App\Http\Controllers\ContactController::class, 'submitContactForm'])->name('contact.submit');
+Route::get('magazine-selection/{package}', [MagazineController::class, 'showMagazineSelect'])->name('magazine.selection');
+
 // auth routes
 Route::get('/login', [App\Http\Controllers\PageController::class, 'login'])->name('login');
 Route::post('/login', [App\Http\Controllers\Auth\AuthController::class, 'login'])->name('auth.login');
@@ -44,7 +49,7 @@ Route::middleware((AuthMiddleware::class))->group(function () {
 // user authenticated routes
 Route::middleware(UserMiddleware::class)->prefix('user')->group(function(){
     // user subscription routes
-    Route::get('subscribe/{id}', [UserSubscriptionController::class,'subscribe'])->name('user.subscribe');
+    Route::post('subscribe', [UserSubscriptionController::class,'subscribe'])->name('user.subscribe');
     Route::get('subscribe/cancel/{id}', [UserSubscriptionController::class,'subscribeCancel'])->name('user.subscribe.cancel');
     Route::get('subscribe/resume/{id}', [UserSubscriptionController::class,'resumeSubscribe'])->name('user.subscribe.resume');
     Route::get('subscribe/download/{id}', [UserSubscriptionController::class,'resumeDownload'])->name('user.subscribe.download');
@@ -58,15 +63,10 @@ Route::middleware(UserMiddleware::class)->prefix('user')->group(function(){
     Route::get('gif-packs/download/{id}', [UserGifController::class, 'downloadGifPacks'])->name('user.gif-pack.download');
 
     // magazine routes
-    Route::get('magazines/{package_id}',[ IssueController::class, 'userMagazine'])->name('user.magazines');
+    Route::get('magazines/{subscription}',[ IssueController::class, 'userMagazine'])->name('user.magazines');
     Route::get('magazines/{id}/show', [IssueController::class, 'openIssues'])->name('user.magazine.view');
-    Route::get('read/magazine/{id}', [IssueController::class, 'readIssue'])->name('user.magazine.read');
+    Route::get('read/issue/{id}', [IssueController::class, 'readIssue'])->name('user.magazine.read');
 });
-
-// general routes
-Route::get('/contact', [App\Http\Controllers\PageController::class, 'contact'])->name('contact');
-Route::post('/contact', [App\Http\Controllers\ContactController::class, 'submitContactForm'])->name('contact.submit');
-
 
 // admin routes
 Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){

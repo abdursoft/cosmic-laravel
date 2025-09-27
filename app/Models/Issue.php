@@ -20,7 +20,9 @@ class Issue extends Model
         'status',
         'issue',
         'issue_type',
-        'magazine_id'
+        'magazine_id',
+        'is_archive',
+        'issue_index'
     ];
 
     /**
@@ -28,5 +30,15 @@ class Issue extends Model
      */
     public function magazines(){
         return $this->belongsTo(Magazine::class, 'magazine_id');
+    }
+
+    /**
+     * check model is archive or not
+     */
+    public function isArchive(){
+        if($this->is_archive == '1'){
+            return true;
+        }
+        return false;
     }
 }

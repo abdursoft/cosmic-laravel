@@ -36,4 +36,15 @@ class Magazine extends Model
     public function issues(){
         return $this->hasMany(Issue::class);
     }
+
+
+    /**
+     * check model is archive access
+     */
+    public function accessible(){
+        if($this->archive_access == '1'){
+            return true;
+        }
+        return false;
+    }
 }

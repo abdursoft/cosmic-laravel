@@ -19,6 +19,7 @@ class Package extends Model
         'cta_text',
         'price_id',
         'product_id',
+        'allowed_magazine'
     ];
 
     /**
