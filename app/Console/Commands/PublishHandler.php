@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\Magazine;
+use Carbon\Carbon;
 
 class PublishHandler extends Command
 {
@@ -18,13 +20,29 @@ class PublishHandler extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Publish magazines automatically when publish_date is reached';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        //
+        $now = Carbon::now();
+
+        $magazines = Magazine::where('publish_status', 'scheduled')
+            ->where('publish_date', '<=', $now)
+            ->get();
+
+        if ($magazines->isEmpty()) {
+            $this->info('No magazines to publish right now.');
+            return Command::SUCCESS;
+        }
+
+        foreach ($magazines as $mag) {
+            $mag->update(['publish_status' => 'published']);
+            $this->info("Published magazine: {$mag->title}");
+        }
+
+        return Command::SUCCESS;
     }
 }

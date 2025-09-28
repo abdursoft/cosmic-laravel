@@ -86,10 +86,4 @@
     quill.on('text-change', function() {
         hiddenInput.value = quill.root.innerHTML;
     });
-
-    window.onload = () => {
-        const value = $('#status').val();
-        premiumChange(value);
-    }
-
 </script>

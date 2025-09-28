@@ -1,12 +1,15 @@
 <?php
+
 namespace App\Http\Controllers\Payment;
 
 use App\Http\Controllers\Controller;
+use App\Mail\SubscriptionCancel;
+use App\Mail\SubscriptionMail;
 use App\Models\UserGif;
 use App\Models\UserMagazine;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class StripeController extends Controller
 {
@@ -84,11 +87,11 @@ class StripeController extends Controller
         $this->pay->products->delete($product, []);
     }
 
-    public function productSubscription($customer_id,$price_id)
+    public function productSubscription($customer_id, $price_id)
     {
         return $this->pay->subscriptions->create([
-            'customer' => $customer_id,
-            'items'    => [['price' => $price_id]],
+            'customer'         => $customer_id,
+            'items'            => [['price' => $price_id]],
             'payment_behavior' => 'default_incomplete',
             'payment_settings' => ['save_default_payment_method' => 'on_subscription'],
             'expand'           => ['latest_invoice.payment_intent'],
@@ -122,8 +125,8 @@ class StripeController extends Controller
     public function payment(string $email, int | float $amount, string $currency, string $name, array $data, $trans_id)
     {
         $checkout_session = $this->pay->checkout->sessions->create([
-            'success_url'                => route('payment.stripe.callback',$trans_id),
-            'cancel_url'                 => route('payment.stripe.callback',$trans_id),
+            'success_url'                => route('payment.stripe.callback', $trans_id),
+            'cancel_url'                 => route('payment.stripe.callback', $trans_id),
             'customer_email'             => $email,
             'submit_type'                => 'pay',
             'payment_method_types'       => ['card'],
@@ -207,15 +210,36 @@ class StripeController extends Controller
                     $payment->update([
                         'status' => 'active',
                     ]);
-                    return redirect()->route('service')->with("success","Payment has been completed");
+                    return redirect()->route('service')->with("success", "Payment has been completed");
                 } catch (\Throwable $th) {
-                    return redirect()->route('service')->with("error","Payment couldn't completed");
+                    return redirect()->route('service')->with("error", "Payment couldn't completed");
                 }
             } else {
-                return redirect()->route('service')->with("error","Payment has been failed");
+                return redirect()->route('service')->with("error", "Payment has been failed");
             }
         } else {
-            return redirect()->route('service')->with("error","Invalid payment ID");
+            return redirect()->route('service')->with("error", "Invalid payment ID");
+        }
+    }
+
+    /**
+     * subscription event update and confirmation
+     */
+    public function subscriptionEvent($subscription_id, $status, $mag_status)
+    {
+        $subscription = UserSubscription::where('subscription_id', $subscription_id)->update([
+            'status' => $status,
+        ]);
+
+        UserMagazine::where('user_subscription_id', $subscription_id)->update([
+            'status' => $mag_status,
+        ]);
+
+
+        if($status == 'updated' || $status == 'resumed'){
+            Mail::to($subscription->user->email)->send(new SubscriptionMail($subscription));
+        }else{
+            Mail::to($subscription->user->email)->send(new SubscriptionCancel($subscription));
         }
     }
 
@@ -228,7 +252,9 @@ class StripeController extends Controller
         $event      = null;
 
         $event = \Stripe\Webhook::constructEvent(
-            $payload, $sig_header, $endpoint_secret
+            $payload,
+            $sig_header,
+            $endpoint_secret
         );
 
         switch ($event->type) {
@@ -236,28 +262,16 @@ class StripeController extends Controller
                 $subscription = $event->data->object;
             case 'customer.subscription.deleted':
                 $subscription = $event->data->object;
-                UserSubscription::where('subscription_id', $subscription->id)->delete();
+                $this->subscriptionEvent($subscription->id, 'cancelled', 'inactive');
             case 'customer.subscription.paused':
                 $subscription = $event->data->object;
-                UserSubscription::where('subscription_id', $subscription->id)->update([
-                    'status' => 'paused',
-                ]);
+                $this->subscriptionEvent($subscription->id, 'paused', 'inactive');
             case 'customer.subscription.resumed':
                 $subscription = $event->data->object;
-                UserSubscription::where('subscription_id', $subscription->id)->update([
-                    'status' => 'active',
-                ]);
-                UserMagazine::where('user_subscription_id',$subscription->id)->update([
-                    'status' => 'active'
-                ]);
+                $this->subscriptionEvent($subscription->id, 'active', 'active');
             case 'customer.subscription.updated':
                 $subscription = $event->data->object;
-                UserSubscription::where('subscription_id', $subscription->id)->update([
-                    'status' => 'active',
-                ]);
-                UserMagazine::where('user_subscription_id',$subscription->id)->update([
-                    'status' => 'active'
-                ]);
+                $this->subscriptionEvent($subscription->id, 'active', 'active');
             default:
                 true;
         }

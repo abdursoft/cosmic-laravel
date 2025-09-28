@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -43,5 +44,23 @@ class UserSubscription extends Model
      */
     public function userMagazine(){
         return $this->hasMany(UserMagazine::class);
+    }
+
+
+    /**
+     * Package renewal date
+     */
+    public function nextBill(){
+        $bill = null;
+        if($this->type == 'monthly'){
+            $bill = Carbon::now()->addMonth(1);
+        }elseif($this->type == 'weekly'){
+            $bill = Carbon::now()->addDays(7);
+        }elseif($this->type == 'yearly'){
+            $bill = Carbon::now()->addMonths(12);
+        }else{
+            $bill = Carbon::now()->addCenturies(1);
+        }
+        return date('M-d-Y',strtotime($bill));
     }
 }

@@ -19,7 +19,8 @@ class Magazine extends Model
         'is_archive',
         'archive_days',
         'archive_access',
-        'publish_date'
+        'publish_date',
+        'publish_status'
     ];
 
     /**
@@ -43,6 +44,16 @@ class Magazine extends Model
      */
     public function accessible(){
         if($this->archive_access == '1'){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check model is publish
+     */
+    public function publish(){
+        if($this->publish_status == 'published'){
             return true;
         }
         return false;

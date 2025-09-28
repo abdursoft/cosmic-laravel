@@ -46,11 +46,30 @@
                         name="archive_access" required
                         class="mt-1 block w-full px-3 py-[10px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('archive_access') border-red-500 @enderror text-slate-800">
                         <option value="0">Select an access</option>
-                        <option value="1" @isset($magazine)@if($magazine->archive_access == '1') ? 'selected' : '' @endif @endisset>Yes</option>
-                        <option value="0" @isset($magazine) @if($magazine->archive_access == '0') ? 'selected' : '' @endif @endisset>No</option>
+                        <option value="1"
+                        @php echo !empty($magazine) && ($magazine->archive_access == '1') ? 'selected' : '' @endphp>Yes</option>
+                        <option value="0" @php echo !empty($magazine) && ($magazine->archive_access == '0') ? 'selected' : '' @endphp>No</option>
 
                     </select>
                     @error('archive_access')
+                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="flex justify-between my-1 gap-3">
+                <div class=" w-full">
+                    <label for="publish_status" class="block text-sm font-medium text-gray-700">Publish status</label>
+                    <select id="publish_status" value=" {{ old('publish_status') ?? ($magazine->publish_status ?? '') }}"
+                        name="publish_status" required
+                        class="mt-1 block w-full px-3 py-[10px] border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('publish_status') border-red-500 @enderror text-slate-800">
+                        <option >Select publish status</option>
+                        <option value="published"
+                        @php echo !empty($magazine) &&($magazine->publish_status == 'published') ? 'selected' : '' @endphp>Publish</option>
+                        <option value="scheduled" @php echo !empty($magazine) &&($magazine->publish_status == 'scheduled') ? 'selected' : '' @endphp>Schedule</option>
+
+                    </select>
+                    @error('publish_status')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror
                 </div>
@@ -67,7 +86,7 @@
                     @enderror
                 </div>
                 <div class="w-full md:w-1/2">
-                    <label for="publish_date" class="block text-sm font-medium text-gray-700"> Publishable Date</label>
+                    <label for="publish_date" class="block text-sm font-medium text-gray-700"> Publish on (Date)</label>
                     <input type="date" id="publish_date" name="publish_date" required autofocus
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('title') border-red-500 @enderror text-slate-800"
                         value="{{ old('publish_date') ?? (date('Y-m-d',strtotime(isset($magazine) ? $magazine->publish_date : '+7 days')) ?? '+7 days') }}">
