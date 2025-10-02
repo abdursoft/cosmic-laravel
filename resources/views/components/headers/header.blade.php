@@ -1,6 +1,6 @@
     <!-- header section  -->
     <div class="w-full flex text-white items-center justify-center bg-[#100f0f] ">
-        <header class="flex items-center justify-between p-3 shadow-md w-full md:max-w-[85%]">
+        <header class="flex items-center justify-between p-3 shadow-md w-full lg:max-w-[85%]">
             <div class="flex items-center justify-start gap-5">
                 <div class="flex items-center">
                     <a href="{{ route('home') }}" class="text-lg font-semibold text-gray-900 dark:text-white">

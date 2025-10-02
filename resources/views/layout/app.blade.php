@@ -25,6 +25,10 @@
         {{-- custom style  --}}
         @yield('styles')
 
+        
+        {{-- load jquery script  --}}
+        <script src="{{asset('js/jquery.min.js')}}"></script>
+
     </head>
     <body class="bg-[#262323]">
         {{-- load header component --}}

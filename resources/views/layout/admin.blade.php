@@ -25,6 +25,10 @@
         {{-- custom style  --}}
         @yield('styles')
 
+        
+        {{-- load jquery script  --}}
+        <script src="{{asset('js/jquery.min.js')}}"></script>
+
     </head>
     <body class="bg-[#FDFDFC] flex flex-col md:flex-row">
 
@@ -46,7 +50,7 @@
                 @include('components.headers.admin')
 
                 {{-- load dynamic contents  --}}
-                <div class="w-full p-3">
+                <div class="w-full p-3 h-auto">
                     @yield('content')
                 </div>
 

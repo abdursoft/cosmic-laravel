@@ -29,7 +29,7 @@
     {{-- load body components --}}
 
     {{-- load dynamic contents  --}}
-    <div class="w-full p-3">
+    <div class="w-full p-3 flex items-center justify-center">
         @yield('content')
     </div>
 

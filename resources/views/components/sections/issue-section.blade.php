@@ -12,11 +12,11 @@
         @include('components.sections.item-section')
         <div
             class="flex mt-5 w-full flex-col items-center justify-center lg:flex-row flex-wrap">
-            @foreach ($issues as $key => $issue)
+            @foreach (magazines() as $key => $magazine)
                 <div class="w-full h-[50vh] lg:w-1/2 h-[60vh] md:h-[65vh] lg:h-[75vh] lg:p-3 max-w-[700px]"
                     data-aos="zoom-in">
                     <div class="w-full h-full rounded-[22px] shadow-md h-md bg-white relative">
-                        <img src="{{ Storage::url($issue->thumbnail) }}" loading="lazy" alt=""
+                        <img src="{{ Storage::url($magazine->thumbnail) }}" loading="lazy" alt=""
                             class="w-full h-full rounded-[22px]">
                     </div>
                 </div>

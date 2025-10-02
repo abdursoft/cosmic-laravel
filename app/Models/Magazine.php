@@ -38,6 +38,13 @@ class Magazine extends Model
         return $this->hasMany(Issue::class);
     }
 
+    /**
+     * Relationship with user magazines table
+     */
+    public function userMagazine(){
+        return $this->hasMany(UserMagazine::class);
+    }
+
 
     /**
      * check model is archive access

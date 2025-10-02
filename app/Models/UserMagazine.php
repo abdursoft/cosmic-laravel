@@ -35,6 +35,6 @@ class UserMagazine extends Model
     // A user magazine belongs to a magazine
     public function magazine()
     {
-        return $this->belongsTo(Magazine::class);
+        return $this->belongsTo(Magazine::class,'magazine_id');
     }
 }

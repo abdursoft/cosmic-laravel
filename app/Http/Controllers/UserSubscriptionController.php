@@ -87,7 +87,7 @@ class UserSubscriptionController extends Controller
         $magazine = count($request->magazine);
 
         if($magazine > $package->allowed_magazine){
-            return back()->with('error', "You can't select more that {$package->allowed_magazine} magazines");
+            return back()->with('error', "You can't select more than {$package->allowed_magazine} magazines");
         }
 
         if (empty($user->customer_id)) {

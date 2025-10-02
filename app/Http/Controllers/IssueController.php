@@ -300,13 +300,24 @@ class IssueController extends Controller
     }
 
     // open issues according the magazine id
-    public function openIssues(Request $request, $id){
-        $magazines = Magazine::with('issues')->find($id);
-        if($magazines){
-            return view('auth.users.issues',compact('magazines'));
+    public function openIssues(Request $request, $id)
+    {
+        $magazines = Magazine::with(['issues' => function ($query) {
+            $query->where('status', 'active');
+        }])->find($id);
+
+        if (!$magazines) {
+            return back()->with('error', "There are no issues according the magazine {$id}");
         }
-        return back()->with('error', "There are no issues according the magazine {$id}");
+
+        $issues = $magazines->issues;
+
+        $archive = $issues->filter(fn($issue) => $issue->isArchive())->count();
+        $active = $issues->count() - $archive;
+
+        return view('auth.users.issues', compact('magazines', 'active', 'archive'));
     }
+
 
     // read issues
     public function adminReadIssue($id)

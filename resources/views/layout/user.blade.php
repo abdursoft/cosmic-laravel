@@ -26,6 +26,10 @@
     {{-- custom style  --}}
     @yield('styles')
 
+    
+    {{-- load jquery script  --}}
+    <script src="{{asset('js/jquery.min.js')}}"></script>
+
 </head>
 
 <body class="bg-[#ddd]">
@@ -38,17 +42,14 @@
 
     {{-- load body components --}}
     <div class="flex justify-center w-full min-h-[84vh]">
-        <div class="w-full flex flex-col md:flex-row p-3 max-w-[1550px]">
-            <div class="w-full md:w-1/4 lg:w-1/5 flex flex-row md:flex-col items-center md:items-start gap-2">
+        <div class="w-full flex flex-col p-3 max-w-[1550px]">
+            <div class="w-full flex flex-row md:flex-col items-center md:items-start gap-2">
                 {{-- load user nav bar  --}}
                 @include('components.headers.user')
-                {{-- load overview card component  --}}
-                @include('components.cards.user-service')
             </div>
 
             {{-- load body content  --}}
-            <div class="w-full md:w-3/4 lg:w-4/5 rounded-md">
-
+            <div class="w-full rounded-md">
                 {{-- load dynamic contents  --}}
                 <div class="w-full md:p-3">
                     @yield('content')

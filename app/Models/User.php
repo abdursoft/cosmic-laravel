@@ -25,6 +25,7 @@ class User extends Authenticatable
         'avatar',
         'password',
         'customer_id',
+        'remember_token',
         'password_reset_token',
     ];
 
@@ -77,7 +78,17 @@ class User extends Authenticatable
         return $this->hasMany(UserSubscription::class);
     }
 
+    /**
+     * Make the relation with purchase gif packs
+     */
     public function gifs(){
         return $this->hasMany(UserGif::class);
+    }
+
+    /**
+     * Make the relation with user purchase magazine
+     */
+    public function userMagazine(){
+        return $this->hasMany(UserMagazine::class);
     }
 }

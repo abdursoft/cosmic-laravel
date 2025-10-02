@@ -32,6 +32,7 @@ class MagazineController extends Controller
             'archive_access' => 'nullable',
             'archive_days'   => 'nullable',
             'publish_date'   => 'required',
+            'publish_status' => 'nullable|in:scheduled,published',
             'is_archive'     => 'nullable',
         ]);
 
@@ -71,6 +72,7 @@ class MagazineController extends Controller
             'archive_access' => 'nullable',
             'archive_days'   => 'nullable',
             'publish_date'   => 'required',
+            'publish_status' => 'sometimes|in:scheduled,published',
             'is_archive'     => 'nullable',
         ]);
 

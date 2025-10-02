@@ -6,6 +6,7 @@ use App\Http\Controllers\GifPackController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\MagazineController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PageController as ControllersPageController;
 use App\Http\Controllers\Payment\StripeController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\UserGifController;
@@ -44,12 +45,13 @@ Route::post('/reset-password', [App\Http\Controllers\PasswordController::class, 
 // dashboard route
 Route::middleware((AuthMiddleware::class))->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\PageController::class, 'dashboard'])->name('auth.dashboard');
+
+    Route::post('subscribe', [UserSubscriptionController::class,'subscribe'])->name('user.subscribe');
 });
 
 // user authenticated routes
 Route::middleware(UserMiddleware::class)->prefix('user')->group(function(){
     // user subscription routes
-    Route::post('subscribe', [UserSubscriptionController::class,'subscribe'])->name('user.subscribe');
     Route::get('subscribe/cancel/{id}', [UserSubscriptionController::class,'subscribeCancel'])->name('user.subscribe.cancel');
     Route::get('subscribe/resume/{id}', [UserSubscriptionController::class,'resumeSubscribe'])->name('user.subscribe.resume');
     Route::get('subscribe/download/{id}', [UserSubscriptionController::class,'resumeDownload'])->name('user.subscribe.download');
@@ -63,6 +65,7 @@ Route::middleware(UserMiddleware::class)->prefix('user')->group(function(){
     Route::get('gif-packs/download/{id}', [UserGifController::class, 'downloadGifPacks'])->name('user.gif-pack.download');
 
     // magazine routes
+    Route::get('magazine',[ ControllersPageController::class, 'userMagazines'])->name('user.magazine');
     Route::get('magazines/{subscription}',[ IssueController::class, 'userMagazine'])->name('user.magazines');
     Route::get('magazines/{id}/show', [IssueController::class, 'openIssues'])->name('user.magazine.view');
     Route::get('read/issue/{id}', [IssueController::class, 'readIssue'])->name('user.magazine.read');

@@ -1,10 +1,12 @@
- <!--Regular Datatables CSS-->
- <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
- <!--Responsive Extension Datatables CSS-->
- <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
+@section('styles')
+	 <!--Regular Datatables CSS-->
+	 <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
+	 <!--Responsive Extension Datatables CSS-->
+	 <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
 
- {{-- datatable css  --}}
- <link rel="stylesheet" href="{{ asset('css/data-table.css') }}">
+     {{-- datatable css  --}}
+     <link rel="stylesheet" href="{{asset('css/data-table.css')}}">
+@endSection
 
  <!--Container-->
  <div class="w-full text-slate-800">
@@ -52,26 +54,19 @@
  </div>
  <!--/container-->
 
- <!-- jQuery -->
- <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+@section('scripts')
+	<!--Datatables -->
+	<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+	<script>
+		$(document).ready(function() {
 
- <!--Datatables -->
- <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
- <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
- <script>
-     $(document).ready(function() {
+			var table = $('#example').DataTable( {
+					responsive: true
+				} )
+				.columns.adjust()
+				.responsive.recalc();
+		} );
 
-         var table = $('#example').DataTable({
-                 responsive: true
-             })
-             .columns.adjust()
-             .responsive.recalc();
-     });
-
-     function setUser(name, email, subject, id) {
-         $('#id').val(id);
-         $('#name').val(name);
-         $('#email').val(email);
-         $('#subject').val(subject);
-     }
- </script>
+	</script>
+@endsection

@@ -18,8 +18,9 @@ class AuthController extends Controller
     {
         // Logic for handling login
         $credentials = $request->only('email', 'password');
-        if (auth()->attempt($credentials)) {
+        if (auth()->attempt($credentials, $request->boolean('remember'))) {
             // Authentication passed
+            $request->session()->regenerate();
             return redirect()->route('auth.dashboard')->with('success', 'Login successful!');
         }
         return back()->withErrors(['email' => 'The provided credentials do not match our records.']);

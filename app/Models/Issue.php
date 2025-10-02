@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -37,6 +38,16 @@ class Issue extends Model
      */
     public function isArchive(){
         if($this->is_archive == '1'){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * checking the issue new or old 
+     */
+    public function isNew(){
+        if($this->updated_at > Carbon::now()->subDays(3)){
             return true;
         }
         return false;
