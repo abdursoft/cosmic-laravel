@@ -73,3 +73,15 @@ if(!function_exists('selection')){
         return '';
     }
 }
+
+
+/**
+ * Get an model
+ */
+if (!function_exists('getModel')) {
+    function getModel($model, $id)
+    {
+        $class = "\\App\\Models\\$model";
+        return $class::find($id) ?: (object) [];
+    }
+}

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Magazine;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Storage;
 
 class MagazineController extends Controller
@@ -124,6 +125,7 @@ class MagazineController extends Controller
      */
     public function showMagazineSelect($package){
         $package = Package::find($package);
-        return view ('magazine-selection',compact('package'));
+        $session = Cookie::get('purchase_session');
+        return view ('magazine-selection',compact('package','session'));
     }
 }

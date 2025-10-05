@@ -38,6 +38,7 @@ class User extends Authenticatable
         'otp',
         'password',
         'remember_token',
+        'password_reset_token'
     ];
 
     /**
@@ -90,5 +91,12 @@ class User extends Authenticatable
      */
     public function userMagazine(){
         return $this->hasMany(UserMagazine::class);
+    }
+
+    /**
+     * Relationship: Shopping cart has users
+     */
+    public function shoppingCart(){
+        return $this->hasMany(ShoppingCart::class);
     }
 }

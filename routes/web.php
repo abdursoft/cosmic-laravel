@@ -8,6 +8,7 @@ use App\Http\Controllers\MagazineController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PageController as ControllersPageController;
 use App\Http\Controllers\Payment\StripeController;
+use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\UserGifController;
 use App\Http\Controllers\UserSubscriptionController;
@@ -35,6 +36,7 @@ Route::post('/login', [App\Http\Controllers\Auth\AuthController::class, 'login']
 Route::get('/register', [App\Http\Controllers\PageController::class, 'register'])->name('register');
 Route::post('/register', [App\Http\Controllers\Auth\AuthController::class, 'register'])->name('auth.register');
 Route::get('/logout', [App\Http\Controllers\Auth\AuthController::class, 'logout'])->name('auth.logout');
+Route::post('/auth-check', [App\Http\Controllers\Auth\AuthController::class, 'emailCheck'])->name('auth.check');
 
 // forgot password routes
 Route::get('/forgot-password', [App\Http\Controllers\PageController::class, 'forgotPassword'])->name('password.forgot');
@@ -42,10 +44,19 @@ Route::get('/reset-password', [App\Http\Controllers\PageController::class, 'rese
 Route::post('/forgot-password', [App\Http\Controllers\PasswordController::class, 'sendPasswordOTP'])->name('password.forgot.submit');
 Route::post('/reset-password', [App\Http\Controllers\PasswordController::class, 'resetPassword'])->name('password.reset.submit');
 
+// cart routes
+Route::prefix('shopping-cart')->group(function(){
+    Route::post('add', [PurchaseController::class, 'shoppingCart'])->name('cart.add');
+    Route::post('remove', [PurchaseController::class, 'removeCart'])->name('cart.remove');
+    Route::post('remove-package', [PurchaseController::class, 'removePackage'])->name('cart.remove.package');
+    Route::get('', [PurchaseController::class, 'cartView'])->name('cart.list');
+});
+
 // dashboard route
 Route::middleware((AuthMiddleware::class))->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\PageController::class, 'dashboard'])->name('auth.dashboard');
 
+    Route::get('purchase', [PurchaseController::class,'purchase'])->name('user.purchase');
     Route::post('subscribe', [UserSubscriptionController::class,'subscribe'])->name('user.subscribe');
 });
 
@@ -117,6 +128,11 @@ Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){
     Route::get('pages/edit/{id}', [PageController::class,'edit'])->name('admin.pages.edit');
     Route::post('pages/update/{id}', [PageController::class,'update'])->name('admin.pages.update');
     Route::get('pages/delete/{id}', [PageController::class,'destroy'])->name('admin.pages.destroy');
+
+    // subscription routes
+    Route::get('subscribe/cancel/{id}', [UserSubscriptionController::class,'adminSubscribeCancel'])->name('admin.subscribe.cancel');
+    Route::get('subscribe/approve/{id}', [UserSubscriptionController::class,'subscribeApprove'])->name('admin.subscribe.approve');
+
 });
 
 

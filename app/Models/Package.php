@@ -37,4 +37,11 @@ class Package extends Model
     public function magazines(){
         return $this->hasMany(Magazine::class);
     }
+
+    /**
+     * Relationship: Shopping cart has packages
+     */
+    public function shoppingCart(){
+        return $this->hasMany(ShoppingCart::class);
+    }
 }

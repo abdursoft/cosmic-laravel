@@ -34,11 +34,11 @@
                         <td>{{ date('Y-m-d H:i:s', strtotime($subscription->created_at)) }}</td>
                         <td>
                             <div class="flex items-center gap-3">
-                                <a href="{{route('user.subscribe.cancel',$subscription->id)}}" class="p-3 rounded-md @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-red-600 text-white">
+                                <a href="{{route('admin.subscribe.cancel',$subscription->id)}}" class="p-3 rounded-md bg-red-600 text-white">
                                     Cancel
                                 </a>
-                                <a href="{{route('user.subscribe.resume',$subscription->id)}}" class="p-3 rounded-md @php echo $subscription->status == 'suspended' ? '' : 'hidden' @endphp bg-green-600 text-white">
-                                    Resume
+                                <a href="{{route('admin.subscribe.approve',$subscription->id)}}" class="p-3 rounded-md bg-green-600 text-white @php echo $subscription->status == 'pending' ? '' : 'hidden' @endphp">
+                                    Approve
                                 </a>
                             </div>
                         </td>

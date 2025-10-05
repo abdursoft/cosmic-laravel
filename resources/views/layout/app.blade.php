@@ -25,9 +25,13 @@
         {{-- custom style  --}}
         @yield('styles')
 
-        
+
         {{-- load jquery script  --}}
         <script src="{{asset('js/jquery.min.js')}}"></script>
+
+        {{-- axios and sweetjs  --}}
+        <script src="{{asset('js/axios.js')}}"></script>
+        <script src="{{asset('js/sweet.js')}}"></script>
 
     </head>
     <body class="bg-[#262323]">
@@ -43,6 +47,8 @@
                 @yield('content')
             </div>
         </div>
+
+        @include('components.modals.auth')
 
         {{-- load footer component --}}
         @include('components.footers.footer')

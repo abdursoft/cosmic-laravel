@@ -44,7 +44,7 @@ class Issue extends Model
     }
 
     /**
-     * checking the issue new or old 
+     * checking the issue new or old
      */
     public function isNew(){
         if($this->updated_at > Carbon::now()->subDays(3)){

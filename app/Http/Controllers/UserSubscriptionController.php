@@ -149,6 +149,33 @@ class UserSubscriptionController extends Controller
 
         $subscribe->status = 'canceled';
         $subscribe->save();
+
+        UserMagazine::where('user_subscription_id',$id)->update([
+            'status' => 'inactive'
+        ]);
+
+        return back()->with('success', 'Your subscription has been canceled');
+    }
+
+
+    // cancel subscription
+    public function adminSubscribeCancel(Request $request, $id)
+    {
+        $subscribe = UserSubscription::findOrFail($id);
+
+        $stripe = new StripeController();
+
+        $cancel = $stripe->subscriptionCancel($subscribe->subscription_id);
+        if (! $cancel) {
+            return back()->with('error', 'Subscription couldn\'t cancel, Please contact with admin');
+        }
+
+        $subscribe->status = 'canceled';
+        $subscribe->save();
+
+        UserMagazine::where('user_subscription_id',$id)->update([
+            'status' => 'inactive'
+        ]);
         return back()->with('success', 'Your subscription has been canceled');
     }
 
@@ -190,5 +217,22 @@ class UserSubscriptionController extends Controller
     public function userSubscriptions(){
         $subscriptions = UserSubscription::with('package')->where('user_id',auth()->user()->id)->latest()->get();
         return view('auth.users.subscription',compact('subscriptions'));
+    }
+
+    /**
+     * Approved subscription
+     */
+    public function subscribeApprove(Request $request, $id){
+        $sub = UserSubscription::find($id);
+
+        if($sub){
+            $sub->status = 'active';
+            $sub->save();
+
+            UserMagazine::where('user_subscription_id',$id)->update([
+                'status' => 'active'
+            ]);
+        }
+        return back()->with('success','Subscription approved');
     }
 }

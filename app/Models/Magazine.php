@@ -45,6 +45,13 @@ class Magazine extends Model
         return $this->hasMany(UserMagazine::class);
     }
 
+    /**
+     * Relationship: Shopping cart has magazines
+     */
+    public function shoppingCart(){
+        return $this->hasMany(ShoppingCart::class);
+    }
+
 
     /**
      * check model is archive access
