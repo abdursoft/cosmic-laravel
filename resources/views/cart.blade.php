@@ -22,7 +22,7 @@
                         @foreach($magazineIds as $magazineId)
                             @php $magazine = getModel('Magazine',$magazineId);  @endphp
                             <div class="flex items-start justify-start gap-2 flex-col md:flex-row my-3 mag_{{$magazine->id}}_remove">
-                                <img class="max-w-[350px] w-full" src="{{Storage::url($magazine->thumbnail)}}" alt="{{$magazine->title}}">
+                                <img class="max-w-[350px] h-[240px] w-full" src="{{Storage::url($magazine->thumbnail)}}" alt="{{$magazine->title}}">
                                 <div class="flex flex-col justify-start gap-5 h-[200px]">
                                     <div class="">
                                         <h2 class="text-xl md:text-2xl">{{$magazine->title}}</h2>
@@ -94,7 +94,7 @@
         try {
             const res = await axios.post('{{route('cart.remove')}}',{package:package,magazine:magazine});
 
-            $(`.mag_${package}_remove`).remove();
+            $(`.mag_${magazine}_remove`).remove();
             await sweetMessage('success',"Magazine remove",res.data.message)
         } catch (error) {
             await sweetMessage('error',"Magazine remove",error.response?.data.message)

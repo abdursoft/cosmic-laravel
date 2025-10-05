@@ -28,9 +28,8 @@ class AuthController extends Controller
                     525600
                 );
                 return response()->json([
-                    'code' => 'REGISTRATION_SUCCESS',
+                    'code' => 'LOGIN_SUCCESS',
                     'message' => 'Registration successful',
-                    'user' => auth()->user()
                 ]);
             }
             $request->session()->regenerate();
@@ -51,7 +50,7 @@ class AuthController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:6',
         ]);
 
         try {
@@ -68,20 +67,20 @@ class AuthController extends Controller
             auth()->login($user);
 
             if($request->axios){
-                Cookie::queue(
-                    'user_session',
-                    auth()->user()->id,
-                    525600
-                );
                 return response()->json([
                     'code' => 'REGISTRATION_SUCCESS',
                     'message' => 'Registration successful',
-                    'user' => $user
                 ]);
             }
 
             return redirect()->route('auth.dashboard')->with('success', 'Registration successful!');
         } catch (\Exception $e) {
+            if($request->axios){
+                return response()->json([
+                    'code' => 'REGISTRATION_SUCCESS',
+                    'message' => 'Registration successful',
+                ]);
+            }
             return back()->withErrors(['error' => 'Registration failed. Please try again.']);
         }
     }

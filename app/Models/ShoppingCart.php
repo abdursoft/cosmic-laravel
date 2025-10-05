@@ -30,8 +30,8 @@ class ShoppingCart extends Model
         return $this->belongsTo(Magazine::class);
     }
 
-    public function issue()
+    public function package()
     {
-        return $this->belongsTo(Issue::class);
+        return $this->belongsTo(Package::class);
     }
 }

@@ -133,7 +133,7 @@ class PurchaseController extends Controller
                 'session_id' => $request->cookie('purchase_session'),
                 'user_id' => optional($request->user())->id,
                 'magazine_id' => $request->magazine_id,
-                'package_id' => $request->package
+                'package_id' => $package->id
             ]);
 
             return response()->json([

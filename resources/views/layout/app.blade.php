@@ -25,6 +25,9 @@
         {{-- custom style  --}}
         @yield('styles')
 
+        {{-- csrf token  --}}
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
         {{-- load jquery script  --}}
         <script src="{{asset('js/jquery.min.js')}}"></script>

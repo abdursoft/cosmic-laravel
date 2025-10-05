@@ -31,10 +31,10 @@ Route::post('/contact', [App\Http\Controllers\ContactController::class, 'submitC
 Route::get('magazine-selection/{package}', [MagazineController::class, 'showMagazineSelect'])->name('magazine.selection');
 
 // auth routes
-Route::get('/login', [App\Http\Controllers\PageController::class, 'login'])->name('login');
-Route::post('/login', [App\Http\Controllers\Auth\AuthController::class, 'login'])->name('auth.login');
-Route::get('/register', [App\Http\Controllers\PageController::class, 'register'])->name('register');
-Route::post('/register', [App\Http\Controllers\Auth\AuthController::class, 'register'])->name('auth.register');
+Route::get('login', [App\Http\Controllers\PageController::class, 'login'])->name('login');
+Route::post('login', [App\Http\Controllers\Auth\AuthController::class, 'login'])->name('auth.login');
+Route::get('register', [App\Http\Controllers\PageController::class, 'register'])->name('register');
+Route::post('register', [App\Http\Controllers\Auth\AuthController::class, 'register'])->name('auth.register');
 Route::get('/logout', [App\Http\Controllers\Auth\AuthController::class, 'logout'])->name('auth.logout');
 Route::post('/auth-check', [App\Http\Controllers\Auth\AuthController::class, 'emailCheck'])->name('auth.check');
 

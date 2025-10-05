@@ -24,7 +24,8 @@
                 class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
         </div>
-        <div class="w-full password mt-4">
+        <p class="text-blue-600 mt-2 cursor-pointer" onclick="formReset()">Change email</p>
+        <div class="w-full mt-2">
             <button onclick="authCheck()" class="bg-blue-800 text-white w-full text-center rounded-md cursor-pointer py-2">Continue</button>
             <p class="text-base md:text-normal w-full">By clicking <strong>"Continue"</strong>, I agree with terms and condition </p>
         </div>
@@ -38,18 +39,31 @@
         $('.auth-modal').css({display:'none'});
     }
 
+    function formReset(){
+        authEmail = 'check';
+        $('.email').removeClass('hidden')
+        $('.password').addClass('hidden');
+        $('.name').addClass('hidden');
+    }
+
     async function authCheck(){
         const data = {
             name: $("input[name='name']").val(),
             email: $("input[name='email']").val(),
             password: $("input[name='password']").val(),
-            axios:true
+            axios:true,
         }
+
+        const header = {
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    }
 
         const url = authEmail == 'check' ? '{{route('auth.check')}}' : (authEmail == 'login' ? '{{route('auth.login')}}' : '{{route('auth.register')}}')
 
         try {
-            const res = await axios.post(url,data);
+            const res = await axios.post(url,data,header);
             if(res.data?.code == 'EMAIL_EXISTS'){
                 authEmail = 'login';
                 $('.email').addClass('hidden')
@@ -60,7 +74,7 @@
                 $('.password').removeClass('hidden');
                 $('.name').removeClass('hidden');
             }else{
-                if(res.data?.code == 'LOGIN_SUCCESS' || res.data?.code == 'REGISTER_SUCCESS'){
+                if(res.data?.code == 'LOGIN_SUCCESS' || res.data?.code == 'REGISTRATION_SUCCESS'){
                     window.location.href= '{{route('user.purchase')}}'
                 }
             }
