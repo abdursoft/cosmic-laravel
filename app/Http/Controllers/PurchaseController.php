@@ -109,7 +109,7 @@ class PurchaseController extends Controller
             return response()->json([
                 'code' => 'ALREADY_EXISTS',
                 'message' => 'Magazine already exists in your cart'
-            ], 422);
+            ], 200);
         }
 
         // Fetch user or session-based cart
@@ -123,7 +123,7 @@ class PurchaseController extends Controller
         // Check allowed magazine count
         if ($magazine->count() >= $package->allowed_magazine) {
              return response()->json([
-                'code' => 'INTERNAL_ERROR',
+                'code' => 'MAGAZINE_OVER',
                 'message' => "You couldn't add more than {$package->allowed_magazine} magazines",
             ], 422);
         }

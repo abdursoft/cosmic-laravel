@@ -123,7 +123,7 @@ class MagazineController extends Controller
     /**
      * Show magazine for user selection
      */
-    public function showMagazineSelect($package){
+    public function showMagazineSelect(Request $request, $package){
         $package = Package::find($package);
         $session = Cookie::get('purchase_session');
         return view ('magazine-selection',compact('package','session'));

@@ -85,3 +85,16 @@ if (!function_exists('getModel')) {
         return $class::find($id) ?: (object) [];
     }
 }
+
+/**
+ * if magazine into the shopping cart
+ */
+if(!function_exists('isCart')){
+    function isCart($package,$magazine){
+        $session = request()->cookie('purchase_session');
+        return \App\Models\ShoppingCart::where('session_id', $session)
+            ->where('magazine_id', $magazine)
+            ->where('package_id', $package)
+            ->exists();
+    }
+}
