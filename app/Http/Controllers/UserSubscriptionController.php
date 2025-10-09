@@ -150,10 +150,7 @@ class UserSubscriptionController extends Controller
         $subscribe->status = 'canceled';
         $subscribe->save();
 
-        UserMagazine::where('user_subscription_id',$id)->update([
-            'status' => 'inactive'
-        ]);
-
+        $subscribe->userMagazine()->delete();
         return back()->with('success', 'Your subscription has been canceled');
     }
 
@@ -173,10 +170,24 @@ class UserSubscriptionController extends Controller
         $subscribe->status = 'canceled';
         $subscribe->save();
 
-        UserMagazine::where('user_subscription_id',$id)->update([
-            'status' => 'inactive'
-        ]);
+        $subscribe->userMagazine()->delete();
         return back()->with('success', 'Your subscription has been canceled');
+    }
+
+    /**
+     * Admin subscription cancel
+     */
+    public function subscribeDelete(Request $request, $id){
+        $subscribe = UserSubscription::find($id);
+        if($subscribe){
+            $subscribe->userMagazine()->delete();
+            if($subscribe->status == 'active'){
+                $stripe = new StripeController();
+                $stripe->subscriptionCancel($subscribe->subscription_id);
+            }
+        }
+        $subscribe->delete();
+        return back()->with('success','Subscription has been deleted');
     }
 
     // resume subscribe

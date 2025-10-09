@@ -10,38 +10,33 @@
 
 <!--Container-->
 <div class="w-full text-slate-800">
-<h2 class="text-xl md:text-3xl my-3">User subscriptions</h2>
+<h2 class="text-xl md:text-3xl my-3">Subscriptions Tier overview</h2>
     <!--Card-->
         <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow bg-white">
         <table id="example" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
             <thead>
                 <tr>
                     <th data-priority="1">Name</th>
-                    <th data-priority="2">Package</th>
-                    <th data-priority="3">Type</th>
+                    <th data-priority="6">Sub ID</th>
                     <th data-priority="4">Status</th>
-                    <th data-priority="5">Expired at</th>
-                    <th data-priority="6">Action</th>
+                    <th data-priority="6">Created at</th>
+                    <th data-priority="7">Action</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($subscriptions as $key=>$subscription)
+                @foreach($tiers as $key=>$tier)
                     <tr>
-                        <td>{{ $subscription->user->name }}</td>
-                        <td>{{ $subscription->package->name }}</td>
-                        <td>{{ ucfirst($subscription->package->type)}}</td>
-                        <td>{{ $subscription->status }}</td>
-                        <td>{{ date('Y-m-d H:i:s', strtotime($subscription->created_at)) }}</td>
+                        <td>{{ $tier->user->name }}</td>
+                        <td>{{ $tier->sub_id }}</td>
+                        <td>{{ $tier->status }}</td>
+                        <td>{{ date('Y-m-d', strtotime($tier->created_at)) }}</td>
                         <td>
                             <div class="flex items-center gap-3">
-                                <a href="{{route('admin.subscribe.cancel',$subscription->id)}}" class="p-3 rounded-md bg-yellow-600 text-white">
+                                <a href="{{route('user.subscribe.tier.cancel',$tier->id)}}" class="py-2 px-3 rounded-md @php echo $tier->status != 'canceled' ? '' : 'hidden' @endphp bg-red-600 text-white">
                                     Cancel
                                 </a>
-                                <a href="{{route('admin.subscribe.delete',$subscription->id)}}" class="p-3 rounded-md bg-red-600 text-white">
-                                    Delete
-                                </a>
-                                <a href="{{route('admin.subscribe.approve',$subscription->id)}}" class="p-3 rounded-md bg-green-600 text-white @php echo $subscription->status == 'pending' ? '' : 'hidden' @endphp">
-                                    Approve
+                                <a target="_blank" href="{{$tier->payment_url}}" class="py-2 px-3 rounded-md @php echo $tier->payment_url != '' ? '' : 'hidden' @endphp bg-green-600 text-white">
+                                    Pay
                                 </a>
                             </div>
                         </td>
@@ -53,7 +48,6 @@
     <!--/Card-->
 </div>
 <!--/container-->
-
 
 @section('scripts')
 	<!--Datatables -->

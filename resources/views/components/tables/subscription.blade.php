@@ -39,6 +39,9 @@
                                 <a href="{{route('user.subscribe.cancel',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status !== 'canceled' ? '' : 'hidden' @endphp bg-red-600 text-white">
                                     Cancel
                                 </a>
+                                <a href="{{route('user.subscribe.tier',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-teal-600 text-white">
+                                    Manage
+                                </a>
                                 <a href="{{route('user.magazines',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-green-600 text-white">
                                     Magazines
                                 </a>

@@ -99,4 +99,11 @@ class User extends Authenticatable
     public function shoppingCart(){
         return $this->hasMany(ShoppingCart::class);
     }
+
+    /**
+     * Relationship:  Subscription tier has users
+     */
+    public function tier(){
+        return $this->hasMany(SubscriptionTier::class);
+    }
 }

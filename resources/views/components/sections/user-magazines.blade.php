@@ -2,7 +2,8 @@
 <section class="w-full text-white md:px-5 min-h-screen h-auto">
     <div class="flex mt-5 w-full flex-row flex-wrap mb-8 h-auto">
         @if ($subscription->userMagazine)
-            @foreach ($subscription->userMagazine as $magazine)
+            @foreach ($subscription->userMagazine as $mag)
+            @php $magazine = $mag->magazine; @endphp
                 <div
                     class="flex flex-col relative h-70 md:h-85 lg:h-95 w-1/2 lg:1/3 xl:w-1/4 my-2 overflow-hidden p-1 md:p-3">
                     <div class="w-full h-full shadow-md text-gray-800 rounded-[22px] relative overflow-hidden">

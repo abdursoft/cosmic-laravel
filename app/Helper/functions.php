@@ -98,3 +98,12 @@ if(!function_exists('isCart')){
             ->exists();
     }
 }
+
+/**
+ * if magazine into the user magazine cart
+ */
+if(!function_exists('purchasedMagazine')){
+    function purchasedMagazine($magazine,$list){
+        return $list->contains('magazine_id',$magazine);
+    }
+}

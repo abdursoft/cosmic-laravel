@@ -231,9 +231,39 @@ class StripeController extends Controller
             'status' => $status,
         ]);
 
+
+
+        if($subscription->tier && $status == 'active'){
+
+            UserMagazine::where('user_id', $subscription->user_id)->where('subscription_id',$subscription->id)->delete();
+
+            $subscription->tier->status = $status;
+            $subscription->tier->save();
+
+            if($subscription->subscription_id != $subscription->tier->sub_id){
+                $this->subscriptionCancel($subscription->subscription_id);
+            }
+
+            $subscription->subscription_id = $subscription->tier->sub_id;
+            $subscription->package_id = $subscription->tier->package_id;
+            $subscription->save();
+
+            $magazines = explode(',',$subscription->tier->magazines);
+
+            foreach($magazines as $mag){
+                UserMagazine::create([
+                    'user_subscription_id' => $subscription->id,
+                    'magazine_id' => $mag,
+                    'user_id' => $subscription->user_id,
+                    'status' => 'active',
+                ]);
+            }
+        }
+
         UserMagazine::where('user_subscription_id', $subscription_id)->update([
             'status' => $mag_status,
         ]);
+
 
 
         if($status == 'updated' || $status == 'resumed'){

@@ -37,7 +37,7 @@
             </div>
         @else
             <div class="text-center w-full text-xl md:text-2xl text-gray-400 h-[40vh] flex items-center justify-center">
-                There are no active Magazines!
+                There are no active issues!
             </div>
         @endif
     </div>
@@ -78,9 +78,9 @@
                     @endif
                 @endforeach
             </div>
-        @else 
+        @else
             <div class="text-center w-full text-xl md:text-2xl text-gray-400 h-[40vh] flex items-center justify-center">
-                There are no archive Magazines!
+                There are no archive issues!
             </div>
         @endif
     </div>

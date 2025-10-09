@@ -22,7 +22,7 @@
                         @foreach($magazineIds as $magazineId)
                             @php $magazine = getModel('Magazine',$magazineId);  @endphp
                             <div class="flex items-start justify-start gap-2 flex-col md:flex-row my-3 mag_{{$magazine->id}}_remove">
-                                <img class="md:max-w-[340px] h-[240px] w-full" src="{{Storage::url($magazine->thumbnail)}}" alt="{{$magazine->title}}">
+                                <img class="md:max-w-[340px] h-full md:max-h-[250px] w-full" src="{{Storage::url($magazine->thumbnail)}}" alt="{{$magazine->title}}">
                                 <div class="flex-1 flex flex-col justify-start gap-5 h-[200px]">
                                     <div class="">
                                         <h2 class="text-xl md:text-2xl">{{$magazine->title}}</h2>
@@ -62,7 +62,7 @@
                 <div class="text-s">
                     Every issue delivers a provocative journey into control, obedience, and desire. Curated for those who crave power dynamics and high-art erotica. No censorship. Just raw expression.
                 </div>
-                <div class="flex items-center justify-between mt-4 group">
+                <div class="flex items-center flex-col md:flex-row justify-between mt-4 group gap-2">
                     <label for="agree" class="flex items-center justify-start gap-1">
                         <input type="checkbox" name="agree" id="agree" />
                         <p class="text-sm text-orange-800">I agree to the Terms of Pleasure and Conditions</p>

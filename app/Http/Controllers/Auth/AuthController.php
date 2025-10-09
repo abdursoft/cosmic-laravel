@@ -22,11 +22,6 @@ class AuthController extends Controller
         if (auth()->attempt($credentials, $request->boolean('remember'))) {
             // Authentication passed
             if($request->axios){
-                Cookie::queue(
-                    'user_session',
-                    auth()->user()->id,
-                    525600
-                );
                 return response()->json([
                     'code' => 'LOGIN_SUCCESS',
                     'message' => 'Registration successful',

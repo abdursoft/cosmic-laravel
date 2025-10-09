@@ -10,6 +10,7 @@ use App\Http\Controllers\PageController as ControllersPageController;
 use App\Http\Controllers\Payment\StripeController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SiteSettingController;
+use App\Http\Controllers\SubscriptionTierController;
 use App\Http\Controllers\UserGifController;
 use App\Http\Controllers\UserSubscriptionController;
 use App\Http\Middleware\AdminMiddleware;
@@ -66,6 +67,13 @@ Route::middleware(UserMiddleware::class)->prefix('user')->group(function(){
     Route::get('subscribe/cancel/{id}', [UserSubscriptionController::class,'subscribeCancel'])->name('user.subscribe.cancel');
     Route::get('subscribe/resume/{id}', [UserSubscriptionController::class,'resumeSubscribe'])->name('user.subscribe.resume');
     Route::get('subscribe/download/{id}', [UserSubscriptionController::class,'resumeDownload'])->name('user.subscribe.download');
+
+    // subscription tier changing
+    Route::get('subscribe/tiers', [SubscriptionTierController::class,'index'])->name('user.subscribe.tiers');
+    Route::get('subscribe/tiers/cancel/{id}', [SubscriptionTierController::class,'cancelTier'])->name('user.subscribe.tier.cancel');
+    Route::get('subscribe/tier/{id}', [SubscriptionTierController::class,'showTier'])->name('user.subscribe.tier');
+    Route::post('package/tier', [SubscriptionTierController::class,'magazineList'])->name('user.package.tier');
+    Route::post('process/tier', [SubscriptionTierController::class,'processTier'])->name('user.process.tier');
 
     // user purchase routes
     Route::get('purchase/gif/{id}', [UserGifController::class,'purchaseGifPack'])->name('user.purchase.gif');
@@ -132,6 +140,7 @@ Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){
     // subscription routes
     Route::get('subscribe/cancel/{id}', [UserSubscriptionController::class,'adminSubscribeCancel'])->name('admin.subscribe.cancel');
     Route::get('subscribe/approve/{id}', [UserSubscriptionController::class,'subscribeApprove'])->name('admin.subscribe.approve');
+    Route::get('subscribe/delete/{id}', [UserSubscriptionController::class,'subscribeDelete'])->name('admin.subscribe.delete');
 
 });
 

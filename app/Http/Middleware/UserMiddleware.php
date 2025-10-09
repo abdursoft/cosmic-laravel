@@ -16,7 +16,7 @@ class UserMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         // Check if the user is authenticated and has user privileges
-        if (!auth()->check() || !auth()->user()->isUser() || !$request->cookie('user_session')) {
+        if (!auth()->check() || !auth()->user()->isUser()) {
             // Redirect to the home page if not a user
             return redirect()->route('home')->with('error', 'You do not have permission to access this page.');
         }

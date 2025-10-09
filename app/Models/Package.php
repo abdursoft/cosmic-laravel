@@ -44,4 +44,11 @@ class Package extends Model
     public function shoppingCart(){
         return $this->hasMany(ShoppingCart::class);
     }
+
+    /**
+     * Relationship: Tier  has package
+     */
+    public function tier(){
+        return $this->hasMany(SubscriptionTier::class);
+    }
 }

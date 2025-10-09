@@ -46,6 +46,13 @@ class UserSubscription extends Model
         return $this->hasMany(UserMagazine::class);
     }
 
+    /**
+     * Relationship:  Subscription tier has users
+     */
+    public function tier(){
+        return $this->hasMany(SubscriptionTier::class);
+    }
+
 
     /**
      * Package renewal date
