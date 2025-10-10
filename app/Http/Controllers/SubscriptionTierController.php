@@ -103,6 +103,7 @@ class SubscriptionTierController extends Controller
         }
 
         try {
+
             $package = Package::find($request->package);
             $magazine = '';
             foreach($request->magazines as $key=>$mag){
@@ -119,9 +120,20 @@ class SubscriptionTierController extends Controller
                     'message' => "You can't select more than {$package->allowed_magazine} magazines"
                 ],422);
             }
+            $xPackage = Package::find($request->xPackage);
+
+            // package price comparison
+            $amount = $package->price - 1;
+
+            if($package->price > $xPackage->price){
+                $amount = $xPackage->price;
+            }
+
+            $coupon_amount = $amount * 100;
 
             $stripe = new StripeController();
-            $subscribe = $stripe->productSubscription($request->user()->customer_id,$package->price_id);
+            $coupon = $stripe->coupon($coupon_amount);
+            $subscribe = $stripe->productSubscription($request->user()->customer_id,$package->price_id,$coupon->id);
 
             $uri = $subscribe->latest_invoice->hosted_invoice_url ?? '';
 
@@ -144,7 +156,6 @@ class SubscriptionTierController extends Controller
             return response()->json([
                 'code' => 'TIER_ERROR',
                 'message' => 'Subscription tier couldn\'t create',
-                'error' => $th->getMessage()
             ],500);
         }
     }

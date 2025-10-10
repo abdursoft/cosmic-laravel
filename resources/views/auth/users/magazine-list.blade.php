@@ -6,7 +6,7 @@
 
     <div class="container min-h-screen">
         <div class="p-0 md:px-5 w-full">
-            <h2 class="text-xl text-white border-b-1 border-slate-700">Your All Magazines</h2>
+            <h2 class="text-xl text-white border-b-1 border-slate-700">Magazines in your subscription</h2>
         </div>
         <!-- active magazine -->
         <div class="mt-5 w-full flex flex-col md:flex-row justify-start flex-wrap mb-8 h-auto magazine">
@@ -23,4 +23,3 @@
         </div>
 
 @endsection
- 

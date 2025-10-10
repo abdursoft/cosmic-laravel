@@ -42,7 +42,7 @@
                                 <a href="{{route('user.subscribe.tier',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-teal-600 text-white">
                                     Manage
                                 </a>
-                                <a href="{{route('user.magazines',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-green-600 text-white">
+                                <a href="{{route('user.magazines',$subscription->id)}}" class="py-2 px-3 rounded-md hidden bg-green-600 text-white">
                                     Magazines
                                 </a>
                             </div>

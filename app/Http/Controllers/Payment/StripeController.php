@@ -87,7 +87,7 @@ class StripeController extends Controller
         $this->pay->products->delete($product, []);
     }
 
-    public function productSubscription($customer_id, $price_id)
+    public function productSubscription($customer_id, $price_id,$coupon=null)
     {
         return $this->pay->subscriptions->create([
             'customer'         => $customer_id,
@@ -95,6 +95,7 @@ class StripeController extends Controller
             'payment_behavior' => 'default_incomplete',
             'payment_settings' => ['save_default_payment_method' => 'on_subscription'],
             'expand'           => ['latest_invoice.payment_intent'],
+            'discounts'        => $coupon ? [['coupon' => $coupon]] : []
         ]);
     }
 
@@ -220,6 +221,18 @@ class StripeController extends Controller
         } else {
             return redirect()->route('service')->with("error", "Invalid payment ID");
         }
+    }
+
+    /**
+     * Create a coupon for subscription or product
+     */
+    public function coupon($amount,$type='flat',$currency='USD',$cycle='once'){
+        $charge = $type === 'flat' ? 'amount_off' : 'percent_off';
+        return $this->pay->coupons->create([
+            'duration' => $cycle,
+            'currency' => $currency,
+            $charge => $amount,
+        ]);
     }
 
     /**

@@ -20,7 +20,7 @@
                     <th data-priority="6">Sub ID</th>
                     <th data-priority="4">Status</th>
                     <th data-priority="6">Created at</th>
-                    <th data-priority="7">Action</th>
+                    <th data-priority="7" class="hidden">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,7 +30,7 @@
                         <td>{{ $tier->sub_id }}</td>
                         <td>{{ $tier->status }}</td>
                         <td>{{ date('Y-m-d', strtotime($tier->created_at)) }}</td>
-                        <td>
+                        <td class="hidden">
                             <div class="flex items-center gap-3">
                                 <a href="{{route('user.subscribe.tier.cancel',$tier->id)}}" class="py-2 px-3 rounded-md @php echo $tier->status != 'canceled' ? '' : 'hidden' @endphp bg-red-600 text-white">
                                     Cancel

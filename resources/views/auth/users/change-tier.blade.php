@@ -9,9 +9,9 @@
 <div class="w-full mx-auto">
     <div class="container">
         <div class="w-full flex justify-between flex-col md:flex-row gap-2 relative">
-            <div class="w-full md:w-1/3 lg:w-1/4 bg-slate-800 relative">
-                <h2 class="text-base md:text-xl text-white p-2">Package</h2>
-                <div class="w-full h-auto bg-gray-200 p-1">
+            <div class="w-full md:w-1/3 lg:w-1/4 bg-slate-800 relative flex flex-col">
+                <h2 class="text-base md:text-xl text-white p-2 h-[45px]">Manage your subscriptions</h2>
+                <div class="w-full h-auto bg-gray-200 p-1 flex-1">
                     <h2 class="text-base">Current Package: <strong>{{$package->name}}</strong></h2>
 
                     <select onchange="fetchPackageData()" name="package" class="w-full py-2 bg-white rounded-md" id="package">
@@ -20,10 +20,16 @@
                             <option value="{{$pack->id}}" {{selection($pack->id,$package->id)}}>{{$pack->name}}</option>
                         @endforeach
                     </select>
+                    <div class="mt-2 w-full">
+                        <p class="text-base text-sm my-2">Your current tier is shown in bold black.</p><p class="text-base text-sm my-2">To change it, select a new subscription tier. </p>
+                        <p class="text-base text-sm my-2">Then choose the magazines you want.
+When you're ready, click Pay Now to confirm the change. If you're upgrading, you'll be charged only the price difference. If downgrading (changing fee $1), the new price will take effect on the next billing cycle. </p>
+                        <p class="text-base text-sm my-2">Your subscription will update immediately after payment.</p>
+                    </div>
                 </div>
-                <div class="flex items-center justify-between w-full gap-2 py-1 absolute bottom-1 px-1">
-                    <button class="bg-teal-600 text-white rounded-md cursor-pointer hover:bg-teal-800 delay-300 transition-all w-1/2" onclick="changeTier('now')">Pay Now</button>
-                    <button class="bg-green-600 text-white rounded-md cursor-pointer hover:bg-green-800 delay-300 transition-all w-1/2" onclick="changeTier('later')">Pay Later</button>
+                <div class="flex items-center justify-center w-full gap-2 py-1 px-1 h-[40px]">
+                    <button class="bg-teal-600 text-white rounded-md cursor-pointer hover:bg-teal-800 delay-300 transition-all w-full max-w-92" onclick="changeTier('now')">Pay Now</button>
+                    <button class="bg-green-600 text-white rounded-md cursor-pointer hover:bg-green-800 delay-300 transition-all w-1/2 hidden" onclick="changeTier('later')">Pay Later</button>
                 </div>
             </div>
             <div class="w-full md:w-2/3 lg:w-3/4 p-2 bg-white relative min-h-[400px]">
@@ -70,7 +76,8 @@
             mode:mode,
             subscription: '{{$subscription->id}}',
             magazines: magazines,
-            package: $("select[name='package']").val()
+            package: $("select[name='package']").val(),
+            xPackage:'{{$package->id}}'
         }
 
         try {
