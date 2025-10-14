@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Issue;
 use App\Models\IssuePackage;
+use App\Models\IssueSequence;
 use App\Models\Magazine;
+use App\Models\UserMagazine;
 use App\Models\UserSubscription;
 use App\Traits\IssueHelper;
 use Illuminate\Http\Request;
@@ -266,28 +268,19 @@ class IssueController extends Controller
     // read issues
     public function readIssue(Request $request, $id)
     {
-        $package  = null;
-        $issue    = Issue::findOrFail($id);
-        $packages = UserSubscription::with('package')->latest()->get();
+        $sequence = IssueSequence::where('issue_id',$id)->where('user_id',$request->user()->id)->first();
 
-        if($request->user()->role == 'user' && $issue->is_archive && !$issue->magazines->accessible()){
+        if($request->user()->role == 'user' && ($sequence->status == 'archived' && !$sequence->magazine->accessible())){
             return back()->with('error', 'Your are not able to see this magazine');
         }
 
-        foreach ($packages as $key => $pack) {
-            if ($pack->status == 'active') {
-                foreach($pack->package->magazines as $magazine){
-                    $package = check_package($issue->id, $magazine->id);
-                    if($package) break;
-                }
-            }
-        }
-
-        if ($package) {
-            $path   = explode('/', $issue->issue_path);
+        if ($sequence->magazine) {
+            $path   = explode('/', $sequence->issue->issue_path);
             $path   = end($path);
+            $issue  = $sequence->issue;
             return view('issue', compact('issue', 'path'));
         }
+
         return back()->with('error', 'Your are not able to see this magazine');
     }
 
@@ -302,20 +295,25 @@ class IssueController extends Controller
     // open issues according the magazine id
     public function openIssues(Request $request, $id)
     {
-        $magazines = Magazine::with(['issues' => function ($query) {
-            $query->where('status', 'active');
-        }])->find($id);
+        $magazines = IssueSequence::where('user_id', $request->user()->id)->where('magazine_id', $id)->get();
 
         if (!$magazines) {
             return back()->with('error', "There are no issues according the magazine {$id}");
         }
 
-        $issues = $magazines->issues;
+        $magazine = Magazine::find($id);
 
-        $archive = $issues->filter(fn($issue) => $issue->isArchive())->count();
-        $active = $issues->count() - $archive;
+        $active  = [];
+        $archive = [];
+        foreach ($magazines as $mag) {
+            if($mag->status == 'active'){
+                $active[] = $mag->issue;
+            }else{
+                $archive[] = $mag->issue;
+            }
+        }
 
-        return view('auth.users.issues', compact('magazines', 'active', 'archive'));
+        return view('auth.users.issues', compact('magazine', 'active', 'archive'));
     }
 
 

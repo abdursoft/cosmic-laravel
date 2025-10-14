@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Payment;
 use App\Http\Controllers\Controller;
 use App\Mail\SubscriptionCancel;
 use App\Mail\SubscriptionMail;
+use App\Models\Issue;
+use App\Models\IssueSequence;
 use App\Models\UserGif;
 use App\Models\UserMagazine;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class StripeController extends Controller
@@ -248,8 +251,6 @@ class StripeController extends Controller
 
         if($subscription->tier && $status == 'active'){
 
-            UserMagazine::where('user_id', $subscription->user_id)->where('subscription_id',$subscription->id)->delete();
-
             $subscription->tier->status = $status;
             $subscription->tier->save();
 
@@ -263,20 +264,65 @@ class StripeController extends Controller
 
             $magazines = explode(',',$subscription->tier->magazines);
 
-            foreach($magazines as $mag){
-                UserMagazine::create([
-                    'user_subscription_id' => $subscription->id,
-                    'magazine_id' => $mag,
-                    'user_id' => $subscription->user_id,
-                    'status' => 'active',
-                ]);
+            DB::beginTransaction();
+            try {
+                foreach($magazines as $mag){
+                    $issue = Issue::where('magazine_id',$mag)->orderBy('issue_index','asc')->first();
+
+                    $exists = UserMagazine::where('user_id', $subscription->user_id)->where('user_subscription_id',$subscription->id)->where('magazine_id',$mag)->first();
+
+                    if(!$exists){
+                        $uMagazine = UserMagazine::create([
+                            'user_subscription_id' => $subscription->id,
+                            'magazine_id' => $mag,
+                            'user_id' => $subscription->user_id,
+                            'status' => 'active',
+                            'issue_sequence_index' => $issue->issue_index,
+                            'sequence_date' => now(),
+                        ]);
+                    }else{
+                        $exists->sequence_date = now();
+                        $exists->status = 'active';
+                        $exists->save();
+                        $uMagazine = $exists;
+                    }
+
+                    $issueExists = IssueSequence::where('issue_id',$issue->id)->where('magazine_id',$mag)->where('user_id',$subscription->tier->user_id)->first();
+
+                    if(!$issueExists){
+                        IssueSequence::create([
+                            'user_id' => $subscription->tier->subscription->user_id,
+                            'magazine_id' => $mag,
+                            'issue_id' => $issue ? $issue->id : null,
+                            'status' => 'active',
+                            'user_magazine_id' => $uMagazine->id,
+                        ]);
+                    }else{
+                        $issueExists->status = 'active';
+                        $issueExists->save();
+                    }
+                }
+                DB::commit();
+            }catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
             }
+        }else{
+            UserMagazine::where('user_subscription_id', $subscription_id)->get()->each(function($magazine) use ($mag_status) {
+                $magazine->status = $mag_status;
+                $magazine->save();
+
+                $issue = Issue::where('magazine_id',$magazine->magazine_id)->orderBy('issue_index','asc')->first();
+
+                IssueSequence::create([
+                    'user_id' => $magazine->user_id,
+                    'magazine_id' => $magazine->magazine_id,
+                    'issue_id' => $issue ? $issue->id : null,
+                    'status' => 'active',
+                    'user_magazine_id' => $magazine->id,
+                ]);
+            });
         }
-
-        UserMagazine::where('user_subscription_id', $subscription_id)->update([
-            'status' => $mag_status,
-        ]);
-
 
 
         if($status == 'updated' || $status == 'resumed'){

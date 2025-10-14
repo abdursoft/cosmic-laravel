@@ -13,6 +13,7 @@ class SubscriptionTier extends Model
         'sub_id',
         'user_id',
         'package_id',
+        'x_package',
         'subscription_id',
         'status',
         'payment_url',
@@ -35,12 +36,19 @@ class SubscriptionTier extends Model
         return $this->belongsTo(UserSubscription::class, 'subscription_id');
     }
 
-    
+
     /**
      * Relationship with package
      */
     public function package()
     {
         return $this->belongsTo(Package::class);
+    }
+
+    /**
+     * Relationship with x package
+     */
+    public function xPackage(){
+        return $this->belongsTo(Package::class, 'x_package');
     }
 }

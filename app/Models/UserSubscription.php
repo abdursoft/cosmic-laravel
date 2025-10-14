@@ -43,7 +43,7 @@ class UserSubscription extends Model
      * Get the magazine associated with subscription
      */
     public function userMagazine(){
-        return $this->hasMany(UserMagazine::class);
+        return $this->hasMany(UserMagazine::class,'user_subscription_id');
     }
 
     /**

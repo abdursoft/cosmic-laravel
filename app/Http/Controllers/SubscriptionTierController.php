@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Payment\StripeController;
+use App\Models\Issue;
+use App\Models\IssueSequence;
 use App\Models\Package;
 use App\Models\SubscriptionTier;
+use App\Models\UserMagazine;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class SubscriptionTierController extends Controller
@@ -64,6 +68,8 @@ class SubscriptionTierController extends Controller
 
         $active = false;
 
+        $checked = $package->allowed_magazine >= 3 ? 'checked' : '';;
+
         $html = "<h2 class='text-base md:text-xl text-red-500 mb-4'>You can select only {$package->allowed_magazine} magazines for $$package->price</h2>";
 
         $html .= '<div class="mt-5 w-full flex-col md:flex-row justify-start flex-wrap mb-8 h-auto magazine" style="display: flex;" id="activeMagazine">';
@@ -77,8 +83,7 @@ class SubscriptionTierController extends Controller
                         <div class="w-full h-full rounded-lg overflow-hidden shadow-2xl flex flex-col"><img class="h-[260px]" src="'.Storage::url($magazine->thumbnail).'" alt="'.$magazine->title.'" loading="lazy">
                             <label for="lb_check_'.$magazine->title.'" class="flex items-center justify-center bg-orange-700 p-2 gap-3">
                                 <input type="checkbox"
-                                value="'.$magazine->id.'" class="check_magazine" name="magazine[]" id="lb_check_'.$magazine->title.'" '.($active == true ? 'checked' : ''). ' />
-
+                                value="'.$magazine->id.'" class="check_magazine" name="magazine[]" id="lb_check_'.$magazine->title.'" '.($active == true ? 'checked' : $checked). ' />
                                 <p class="text-white">Select</p>
                             </label>
                         </div>
@@ -141,6 +146,7 @@ class SubscriptionTierController extends Controller
                 'sub_id' => $subscribe->id,
                 'user_id' => $request->user()->id,
                 'package_id' => $package->id,
+                'x_package'  => $xPackage->id,
                 'subscription_id' => $subscription->id,
                 'status' => 'pending',
                 'payment_url' => $uri,
@@ -212,5 +218,92 @@ class SubscriptionTierController extends Controller
         $tier->delete();
 
         return response()->json(['message' => 'Subscription Tier deleted successfully']);
+    }
+
+    /**
+     * Show tiers in admin panel
+     */
+    public function adminTiers(){
+        $tiers = SubscriptionTier::with('user','package','subscription')->latest()->get();
+        return view('auth.admin.tiers',compact('tiers'));
+    }
+
+    /**
+     * Approve subscription tiers
+     */
+    public function approveTier($id){
+        $tier = SubscriptionTier::with('user','package','subscription')->find($id);
+
+        if(!$tier){
+            return back()->with('error','Tier couldn\'t found!');
+        }
+
+            $tier->status = 'active';
+            $tier->save();
+
+            $tier->subscription->subscription_id = $tier->sub_id;
+            $tier->subscription->package_id = $tier->package_id;
+            $tier->subscription->save();
+
+            $magazines = explode(',',$tier->magazines);
+
+            DB::beginTransaction();
+            try {
+                foreach($magazines as $mag){
+                    $issue = Issue::where('magazine_id',$mag)->orderBy('issue_index','asc')->first();
+
+                    $exists = UserMagazine::where('user_id', $tier->user_id)->where('user_subscription_id',$tier->subscription_id)->where('magazine_id',$mag)->first();
+
+                    if(!$exists){
+                        $uMagazine = UserMagazine::create([
+                            'user_subscription_id' => $tier->subscription->id,
+                            'magazine_id' => $mag,
+                            'user_id' => $tier->subscription->user_id,
+                            'status' => 'active',
+                            'issue_sequence_index' => $issue->issue_index,
+                            'sequence_date' => now(),
+                        ]);
+                    }else{
+                        $exists->sequence_date = now();
+                        $exists->status = 'active';
+                        $exists->save();
+                        $uMagazine = $exists;
+                    }
+
+                    $issueExists = IssueSequence::where('issue_id',$issue->id)->where('magazine_id',$mag)->where('user_id',$tier->user_id)->first();
+
+                    if(!$issueExists){
+                        IssueSequence::create([
+                            'user_id' => $tier->subscription->user_id,
+                            'magazine_id' => $mag,
+                            'issue_id' => $issue ? $issue->id : null,
+                            'status' => 'active',
+                            'user_magazine_id' => $uMagazine->id,
+                        ]);
+                    }else{
+                        $issueExists->status = 'active';
+                        $issueExists->save();
+                    }
+                }
+                DB::commit();
+            }catch (\Exception $e) {
+                DB::rollBack();
+                return back()->with('error','An error occurred while approving the tier: ' . $e->getMessage());
+            }
+
+        return back()->with('success','Subscription tier has been approved!');
+    }
+
+    /**
+     * Admin remove the tiers
+     */
+    public function removeTier($id){
+        $tier = SubscriptionTier::find($id);
+
+        if(!$tier){
+            return back()->with('error','Tier couldn\'t found!');
+        }
+        $tier->delete();
+        return back()->with('success',"Subscription tier has been deleted");
     }
 }

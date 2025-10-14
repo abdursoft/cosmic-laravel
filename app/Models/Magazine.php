@@ -52,6 +52,13 @@ class Magazine extends Model
         return $this->hasMany(ShoppingCart::class);
     }
 
+    /**
+     * Relationship: Sequence has magazines
+     */
+    public function sequence(){
+        return $this->hasMany(IssueSequence::class);
+    }
+
 
     /**
      * check model is archive access

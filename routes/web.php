@@ -141,6 +141,9 @@ Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){
     Route::get('subscribe/cancel/{id}', [UserSubscriptionController::class,'adminSubscribeCancel'])->name('admin.subscribe.cancel');
     Route::get('subscribe/approve/{id}', [UserSubscriptionController::class,'subscribeApprove'])->name('admin.subscribe.approve');
     Route::get('subscribe/delete/{id}', [UserSubscriptionController::class,'subscribeDelete'])->name('admin.subscribe.delete');
+    Route::get('subscribe/tiers', [SubscriptionTierController::class,'adminTiers'])->name('admin.subscribe.tiers');
+    Route::get('subscribe/tier/{id}/approve', [SubscriptionTierController::class,'approveTier'])->name('admin.subscribe.tier.approve');
+    Route::get('subscribe/tier/{id}/delete', [SubscriptionTierController::class,'removeTier'])->name('admin.subscribe.tier.delete');
 
 });
 

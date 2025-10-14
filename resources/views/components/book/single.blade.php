@@ -52,7 +52,7 @@
     let bmgHowl=null;
     let sfxHowls = [];
     let gfxHowls = [];
-    let musicMuted = !1,
+    let musicMuted = false,
         sfxMuted = !1;
     let PAGES = [];
     let images = ["{{ asset('storage/issues/' . $path . '/cover.jpg') }}"];
@@ -235,10 +235,11 @@
         }
 
         bmgHowl = new Howl({
-            src: [audioData.url],
+            src: audioData.url,
             loop: CONTINUOUS_MUSIC,
             volume: parseFloat(musicVol.value),
             html5: !0,
+            mute: musicMuted
         });
         bmgHowl.play();
         currentBMGAudioData = audioData
@@ -277,10 +278,11 @@
         }
 
         musicHowl = new Howl({
-            src: [audioData.url],
+            src: audioData.url,
             loop: CONTINUOUS_MUSIC,
             volume: parseFloat(musicVol.value),
             html5: !0,
+            mute: musicMuted
         });
         musicHowl.play();
         currentAudioData = audioData
@@ -324,10 +326,11 @@
                 sfxHowls.stop()
             }
             sfxHowls = new Howl({
-                src: [audioData?.url],
+                src: audioData?.url,
                 loop: CONTINUOUS_MUSIC,
                 volume: parseFloat(musicVol.value),
                 html5: !0,
+                mute: musicMuted
             });
             sfxHowls.play();
             currentSFXData = audioData
@@ -372,10 +375,11 @@
                 gfxHowls.stop()
             }
             gfxHowls = new Howl({
-                src: [audioData?.url],
+                src: audioData?.url,
                 loop: CONTINUOUS_MUSIC,
                 volume: parseFloat(musicVol.value),
                 html5: !0,
+                mute: musicMuted
             });
             gfxHowls.play();
             currentGFXData = audioData
@@ -389,6 +393,7 @@
             pageTurnHowl = new Howl({
                 src: pageTurnSrc,
                 volume: parseFloat(sfxVol.value),
+                mute: musicMuted
             }).play()
         }
     }
@@ -449,28 +454,14 @@
 
         });
         muteAll.addEventListener("click", () => {
-            const nowMute = !(musicMuted && sfxMuted);
-            musicMuted = nowMute;
-            sfxMuted = nowMute;
-            if (musicHowl instanceof Howl) musicHowl.mute(nowMute);
-            if (pageTurnHowl instanceof Howl) pageTurnHowl.mute(nowMute);
-            if (bmgHowl instanceof Howl) bmgHowl.mute(nowMute);
-            if (gfxHowls) {
-                if (Array.isArray(gfxHowls)) {
-                    gfxHowls.forEach((h) => h.volume(v))
-                }else{
-                    gfxHowls.mute(nowMute);
-                }
-            }
+            musicMuted = !musicMuted;
+            if (musicHowl instanceof Howl) musicHowl.mute(musicMuted);
+            if (pageTurnHowl instanceof Howl) pageTurnHowl.mute(musicMuted);
+            if (bmgHowl instanceof Howl) bmgHowl.mute(musicMuted);
+            if (gfxHowls instanceof Howl) gfxHowls.mute(musicMuted);
 
-            if (sfxHowls) {
-                if (Array.isArray(sfxHowls)) {
-                    sfxHowls.forEach((h) => h.volume(v))
-                }else{
-                    sfxHowls.mute(nowMute);
-                }
-            }
-            muteAll.textContent = nowMute ? "Unmute" : "Mute"
+            if (sfxHowls instanceof Howl)  sfxHowls.mute(musicMuted);
+            muteAll.textContent = musicMuted ? "Unmute" : "Mute"
         })
     }
 

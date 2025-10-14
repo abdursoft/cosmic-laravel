@@ -20,6 +20,10 @@
         class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.transactions') ? 'bg-gray-200 font-semibold' : '' }}">
         Subscriptions
     </a>
+    <a href="{{ route('admin.subscribe.tiers') }}"
+        class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.subscribe.tiers') ? 'bg-gray-200 font-semibold' : '' }}">
+        Tiers
+    </a>
     <a href="{{ route('admin.gif-packs') }}"
         class="block px-4 py-2 rounded hover:bg-gray-200  text-slate-800 {{ request()->routeIs('admin.gif-packs') ? 'bg-gray-200 font-semibold' : '' }}">
         Gif packages

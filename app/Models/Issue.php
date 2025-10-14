@@ -34,6 +34,13 @@ class Issue extends Model
     }
 
     /**
+     * Relationship: Sequence has issues
+     */
+    public function sequence(){
+        return $this->hasMany(IssueSequence::class);
+    }
+
+    /**
      * check model is archive or not
      */
     public function isArchive(){

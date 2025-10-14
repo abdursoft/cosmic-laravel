@@ -14,6 +14,7 @@ class UserMagazine extends Model
         'magazine_id',
         'user_id',
         'status',
+        'next_sub'
     ];
 
     /**
@@ -36,5 +37,12 @@ class UserMagazine extends Model
     public function magazine()
     {
         return $this->belongsTo(Magazine::class,'magazine_id');
+    }
+
+    /**
+     * Relationship: User magazine has issue sequences
+     */
+    public function issueSequence(){
+        return $this->hasMany(IssueSequence::class, 'user_magazine_id');
     }
 }

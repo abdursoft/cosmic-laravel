@@ -78,6 +78,7 @@ class PurchaseController extends Controller
             return redirect()->away($subscribe->latest_invoice->hosted_invoice_url);
         } catch (\Throwable $th) {
             DB::rollBack();
+            dd($th->getMessage());
             return back()->with('error','Couldn\'t process your purchase');
         }
     }

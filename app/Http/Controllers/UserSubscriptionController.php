@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Payment\StripeController;
+use App\Models\Issue;
+use App\Models\IssueSequence;
 use App\Models\Package;
 use App\Models\UserMagazine;
 use App\Models\UserSubscription;
@@ -115,12 +117,23 @@ class UserSubscriptionController extends Controller
             ]);
 
             foreach($request->magazine as $magazine){
-                UserMagazine::create([
-                    'user_id' => $user->id,
-                    'magazine_id' => $magazine,
-                    'user_subscription_id' => $subscription->id,
-                    'status' => 'inactive'
-                ]);
+                $exists = UserMagazine::where('user_id', $user->id)
+                    ->where('magazine_id', $magazine)
+                    ->first();
+
+                if($exists){
+                    $exists->next_sub = $subscription->id;
+                    $exists->save();
+                }else{
+                    $exists = UserMagazine::create([
+                        'user_id' => $user->id,
+                        'magazine_id' => $magazine,
+                        'user_subscription_id' => $subscription->id,
+                        'status' => 'inactive',
+                        'sequence_date' => null,
+                        'issue_sequence_index' => null,
+                    ]);
+                }
             }
 
             DB::commit();
@@ -135,23 +148,27 @@ class UserSubscriptionController extends Controller
     // cancel subscription
     public function subscribeCancel(Request $request, $id)
     {
-        $subscribe = UserSubscription::findOrFail($id);
+        $subscribe = UserSubscription::where('id',$id)->where('user_id',auth()->user()->id)->first();
         if (! $subscribe->user_id == auth()->user()->id) {
             return back()->with('error', 'Unauthorized subscription access');
         }
 
-        $stripe = new StripeController();
+        try {
+            $stripe = new StripeController();
+            $stripe->subscriptionCancel($subscribe->subscription_id);
 
-        $cancel = $stripe->subscriptionCancel($subscribe->subscription_id);
-        if (! $cancel) {
-            return back()->with('error', 'Subscription couldn\'t cancel, Please contact with admin');
+            $subscribe->status = 'canceled';
+            $subscribe->save();
+            $subscribe->userMagazine()->issueSequence()->update(['status' => 'archived']);
+            $subscribe->userMagazine()->update(['status' => 'inactive']);
+            return back()->with('success', 'Your subscription has been canceled');
+        } catch (\Throwable $th) {
+            $subscribe->status = 'canceled';
+            $subscribe->save();
+            $subscribe->userMagazine()->issueSequence()->update(['status' => 'archived']);
+            $subscribe->userMagazine()->update(['status' => 'inactive']);
+            return back()->with('error', $th->getMessage());
         }
-
-        $subscribe->status = 'canceled';
-        $subscribe->save();
-
-        $subscribe->userMagazine()->delete();
-        return back()->with('success', 'Your subscription has been canceled');
     }
 
 
@@ -162,15 +179,22 @@ class UserSubscriptionController extends Controller
 
         $stripe = new StripeController();
 
-        $cancel = $stripe->subscriptionCancel($subscribe->subscription_id);
-        if (! $cancel) {
-            return back()->with('error', 'Subscription couldn\'t cancel, Please contact with admin');
+        try {
+            $stripe->subscriptionCancel($subscribe->subscription_id);
+            $subscribe->status = 'canceled';
+            $subscribe->save();
+
+            $subscribe->userMagazine()->issueSequence()->update(['status' => 'archived']);
+            $subscribe->userMagazine()->update(['status' => 'inactive']);
+        } catch (\Throwable $th) {
+            $subscribe->status = 'canceled';
+            $subscribe->save();
+
+            $subscribe->userMagazine()->issueSequence()->update(['status' => 'archived']);
+            $subscribe->userMagazine()->update(['status' => 'inactive']);
+            return back()->with('error', 'Subscription couldn\'t cancel');
         }
 
-        $subscribe->status = 'canceled';
-        $subscribe->save();
-
-        $subscribe->userMagazine()->delete();
         return back()->with('success', 'Your subscription has been canceled');
     }
 
@@ -183,9 +207,16 @@ class UserSubscriptionController extends Controller
             $subscribe->userMagazine()->delete();
             if($subscribe->status == 'active'){
                 $stripe = new StripeController();
-                $stripe->subscriptionCancel($subscribe->subscription_id);
+                try {
+                    $stripe->subscriptionCancel($subscribe->subscription_id);
+                } catch (\Throwable $th) {
+                    $subscribe->delete();
+                    return back()->with('error',$th->getMessage());
+                }
             }
         }
+        $subscribe->userMagazine()->issueSequence()->delete();
+        $subscribe->userMagazine()->delete();
         $subscribe->delete();
         return back()->with('success','Subscription has been deleted');
     }
@@ -234,15 +265,45 @@ class UserSubscriptionController extends Controller
      * Approved subscription
      */
     public function subscribeApprove(Request $request, $id){
-        $sub = UserSubscription::find($id);
+        $subscription = UserSubscription::where('id',$id)->where('status','pending')->first();
 
-        if($sub){
-            $sub->status = 'active';
-            $sub->save();
+        DB::beginTransaction();
+        if($subscription){
+            $subscription->status = 'active';
+            $subscription->save();
 
-            UserMagazine::where('user_subscription_id',$id)->update([
-                'status' => 'active'
-            ]);
+            try {
+                foreach($subscription->userMagazine as $mag){
+                    $issue = Issue::where('magazine_id',$mag->magazine_id)->orderBy('issue_index','asc')->first();
+
+
+                    $mag->issue_sequence_index = $issue ? $issue->issue_index : null;
+                    $mag->sequence_date = now();
+                    $mag->status = 'active';
+
+                    $mag->user_subscription_id = !empty($mag->next_sub) ? $mag->next_sub : $mag->user_subscription_id;
+                    $mag->save();
+
+                    $issueExists = IssueSequence::where('issue_id',$issue->id)->where('magazine_id',$mag)->where('user_id',$mag->user_id)->first();
+
+                    if(!$issueExists){
+                        IssueSequence::create([
+                            'user_id' => $subscription->user_id,
+                            'magazine_id' => $mag->magazine_id,
+                            'issue_id' => $issue ? $issue->id : null,
+                            'status' => 'active',
+                            'user_magazine_id' => $mag->id,
+                        ]);
+                    }else{
+                        $issueExists->status = 'active';
+                        $issueExists->save();
+                    }
+                }
+                DB::commit();
+            }catch (\Exception $e) {
+                DB::rollBack();
+                return back()->with('error', 'Subscription couldn\'t approve');
+            }
         }
         return back()->with('success','Subscription approved');
     }

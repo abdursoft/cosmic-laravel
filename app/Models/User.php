@@ -106,4 +106,11 @@ class User extends Authenticatable
     public function tier(){
         return $this->hasMany(SubscriptionTier::class);
     }
+
+    /**
+     * Relationship: IssueSequence has users
+     */
+    public function issueSequence(){
+        return $this->hasMany(IssueSequence::class);
+    }
 }
