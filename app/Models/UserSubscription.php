@@ -50,7 +50,7 @@ class UserSubscription extends Model
      * Relationship:  Subscription tier has users
      */
     public function tier(){
-        return $this->hasMany(SubscriptionTier::class);
+        return $this->hasMany(SubscriptionTier::class,'subscription_id');
     }
 
 

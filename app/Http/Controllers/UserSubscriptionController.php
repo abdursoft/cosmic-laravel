@@ -159,13 +159,31 @@ class UserSubscriptionController extends Controller
 
             $subscribe->status = 'canceled';
             $subscribe->save();
-            $subscribe->userMagazine()->issueSequence()->update(['status' => 'archived']);
+
+            $magazines = $subscribe->userMagazine; // get the collection
+
+            foreach ($magazines as $magazine) {
+                // Update issue sequences
+                $magazine->issueSequence()->update(['status' => 'archived']);
+
+                // Update magazine status
+                $magazine->update(['status' => 'inactive']);
+            }
+
             $subscribe->userMagazine()->update(['status' => 'inactive']);
             return back()->with('success', 'Your subscription has been canceled');
         } catch (\Throwable $th) {
             $subscribe->status = 'canceled';
             $subscribe->save();
-            $subscribe->userMagazine()->issueSequence()->update(['status' => 'archived']);
+            $magazines = $subscribe->userMagazine; // get the collection
+
+            foreach ($magazines as $magazine) {
+                // Update issue sequences
+                $magazine->issueSequence()->update(['status' => 'archived']);
+
+                // Update magazine status
+                $magazine->update(['status' => 'inactive']);
+            }
             $subscribe->userMagazine()->update(['status' => 'inactive']);
             return back()->with('error', $th->getMessage());
         }
@@ -184,13 +202,29 @@ class UserSubscriptionController extends Controller
             $subscribe->status = 'canceled';
             $subscribe->save();
 
-            $subscribe->userMagazine()->issueSequence()->update(['status' => 'archived']);
+            $magazines = $subscribe->userMagazine; // get the collection
+
+            foreach ($magazines as $magazine) {
+                // Update issue sequences
+                $magazine->issueSequence()->update(['status' => 'archived']);
+
+                // Update magazine status
+                $magazine->update(['status' => 'inactive']);
+            }
             $subscribe->userMagazine()->update(['status' => 'inactive']);
         } catch (\Throwable $th) {
             $subscribe->status = 'canceled';
             $subscribe->save();
 
-            $subscribe->userMagazine()->issueSequence()->update(['status' => 'archived']);
+            $magazines = $subscribe->userMagazine; // get the collection
+
+            foreach ($magazines as $magazine) {
+                // Update issue sequences
+                $magazine->issueSequence()->update(['status' => 'archived']);
+
+                // Update magazine status
+                $magazine->update(['status' => 'inactive']);
+            }
             $subscribe->userMagazine()->update(['status' => 'inactive']);
             return back()->with('error', 'Subscription couldn\'t cancel');
         }
@@ -215,7 +249,10 @@ class UserSubscriptionController extends Controller
                 }
             }
         }
-        $subscribe->userMagazine()->issueSequence()->delete();
+        $magazines = $subscribe->userMagazine;
+        foreach ($magazines as $magazine) {
+            $magazine->delete();
+        }
         $subscribe->userMagazine()->delete();
         $subscribe->delete();
         return back()->with('success','Subscription has been deleted');

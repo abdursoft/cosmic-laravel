@@ -12,7 +12,7 @@
             @csrf
             <div class="flex justify-between my-1 gap-3">
                 <div class="w-full md:w-1/2">
-                    <label for="title" class="block text-sm font-medium text-gray-700"> Magazine title</label>
+                    <label for="title" class="block text-sm font-medium text-gray-700"> Issue title</label>
                     <input type="title" id="title" placeholder="Magazine name" name="title" required autofocus
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('title') border-red-500 @enderror text-slate-800"
                         value="{{ old('title') ?? ($issue->title ?? '') }}">

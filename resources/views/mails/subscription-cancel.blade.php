@@ -32,7 +32,7 @@
           <!-- Header -->
           <tr>
             <td style="padding:20px; background:#0f1724; color:#ffffff;">
-              <img src="{{ site()->logo }}" alt="{{ site()->name }} logo" width="140" style="display:block; max-width:140px;">
+              <img src="{{ site()->logo ?? '' }}" alt="{{ site()->name ?? '' }} logo" width="140" style="display:block; max-width:140px;">
             </td>
           </tr>
 
@@ -90,7 +90,7 @@
               </table>
 
               <p style="margin:20px 0 0; font-size:14px; color:#6b7280;">
-                Need help? Contact us at <a href="mailto:{{ site()->email }}" style="color:#2563eb;">{{ site()->email }}</a>.
+                Need help? Contact us at <a href="mailto:{{ site()->email ?? '' }}" style="color:#2563eb;">{{ site()->email ?? '' }}</a>.
               </p>
             </td>
           </tr>
@@ -98,8 +98,8 @@
           <!-- Footer -->
           <tr>
             <td style="padding:18px 32px; background:#f8fafc; color:#6b7280; font-size:13px;">
-              {{ site()->name }} • <span class="hide-mobile">{{ site()->address }}</span><br>
-              &copy; {{ now()->year }} {{ site()->name }}. All rights reserved.
+              {{ site()->name ?? '' }} • <span class="hide-mobile">{{ site()->address }}</span><br>
+              &copy; {{ now()->year }} {{ site()->name ?? '' }}. All rights reserved.
             </td>
           </tr>
         </table>

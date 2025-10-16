@@ -19,7 +19,7 @@ use App\Http\Middleware\UserMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/test', function(){
-    return view('demo');
+    return view('welcome');
 });
 
 // page routes

@@ -94,6 +94,12 @@ class PackageController extends Controller
                 $validated['thumbnail'] = Storage::disk('public')->put('thumbnail', $request->file('thumbnail'));
                 Storage::disk('public')->delete($package->thumbnail);
             }
+            if (isset($request->price) && $request->price != $package->price) {
+                $stripe = new StripeController();
+                // update price in stripe
+                $price = $stripe->productPrice($package->product_id, $request->price, 'USD', substr($request->type ?? $package->type, 0, -2));
+                $validated['price_id'] = $price['id'] ?? $price->id;
+            }
             $package->update($validated);
             return back()->with('success', 'Package successfully updated');
         } catch (\Throwable $th) {

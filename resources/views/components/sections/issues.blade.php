@@ -17,7 +17,7 @@
                             class="flex flex-col relative h-70 md:h-85 lg:h-95 w-full md:w-1/3 lg:w-1/4 my-2 overflow-hidden p-3">
                             <a href="{{ route('user.magazine.read', $issue->id) }}" class="w-full h-70 md:h-85 lg:h-95 rounded-[12px] overflow-hidden relative">
                                 <!-- Left side ribbon -->
-                                <div class="absolute top-0 left-0 w-16 h-16">
+                                <div class="absolute top-0 left-0 w-16 h-16 z-2">
                                     <div class="absolute transform rotate-[-45deg] bg-green-600 text-center text-white font-medium py-1 right-[-75px] top-[32px] w-[190px]">
                                     New Release
                                     </div>

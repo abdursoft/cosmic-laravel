@@ -158,6 +158,7 @@ class SubscriptionTierController extends Controller
                 'message' => 'Subscription tier has been created',
                 'payment_url' => $uri
             ],201);
+            
         } catch (\Throwable $th) {
             return response()->json([
                 'code' => 'TIER_ERROR',
@@ -189,8 +190,7 @@ class SubscriptionTierController extends Controller
     public function show($id)
     {
         $tier = SubscriptionTier::with(['user', 'subscription'])->findOrFail($id);
-        return response()->json($tier);
-    }
+        return response()->json($tier);  }
 
     /**
      * Update a specific subscription tier.

@@ -7,12 +7,14 @@ use App\Mail\SubscriptionCancel;
 use App\Mail\SubscriptionMail;
 use App\Models\Issue;
 use App\Models\IssueSequence;
+use App\Models\SubscriptionTier;
 use App\Models\UserGif;
 use App\Models\UserMagazine;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Stripe\Exception\SignatureVerificationException;
 
 class StripeController extends Controller
 {
@@ -239,130 +241,190 @@ class StripeController extends Controller
     }
 
     /**
+     * Subscription tier upgrade application
+     */
+    private function applyTierUpgrade($subscription,$status)
+    {
+        // deactivate previous tiers
+        $subscription->tier()->where('status','active')->update(['status'=>'inactive']);
+        $tier = $subscription->tier()->latest()->first(); // <-- Use () for relationship
+
+        if (!$tier) {
+            return;
+        }
+
+        $tier->update(['status' => $status]);
+
+        if ($subscription->subscription_id !== $tier->sub_id) {
+            $this->subscriptionCancel($subscription->subscription_id);
+        }
+
+        $subscription->update([
+            'subscription_id' => $tier->sub_id,
+            'package_id'      => $tier->package_id,
+            'status'          => $status,
+        ]);
+
+        $this->assignMagazines($subscription, explode(',', $tier->magazines),$status);
+    }
+
+
+    /**
+     * Update magazine statuses based on subscription events
+     */
+    private function assignMagazines($subscription, $magazines,$status)
+    {
+        // Deactivate magazines not in the new list
+        $subscription->userMagazine()->whereNotIn('magazine_id', $magazines)->update(['status' => 'inactive']);
+
+        foreach ($magazines as $mag) {
+            $issue = Issue::where('magazine_id', $mag)->orderBy('issue_index', 'asc')->first();
+
+            $uMagazine = UserMagazine::updateOrCreate(
+                [
+                    'user_subscription_id' => $subscription->id,
+                    'magazine_id' => $mag,
+                    'status' => $status,
+                    'user_id' => $subscription->user_id,
+                ],
+                [
+                    'status' => $status,
+                    'issue_sequence_index' => $issue->issue_index ?? 0,
+                    'sequence_date' => now(),
+                ]
+            );
+
+            IssueSequence::updateOrCreate(
+                [
+                    'user_magazine_id' => $uMagazine->id,
+                    'magazine_id' => $mag,
+                    'status' => $status,
+                    'user_id' => $subscription->user_id,
+                ],
+                [
+                    'issue_id' => $issue->id ?? null,
+                    'status' => $status,
+                ]
+            );
+        }
+    }
+
+
+    /**
+     * Subscription magazine status update
+     */
+    private function updateMagazineStatuses($subscription_id, $mag_status)
+    {
+        UserMagazine::where('user_subscription_id', $subscription_id)->get()->each(function ($magazine) use ($mag_status) {
+
+            $magazine->status = $mag_status;
+            $magazine->sequence_date = now();
+            $magazine->save();
+
+            $issue = Issue::where('magazine_id', $magazine->magazine_id)->orderBy('issue_index', 'asc')->first();
+
+            IssueSequence::updateOrCreate(
+                [
+                    'user_magazine_id' => $magazine->id,
+                    'magazine_id' => $magazine->magazine_id,
+                    'user_id' => $magazine->user_id,
+                ],
+                [
+                    'issue_id' => $issue->id ?? null,
+                    'status' => $mag_status // previously hardcoded active
+                ]
+            );
+        });
+    }
+
+
+    /**
      * subscription event update and confirmation
      */
     public function subscriptionEvent($subscription_id, $status, $mag_status)
     {
-        $subscription = UserSubscription::where('subscription_id', $subscription_id)->update([
-            'status' => $status,
-        ]);
+        $subscription = UserSubscription::where('subscription_id', $subscription_id)->first();
 
-
-
-        if($subscription->tier && $status == 'active'){
-
-            $subscription->tier->status = $status;
-            $subscription->tier->save();
-
-            if($subscription->subscription_id != $subscription->tier->sub_id){
-                $this->subscriptionCancel($subscription->subscription_id);
-            }
-
-            $subscription->subscription_id = $subscription->tier->sub_id;
-            $subscription->package_id = $subscription->tier->package_id;
-            $subscription->save();
-
-            $magazines = explode(',',$subscription->tier->magazines);
-
-            DB::beginTransaction();
-            try {
-                foreach($magazines as $mag){
-                    $issue = Issue::where('magazine_id',$mag)->orderBy('issue_index','asc')->first();
-
-                    $exists = UserMagazine::where('user_id', $subscription->user_id)->where('user_subscription_id',$subscription->id)->where('magazine_id',$mag)->first();
-
-                    if(!$exists){
-                        $uMagazine = UserMagazine::create([
-                            'user_subscription_id' => $subscription->id,
-                            'magazine_id' => $mag,
-                            'user_id' => $subscription->user_id,
-                            'status' => 'active',
-                            'issue_sequence_index' => $issue->issue_index,
-                            'sequence_date' => now(),
-                        ]);
-                    }else{
-                        $exists->sequence_date = now();
-                        $exists->status = 'active';
-                        $exists->save();
-                        $uMagazine = $exists;
-                    }
-
-                    $issueExists = IssueSequence::where('issue_id',$issue->id)->where('magazine_id',$mag)->where('user_id',$subscription->tier->user_id)->first();
-
-                    if(!$issueExists){
-                        IssueSequence::create([
-                            'user_id' => $subscription->tier->subscription->user_id,
-                            'magazine_id' => $mag,
-                            'issue_id' => $issue ? $issue->id : null,
-                            'status' => 'active',
-                            'user_magazine_id' => $uMagazine->id,
-                        ]);
-                    }else{
-                        $issueExists->status = 'active';
-                        $issueExists->save();
-                    }
-                }
-                DB::commit();
-            }catch (\Exception $e) {
-                DB::rollBack();
-                throw $e;
-            }
-        }else{
-            UserMagazine::where('user_subscription_id', $subscription_id)->get()->each(function($magazine) use ($mag_status) {
-                $magazine->status = $mag_status;
-                $magazine->save();
-
-                $issue = Issue::where('magazine_id',$magazine->magazine_id)->orderBy('issue_index','asc')->first();
-
-                IssueSequence::create([
-                    'user_id' => $magazine->user_id,
-                    'magazine_id' => $magazine->magazine_id,
-                    'issue_id' => $issue ? $issue->id : null,
-                    'status' => 'active',
-                    'user_magazine_id' => $magazine->id,
-                ]);
-            });
+        if (empty($subscription)) {
+            $subscription = SubscriptionTier::where('sub_id', $subscription_id)->latest()->first()?->subscription;
         }
 
+        DB::beginTransaction();
+        try {
 
-        if($status == 'updated' || $status == 'resumed'){
+            $subscription->status = $status;
+            $subscription->save();
+
+            if (!empty($subscription->tier) && $status === 'active') {
+                $this->applyTierUpgrade($subscription,$mag_status);
+            } else {
+                $this->updateMagazineStatuses($subscription_id, $mag_status);
+            }
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return;
+        }
+
+        // Mail sending logic (when ready)
+        if (in_array($status, ['updated', 'resumed'])) {
             Mail::to($subscription->user->email)->send(new SubscriptionMail($subscription));
-        }else{
+        } else {
             Mail::to($subscription->user->email)->send(new SubscriptionCancel($subscription));
         }
     }
 
     public function subscriptionEvents(Request $request)
     {
+
+        if($request->query('sub_id')){
+            $id = $request->query('sub_id');
+            if($id){
+                $this->subscriptionEvent($id, 'pending', 'inactive');
+            }
+            return response()->json(['status' => 'success'], 200);
+        }
+
         $endpoint_secret = env('STRIPE_END_POINT');
 
-        $payload    = @file_get_contents('php://input');
+        $payload    = $request->getContent();
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
         $event      = null;
 
-        $event = \Stripe\Webhook::constructEvent(
-            $payload,
-            $sig_header,
-            $endpoint_secret
-        );
+        try {
+            $event = \Stripe\Webhook::constructEvent(
+                $payload,
+                $sig_header,
+                $endpoint_secret
+            );
 
-        switch ($event->type) {
-            case 'customer.subscription.created':
-                $subscription = $event->data->object;
-            case 'customer.subscription.deleted':
-                $subscription = $event->data->object;
-                $this->subscriptionEvent($subscription->id, 'cancelled', 'inactive');
-            case 'customer.subscription.paused':
-                $subscription = $event->data->object;
-                $this->subscriptionEvent($subscription->id, 'paused', 'inactive');
-            case 'customer.subscription.resumed':
-                $subscription = $event->data->object;
-                $this->subscriptionEvent($subscription->id, 'active', 'active');
-            case 'customer.subscription.updated':
-                $subscription = $event->data->object;
-                $this->subscriptionEvent($subscription->id, 'active', 'active');
-            default:
-                true;
+            switch ($event->type) {
+                case 'customer.subscription.created':
+                    $subscription = $event->data->object;
+                    break;
+                case 'customer.subscription.deleted':
+                    $subscription = $event->data->object;
+                    $this->subscriptionEvent($subscription->id, 'canceled', 'inactive');
+                    break;
+                case 'customer.subscription.paused':
+                    $subscription = $event->data->object;
+                    $this->subscriptionEvent($subscription->id, 'paused', 'inactive');
+                    break;
+                case 'customer.subscription.resumed':
+                    $subscription = $event->data->object;
+                    $this->subscriptionEvent($subscription->id, 'active', 'active');
+                    break;
+                case 'customer.subscription.updated':
+                    $subscription = $event->data->object;
+                    $this->subscriptionEvent($subscription->id, 'active', 'active');
+                    break;
+                default:
+                    break;
+            }
+        } catch (SignatureVerificationException $e) {
+            return response('Signature verification failed', 400);
         }
         http_response_code(200);
     }
