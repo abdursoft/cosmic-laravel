@@ -45,7 +45,7 @@
             </div>
             <div>
                 <button type="submit"
-                    class="w-full px-4 py-2 bg-gray-600 text-white font-semibold cursor-pointer rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    class="w-full px-4 py-2 bg-gray-600 text-white font-semibold cursor-pointer rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2  mt-5">
                     Send Message
                 </button>
             </div>

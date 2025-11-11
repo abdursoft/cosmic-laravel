@@ -4,7 +4,7 @@
         <h1 class="text-2xl md:text-3xl">Issue <?php echo $issue->id; ?></h1>
         <p>Tap “Start” to enable sound. Swipe or use arrows to turn pages.</p><button class="btn"
             id="startBtn">Start</button>
-        <p class="hint">Replace images in /pages and sounds in /audio &amp; /sfx.</p>
+        <p class="hint {{$demo == 1 ? 'hidden' : ''}}">Replace images in /pages and sounds in /audio &amp; /sfx.</p>
     </div>
     <div class="book" id="book">
         <div class="topbar">
@@ -30,13 +30,13 @@
             <div class="hint">Keyboard: ← / → • Touch: swipe • Click: arrows</div>
             <div class="nav">
                 <button id="prevBtn" class="relative" aria-label="Previous">⟵</button>
-                <button class="btn closeBtn relative" onclick="closeBook()">
+                <button class="btn closeBtn relative" style="display:{{$demo == 1 ? 'none' : 'block'}}" onclick="closeBook()">
                     Close
                     book</button>
                 <button id="nextBtn" aria-label="Next">⟶</button>
             </div>
             <div class="pill"><a href="javascript:void(0);" onclick="closeBook()" class="btn topClose"
-                    style="text-decoration:none;background:rgba(255,255,255,.06);color:#fff;padding:8px;border-radius:14px;text-align:center;font-size:13px;font-weight:400">Close
+                    style="text-decoration:none;background:rgba(255,255,255,.06);color:#fff;padding:8px;border-radius:14px;text-align:center;font-size:13px;font-weight:400;display:{{$demo == 1 ? 'none' : ''}}">Close
                     book</a>
                 <div id="sceneLabel">Scene: default</div>
             </div>
@@ -46,6 +46,7 @@
 
 
 <script>
+    let maxPage = 6;
     let current = 0;
     let musicHowl = null;
     let pageTurnHowl = null;
@@ -60,8 +61,11 @@
     let viewport = undefined;
     let dWidth = dHeight = 0;
     let isStart = false;
+    let prevAction = false;
+    let isClickable = true;
+    let demo = `{{$demo ?? 0}}`;
 
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'pages']) }}").then((res) => res.json()).then((
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'pages','demo' => $demo ?? false]) }}").then((res) => res.json()).then((
         data) => {
 
         let magazine = '';
@@ -87,27 +91,46 @@
             elevation: 50,
             duration: 1000,
             when: {
-                turned: function(e, page) {
+                turning: function(e, page){
+                    if((current + 1) >= maxPage && demo && prevAction){
+                        message("Demo Simulation", "Max 6 pages allowed for trail");
+                        $('#magazine').turn('disable',true);
+                    }else{
+                        $('#magazine').turn('disable',false);
+                    }
+                    e.preventDefault();
+                    return false;
+                },
+                turned: function (e, page) {
                     current = page;
-                    if (isStart) {
-                        console.log(`\n Current page ${current}`)
+                    if (typeof isStart !== 'undefined' && isStart) {
+                        console.log(`\n Current page ${current}`);
                         setPageTurn();
                         playAudioByBMG(current);
                         playAudioByPage(current);
                         playSFXByPage(current);
                         playGFXByPage(current);
-                        console.log(`Page ${current} end \n`)
+                        console.log(`Page ${current} end \n`);
                     }
                     document.querySelector('.currentPage').textContent = current;
                 }
             }
         });
 
+
         $(window).bind('keydown', function(e) {
-            if (e.keyCode == 37)
+            if (e.keyCode == 37){
                 $('#magazine').turn('previous');
-            else if (e.keyCode == 39)
+                prevAction = false;
+            }
+
+            if (e.keyCode == 39){
+                if(current >= maxPage && demo){
+                    return false;
+                }
                 $('#magazine').turn('next');
+                prevAction = true;
+            }
         });
         // Get initial size of magazine (before fullscreen)
         let mag = document.getElementById("magazine");
@@ -151,17 +174,17 @@
     const CONTINUOUS_MUSIC = !0;
     let audioList = sfxList = [];
     let gfxList = bmgList = [];
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'audio']) }}").then((res) => res.json()).then((
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'audio', 'demo' => $demo ?? false]) }}").then((res) => res.json()).then((
         data) => {
         audioList = data;
     }).catch((err) => console.error("Error fetching audio list:", err));
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'sfx']) }}").then((res) => res.json()).then((data) => {
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'sfx', 'demo' => $demo ?? false]) }}").then((res) => res.json()).then((data) => {
         sfxList = data;
     });
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'gfx']) }}").then((res) => res.json()).then((data) => {
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'gfx', 'demo' => $demo ?? false]) }}").then((res) => res.json()).then((data) => {
         gfxList = data;
     });
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'bmg']) }}").then((res) => res.json()).then((data) => {
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'bmg', 'demo' => $demo ?? false]) }}").then((res) => res.json()).then((data) => {
         bmgList = data;
     });
     const gate = document.getElementById("gate");
@@ -197,9 +220,21 @@
     });
 
     nextBtn.addEventListener("click", () => {
-        $('#magazine').turn('next');
+        if(current >= maxPage && demo){
+            message("Demo Simulation", "Max 6 pages allowed for trail");
+            return false;
+        }
+        if(isClickable){
+            $('#magazine').turn('next');
+            isClickable = false;
+            prevAction = true;
+            setTimeout(() => {
+                isClickable = true;
+            }, 1100);
+        }
     });
     prevBtn.addEventListener("click", () => {
+        prevAction = false;
         $('#magazine').turn('previous');
     });
 
@@ -439,7 +474,8 @@
             if (musicHowl) {
                 musicHowl.volume(musicMuted ? 0 : parseFloat(musicVol.value))
             }
-            if (gfxHowls instanceof Howl) gfxHowls.volume(v);
+            if (gfxHowls instanceof Howl) gfxHowls.volume(musicMuted ? 0 : parseFloat(musicVol.value));
+            if (bmgHowl instanceof Howl) bmgHowl.volume(musicMuted ? 0 : parseFloat(musicVol.value));
         });
         sfxVol.addEventListener("input", () => {
             const v = sfxMuted ? 0 : parseFloat(sfxVol.value);
@@ -467,5 +503,13 @@
 
     function closeBook() {
         window.history.back();
+    }
+
+    function message(title,message){
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: "error"
+        });
     }
 </script>

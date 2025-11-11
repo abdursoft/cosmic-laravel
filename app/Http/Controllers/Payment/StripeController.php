@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Stripe\Exception\SignatureVerificationException;
 
+use function Illuminate\Log\log;
+
 class StripeController extends Controller
 {
     private $pay;
@@ -92,8 +94,20 @@ class StripeController extends Controller
         $this->pay->products->delete($product, []);
     }
 
-    public function productSubscription($customer_id, $price_id,$coupon=null)
+    public function productSubscription($customer_id, $price_id,$txnID, $coupon=null)
     {
+        return $this->pay->checkout->sessions->create([
+            'payment_method_types' => ['card'],
+            'line_items' => [[
+                'price' => $price_id,
+                'quantity' => 1,
+            ]],
+            'mode' => 'subscription',
+            'discounts' => $coupon ? [['coupon' => $coupon]] : [],
+            'success_url' => route('payment.stripe.subscription.callback', ['status' => 'success','trans_id' => $txnID]),
+            'cancel_url' => route('payment.stripe.subscription.callback', ['status' => 'success','trans_id' => $txnID]),
+        ]);
+
         return $this->pay->subscriptions->create([
             'customer'         => $customer_id,
             'items'            => [['price' => $price_id]],
@@ -229,6 +243,50 @@ class StripeController extends Controller
     }
 
     /**
+     * Stripe subscription callback
+     */
+    public function subscriptionCallback($trans_id,$status='cancel'){
+        $subscription = UserSubscription::where('transaction_id', $trans_id)->orderBy('id', 'desc')->first();
+        if ($status === 'success') {
+
+            
+            if(!$subscription){
+                $subscription = SubscriptionTier::where('transaction_id',$trans_id)->orderBy('id','desc')->first();
+            }
+            
+            $payment = $this->paymentRetrieve($subscription->payment_id);
+
+            if($payment){
+                return redirect()->route('auth.dashboard')->with("success", "Subscription has been activated");
+                
+                // if(!empty($subscription->sub_id)){
+                //     $subscription->update([
+                //         'status' => 'active',
+                //         'sub_id' => $payment->subscription,
+                //     ]);
+                //     $this->subscriptionEvent($payment->subscription, 'active', 'active');
+                //     return redirect()->route('auth.dashboard')->with("success", "Subscription has been activated");
+                // }
+
+                try {
+                    // $subscription->update([
+                    //     'status' => 'active',
+                    //     'subscription_id' => $payment->subscription,
+                    // ]);
+                    // $this->subscriptionEvent($payment->subscription, 'active', 'active');
+                    // return redirect()->route('auth.dashboard')->with("success", "Subscription has been activated");
+                } catch (\Throwable $th) {
+                    // return redirect()->route('auth.dashboard')->with("error", "Subscription couldn't be activated");
+                }
+            }else{
+                return redirect()->route('auth.dashboard')->with("error", "Subscription couldn't be activated");
+            }
+        } else {
+            return redirect()->route('auth.dashboard')->with("error", "Subscription has been cancelled");
+        }
+    }
+
+    /**
      * Create a coupon for subscription or product
      */
     public function coupon($amount,$type='flat',$currency='USD',$cycle='once'){
@@ -348,41 +406,91 @@ class StripeController extends Controller
         if (empty($subscription)) {
             $subscription = SubscriptionTier::where('sub_id', $subscription_id)->latest()->first()?->subscription;
         }
-
+        
         DB::beginTransaction();
         try {
 
             $subscription->status = $status;
             $subscription->save();
 
-            if (!empty($subscription->tier) && $status === 'active') {
+            if (!empty($subscription->tier) && count($subscription->tier) > 0 && $status === 'active') {
                 $this->applyTierUpgrade($subscription,$mag_status);
             } else {
-                $this->updateMagazineStatuses($subscription_id, $mag_status);
+                $this->updateMagazineStatuses($subscription->id, $mag_status);
             }
 
             DB::commit();
-
         } catch (\Exception $e) {
             DB::rollBack();
             return;
         }
 
         // Mail sending logic (when ready)
-        if (in_array($status, ['updated', 'resumed'])) {
+        if (in_array($status, ['updated', 'resumed','completed'])) {
             Mail::to($subscription->user->email)->send(new SubscriptionMail($subscription));
         } else {
             Mail::to($subscription->user->email)->send(new SubscriptionCancel($subscription));
         }
     }
 
+    /**
+     * Update subscription id according the payment charge id
+     */
+    private function updateSubscriptionId($charge_id, $subscription_id)
+    {
+        $subscription = UserSubscription::where('payment_id', $charge_id)->first();
+        if ($subscription) {
+            $subscription->update([
+                'subscription_id' => $subscription_id,
+            ]);
+            return;
+        }
+
+        $tier = SubscriptionTier::where('payment_id', $charge_id)->latest()->first();
+        if ($tier) {
+            $tier->update([
+                'sub_id' => $subscription_id,
+            ]);
+        }
+    }
+
+    /**
+     * Get subscription according the sub id
+     */
+    private function getSubscription($id){
+        $subscription = null;
+        if($id){
+            $subscription = UserSubscription::where('payment_id', $id)->first();
+
+            if(!$subscription){
+                $subscription = SubscriptionTier::where('payment_id',$id)->latest()->first()?->subscription;
+            }
+            if($subscription){
+                $this->subscriptionEvent($subscription->subscription_id, 'active', 'active');
+            }
+        }
+        return $subscription;
+    }
+
     public function subscriptionEvents(Request $request)
     {
 
-        if($request->query('sub_id')){
-            $id = $request->query('sub_id');
+        if($request->query('sub')){
+            $id = $request->query('sub');
+            return $this->subscriptionEvent($id,'active','active');    
+            }
+
+        if($request->query('payment_id')){
+            $id = $request->query('payment_id');
             if($id){
-                $this->subscriptionEvent($id, 'pending', 'inactive');
+                $subscription = UserSubscription::where('payment_id', $id)->first();
+
+                if(!$subscription){
+                    $subscription = SubscriptionTier::where('payment_id',$id)->latest()->first()?->subscription;
+                }
+                if($subscription){
+                    $this->subscriptionEvent($subscription->subscription_id, 'active', 'active');
+                }
             }
             return response()->json(['status' => 'success'], 200);
         }
@@ -419,6 +527,16 @@ class StripeController extends Controller
                 case 'customer.subscription.updated':
                     $subscription = $event->data->object;
                     $this->subscriptionEvent($subscription->id, 'active', 'active');
+                    break;
+                case 'checkout.session.expired':
+                    $charge = $event->data->object;
+                    $this->updateSubscriptionId($charge->id, $charge->subscription);
+                    $this->subscriptionEvent($charge->subscription, 'paused', 'inactive');
+                    break;
+                case 'checkout.session.completed':
+                    $session = $event->data->object;
+                    $this->updateSubscriptionId($session->id, $session->subscription);
+                    $this->subscriptionEvent($session->subscription, 'active', 'active');
                     break;
                 default:
                     break;

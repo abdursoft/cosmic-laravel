@@ -75,8 +75,8 @@
                 </div>
             </div>
 
-            <div class="flex justify-between my-1 gap-3">
-                <div class=" w-full md:w-1/2">
+            <div class="flex justify-between flex-col md:flex-row my-1 gap-3">
+                <div class="w-full md:w-1/2">
                     <label for="archive_days" class="block text-sm font-medium text-gray-700"> Archive in (Days)</label>
                     <input type="number" min="1" max="90" id="archive_days" placeholder="Magazine short description" name="archive_days"
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('sub_title') border-red-500 @enderror text-slate-800"
@@ -106,9 +106,9 @@
                 </div>
                 <input type="hidden" name="description" id="hiddenContent">
             </div>
-            <div>
+            <div class="mt-20 md:mt-0">
                 <button type="submit"
-                    class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5">
+                    class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-15 md:mt-5">
                     {{ !empty($magazine) ? 'Save' : 'Create' }}
                 </button>
             </div>

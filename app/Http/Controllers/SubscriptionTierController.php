@@ -136,11 +136,13 @@ class SubscriptionTierController extends Controller
 
             $coupon_amount = $amount * 100;
 
+            $txnID = uniqueID(SubscriptionTier::class, 'transaction_id', 16);
+
             $stripe = new StripeController();
             $coupon = $stripe->coupon($coupon_amount);
-            $subscribe = $stripe->productSubscription($request->user()->customer_id,$package->price_id,$coupon->id);
+            $subscribe = $stripe->productSubscription($request->user()->customer_id,$package->price_id,$txnID,$coupon->id);
 
-            $uri = $subscribe->latest_invoice->hosted_invoice_url ?? '';
+            $uri = $subscribe->url ?? '';
 
             SubscriptionTier::create([
                 'sub_id' => $subscribe->id,
@@ -150,6 +152,8 @@ class SubscriptionTierController extends Controller
                 'subscription_id' => $subscription->id,
                 'status' => 'pending',
                 'payment_url' => $uri,
+                'payment_id' => $subscribe->id,
+                'transaction_id' => $txnID,
                 'magazines' => $magazine,
             ]);
 
@@ -158,7 +162,7 @@ class SubscriptionTierController extends Controller
                 'message' => 'Subscription tier has been created',
                 'payment_url' => $uri
             ],201);
-            
+
         } catch (\Throwable $th) {
             return response()->json([
                 'code' => 'TIER_ERROR',

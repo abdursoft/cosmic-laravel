@@ -41,9 +41,9 @@
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
             </div>
-            <div>
+            <div class="mt-20 md:mt-0">
                 <button type="submit"
-                    class="w-auto px-4 py-2 bg-[#333333] text-white font-semibold cursor-pointer rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    class="w-auto px-4 py-2 bg-[#333333] text-white font-semibold cursor-pointer rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-15 md:mt-5">
                     Send Message
                 </button>
             </div>

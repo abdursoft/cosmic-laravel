@@ -35,8 +35,7 @@ class PageController extends Controller
     // home page
     public function home()
     {
-        $issues = Issue::where('status', 'active')->latest()->get();
-        return view('app', compact('issues'));
+        return view('app');
     }
 
     // contact page
@@ -51,6 +50,11 @@ class PageController extends Controller
         $packages  = Package::where('status', 'active')->get();
         $gif_packs = GifPack::where('status', 'active')->get();
         return view('service', compact('packages', 'gif_packs'));
+    }
+
+    // Demonstration page
+    public function demonstration(){
+        return view('typeset');
     }
 
     // forgot password page

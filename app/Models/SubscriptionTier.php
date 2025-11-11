@@ -12,8 +12,10 @@ class SubscriptionTier extends Model
     protected $fillable = [
         'sub_id',
         'user_id',
+        'payment_id',
         'package_id',
         'x_package',
+        'transaction_id',
         'subscription_id',
         'status',
         'payment_url',

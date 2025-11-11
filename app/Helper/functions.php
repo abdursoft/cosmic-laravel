@@ -107,3 +107,15 @@ if(!function_exists('purchasedMagazine')){
         return $list->contains('magazine_id',$magazine);
     }
 }
+
+/**
+ * Create unique id
+ */
+if(!function_exists('uniqueID')){
+    function uniqueID($model, $column, $length = 16) {
+        do {
+            $id = substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, $length);
+        } while ($model::where($column, $id)->exists());
+        return $id;
+    }
+}

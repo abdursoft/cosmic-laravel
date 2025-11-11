@@ -15,6 +15,8 @@ class UserSubscription extends Model
         'package_id',
         'status',
         'price',
+        'payment_id',
+        'transaction_id',
         'subscription_id',
         'expire_at',
     ];

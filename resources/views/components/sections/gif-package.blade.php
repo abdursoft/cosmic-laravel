@@ -1,5 +1,5 @@
 <!-- gif package section  -->
-<section class="w-full bg-[#250c04] text-white py-20 px-4 lg:px-25 2xl:px-45 md:px-10 min-h-[76vh]" id="gifPacks">
+<section class="w-full bg-[#250c04] text-white py-20 px-5 lg:px-25 2xl:px-45 md:px-10 min-h-[76vh]" id="gifPacks">
     <div class="flex mt-5 w-full flex-col md:flex-row flex-wrap mb-8">
 
         @foreach ($gif_packs as $gif)

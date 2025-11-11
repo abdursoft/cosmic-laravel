@@ -176,10 +176,10 @@ class IssueController extends Controller
     }
 
     // IssueController.php
-    public function scan($id, $type, $return = false)
+    public function scan($id, $type, $demo = false, $return = false)
     {
         $issue = Issue::findOrFail($id);
-        if ($issue->issue_type == 'premium' && ! auth()->user()?->id) {
+        if (!$demo && $issue->issue_type == 'premium' && ! auth()->user()?->id) {
             return [];
         }
 
@@ -256,7 +256,7 @@ class IssueController extends Controller
         $p      = $patterns[$type];
         $result = [];
 
-        foreach (scandir($basePath . '/' . $p['dir']) as $file) {
+        foreach (scandir($basePath . '/' . $p['dir']) as $i=>$file) {
             if (preg_match($p['regex'], $file)) {
                 $result[] = $p['formatter']([], $file, $dir);
             }
@@ -278,10 +278,25 @@ class IssueController extends Controller
             $path   = explode('/', $sequence->issue->issue_path);
             $path   = end($path);
             $issue  = $sequence->issue;
-            return view('issue', compact('issue', 'path'));
+            $demo   = false;
+            return view('issue', compact('issue', 'path','demo'));
         }
 
         return back()->with('error', 'Your are not able to see this magazine');
+    }
+
+    // show demo issue
+    public function demoIssue($issue=null){
+        if($issue){
+            $issue = Issue::findOrFail($issue);
+        }else{
+            $issue  = Issue::where('status','active')->orderBy('id','desc')->first();
+        }
+
+        $path   = explode('/', $issue->issue_path);
+        $path   = end($path);
+        $demo   = true;
+        return view('issue', compact('path','issue','demo'));
     }
 
     // user magazines
@@ -323,6 +338,7 @@ class IssueController extends Controller
         $issue  = Issue::findOrFail($id);
         $path   = explode('/', $issue->issue_path);
         $path   = end($path);
-        return view('issue', compact('issue', 'path'));
+        $demo   = false;
+        return view('issue', compact('issue', 'path','demo'));
     }
 }

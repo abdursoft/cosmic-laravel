@@ -8,7 +8,7 @@
         <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">Subscription package</h2>
         <form method="POST" action="@php echo !empty($package) ? route('admin.package.update',$package->id) : route('admin.package.submit') @endphp" enctype="multipart/form-data">
             @csrf
-            <div class="flex justify-between my-1 gap-3">
+            <div class="flex justify-between flex-col md:flex-row my-1 gap-3">
                 <div class="w-full md:w-1/2">
                     <label for="name" class="block text-sm font-medium text-gray-700"> Package Name</label>
                     <input type="name" id="name" placeholder="Subscription package name" name="name" required autofocus
@@ -28,7 +28,7 @@
                     @enderror
                 </div>
             </div>
-            <div class="flex justify-between my-1 gap-3">
+            <div class="flex justify-between flex-col md:flex-row my-1 gap-3">
                 <div class="w-full md:w-1/2">
                     <label for="thumbnail" class="block text-sm font-medium text-gray-700"> Package Thumbnail</label>
                     <input type="file" id="thumbnail" name="thumbnail" autofocus
@@ -56,7 +56,7 @@
                     @enderror
                 </div>
             </div>
-            <div class="flex justify-between my-1 gap-3">
+            <div class="flex justify-between flex-col md:flex-row my-1 gap-3">
                 <div class="w-full md:w-1/2">
                     <label for="type" class="block text-sm font-medium text-gray-700">Subscription Type</label>
                     <select type="type" id="type" value=" {{ old('type') ?? (site()->type ?? '') }}"
@@ -104,9 +104,9 @@
                 </div>
                 <input type="hidden" name="description" id="hiddenContent">
             </div>
-            <div>
+            <div class="mt-20 md:mt-0">
                 <button type="submit"
-                    class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-15 md:mt-5">
                     {{ !empty($package) ? 'Save' : 'Create' }}
                 </button>
             </div>

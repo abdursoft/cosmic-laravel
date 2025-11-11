@@ -105,7 +105,8 @@ class UserSubscriptionController extends Controller
         }
 
         try {
-            $subscribe = $stripe->productSubscription($user->customer_id, $package->price_id);
+            $txnID = uniqueID(UserSubscription::class, 'transaction_id', 16);
+            $subscribe = $stripe->productSubscription($user->customer_id, $package->price_id,$txnID);
 
             DB::beginTransaction();
             $subscription = UserSubscription::create([
@@ -113,7 +114,9 @@ class UserSubscriptionController extends Controller
                 'package_id'      => $package->id,
                 'status'          => 'pending',
                 'price'           => $package->price,
-                'subscription_id' => $subscribe->id,
+                'payment_id'      => $subscribe->id,
+                'transaction_id'  => $txnID,
+                'subscription_id' => $subscribe->subscription->id ?? null,
             ]);
 
             foreach($request->magazine as $magazine){
@@ -138,7 +141,7 @@ class UserSubscriptionController extends Controller
 
             DB::commit();
 
-            return redirect()->away($subscribe->latest_invoice->hosted_invoice_url);
+            return redirect()->away($subscribe->url);
         } catch (\Throwable $th) {
             DB::rollBack();
             return back()->with('error', "Subscription system couldn't proceed!");

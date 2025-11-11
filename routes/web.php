@@ -25,6 +25,7 @@ Route::get('/test', function(){
 // page routes
 Route::get('/', [App\Http\Controllers\PageController::class,'home'])->name('home');
 Route::get('/pricing', [App\Http\Controllers\PageController::class,'service'])->name('service');
+Route::get('/demonstration', [App\Http\Controllers\PageController::class, 'demonstration'])->name('demonstration');
 
 // general routes
 Route::get('/contact', [App\Http\Controllers\PageController::class, 'contact'])->name('contact');
@@ -155,11 +156,14 @@ Route::prefix('payment')->group(function(){
 
     // stripe payment routes
     Route::any('stripe/callback/{trans_id}', [StripeController::class, 'callback'])->name('payment.stripe.callback');
+    Route::any('stripe/subscription/{trans_id}/{status}', [StripeController::class, 'subscriptionCallback'])->name('payment.stripe.subscription.callback');
+
 });
 
 
 // issues routes
-Route::get('issue/scan/{id}/{type}', [IssueController::class, 'scan'])->name('issue.scan');
+Route::get('demo/issue', [IssueController::class, 'demoIssue'])->name('issue.demo');
+Route::get('issue/scan/{id}/{type}/{demo?}', [IssueController::class, 'scan'])->name('issue.scan');
 Route::get('magazines', [IssueController::class, 'showMagazines'])->name('magazine.list');
 Route::get('magazines/{magazine}/issues', [IssueController::class, 'showIssues'])->name('issue.list');
 

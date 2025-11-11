@@ -10,7 +10,7 @@
             action="@php echo !empty($gif_pack) ? route('admin.gif-packs.update',$gif_pack->id) : route('admin.gif-packs.submit') @endphp"
             enctype="multipart/form-data">
             @csrf
-            <div class="flex justify-between my-1 gap-3">
+            <div class="flex justify-between flex-col md:flex-row my-1 gap-3">
                 <div class="w-full md:w-1/2">
                     <label for="title" class="block text-sm font-medium text-gray-700"> Package title</label>
                     <input type="title" id="title" placeholder="Gif package title" name="title" required autofocus
@@ -30,7 +30,7 @@
                     @enderror
                 </div>
             </div>
-            <div class="flex justify-between my-1 gap-3">
+            <div class="flex justify-between flex-col md:flex-row my-1 gap-3">
                 <div class="w-full md:w-1/2">
                     <label for="thumbnail" class="block text-sm font-medium text-gray-700"> Thumbnail</label>
                     <input type="file" id="thumbnail" name="thumbnail"
@@ -50,7 +50,7 @@
                     @enderror
                 </div>
             </div>
-            <div class="flex justify-between my-1 gap-3">
+            <div class="flex justify-between flex-col md:flex-row my-1 gap-3">
                 <div class=" w-full">
                     <label for="status" class="block text-sm font-medium text-gray-700">Public status</label>
                     <select id="status" value=" {{ old('status') ?? ($gif_pack->status ?? '') }}"
@@ -79,9 +79,9 @@
                 </div>
                 <input type="hidden" name="description" id="hiddenContent">
             </div>
-            <div>
+            <div class="mt-20 md:mt-0">
                 <button type="submit"
-                    class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-5">
+                    class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-15 md:mt-5">
                     {{ !empty($gif_pack) ? 'Save' : 'Create' }}
                 </button>
             </div>

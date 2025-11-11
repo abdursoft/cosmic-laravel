@@ -12,10 +12,6 @@
 
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <!--<link rel="preload" as="style" href="{{config('app.url')}}/build/assets/app-DvcdaRmX.css" />-->
-    <!-- <link rel="modulepreload" as="script" href="{{config('app.url')}}/build/assets/app-C0G0cght.js" />-->
-    <!-- <link rel="stylesheet" href="{{config('app.url')}}/build/assets/app-DvcdaRmX.css" />-->
-    <!-- <script type="module" src="{{config('app.url')}}/build/assets/app-C0G0cght.js"></script>-->
 
     {{-- custom style  --}}
     <style>
@@ -343,6 +339,10 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="text/javascript" src="{{ asset('js/turn.min.js') }}"></script>
 
+
+    {{-- sweetjs  --}}
+    <script src="{{asset('js/sweet.js')}}"></script>
+
     {{-- add howler js  --}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
@@ -352,13 +352,13 @@
 <body class="bg-[#ddd]">
 
     {{-- load body components --}}
-    <div class="flex justify-center w-full min-h-[84vh]">
-        <div class="w-full flex flex-col p-3 max-w-[1550px] items-center justify-center">
+    <div class="flex justify-center w-full h-full">
+        <div class="w-full flex flex-col lg:p-3 max-w-[1550px] items-center justify-center">
             {{-- load body content  --}}
             <div class="w-full flex flex-col items-center justify-center">
 
                 {{-- load dynamic contents  --}}
-                <div class="w-full p-3">
+                <div class="w-full lg:p-3">
                     @yield('content')
                 </div>
 

@@ -47,13 +47,15 @@ class PurchaseController extends Controller
             DB::beginTransaction();
             foreach($carts as $key => $magazines){
                 $package = Package::find($key);
-
-                $subscribe = $stripe->productSubscription($user->customer_id, $package->price_id);
+                $txnID = uniqueID(UserSubscription::class, 'transaction_id', 16);
+                $subscribe = $stripe->productSubscription($user->customer_id, $package->price_id,$txnID);
 
                 $subscription = UserSubscription::create([
                     'user_id'         => $user->id,
                     'package_id'      => $package->id,
                     'status'          => 'pending',
+                    'payment_id'      => $subscribe->id,
+                    'transaction_id'  => $txnID,
                     'price'           => $package->price,
                     'subscription_id' => $subscribe->id,
                 ]);
@@ -75,7 +77,7 @@ class PurchaseController extends Controller
                 })->where('package_id',$key)->delete();
             }
             DB::commit();
-            return redirect()->away($subscribe->latest_invoice->hosted_invoice_url);
+            return redirect()->away($subscribe->url);
         } catch (\Throwable $th) {
             DB::rollBack();
             dd($th->getMessage());

@@ -145,9 +145,9 @@
                     @enderror
                 </div>
             </div>
-            <div>
+            <div class="mt-20 md:mt-0">
                 <button type="submit"
-                    class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-3">
+                    class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mt-15 md:mt-5">
                     Save
                 </button>
             </div>

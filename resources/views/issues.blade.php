@@ -23,7 +23,7 @@
             @foreach ($magazine->issues as $key => $issue)
                 @if (!$issue->isArchive())
                     <div
-                        class="flex flex-col relative h-70 md:h-85 lg:h-95 w-1/2 md:1/3 lg:w-1/3 2xl:w-1/4 my-2 overflow-hidden p-3">
+                        class="flex flex-col relative h-70 md:h-85 lg:h-95 w-full md:1/3 lg:w-1/3 2xl:w-1/4 my-2 overflow-hidden p-3">
                         <a href="{{ route(auth()->user()->role == 'admin' ? 'admin.issues.read' : 'user.issue.read', $issue->id) }}"
                             class="w-full h-70 md:h-85 lg:h-95 rounded-[12px] overflow-hidden">
                             <div class="w-full h-full shadow-md text-gray-800 relative overflow-hidden">
