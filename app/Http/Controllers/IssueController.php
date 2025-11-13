@@ -200,7 +200,7 @@ class IssueController extends Controller
         $patterns = [
             'pages' => [
                 'dir'       => 'pages',
-                'regex'     => '/^\d+\.(jpg|png|gif)$/i',
+                'regex'     => '/^\d+\.(jpg|png|gif|webp)$/i',
                 'formatter' => fn($m, $f, $d) => [
                     'page' => (int) preg_replace('/\D/', '', pathinfo($f, PATHINFO_FILENAME)),
                     'file' => $f,

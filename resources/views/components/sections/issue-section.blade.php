@@ -15,9 +15,9 @@
             @foreach (magazines() as $key => $magazine)
                 <div class="w-full h-[50vh] lg:w-1/2 h-[60vh] md:h-[65vh] lg:h-[75vh] lg:p-3 max-w-[700px] my-2"
                     data-aos="zoom-in">
-                    <div class="w-full h-full rounded-[22px] shadow-md h-md bg-white relative">
+                    <div class="w-full h-full rounded-[22px] shadow-md h-md bg-white relative" style="background: url('{{Storage::url($magazine->thumbnail)}}') center;background-repeat:no-repeat;background-size:cover; ">
                         <img src="{{ Storage::url($magazine->thumbnail) }}" loading="lazy" alt=""
-                            class="w-full h-full rounded-[22px]">
+                            class="w-full h-full rounded-[22px] hidden">
                     </div>
                 </div>
             @endforeach

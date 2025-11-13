@@ -5,7 +5,6 @@
             <div class="w-full">
                 <div class="text-center md:text-left">
                     <h2 class="text-xl md:text-4xl">Contact the Guild</h2>
-                    <p class="text-lg mt-2">Contact The Guided Vice</p>
                 </div>
                 <div class="w-full mt-5 flex items-start gap-4 flex-wrap justify-center md:justify-start">
                     <a target="_blank" href="{{ site()->facebook ?? '' }}"

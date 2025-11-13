@@ -17,7 +17,7 @@
                     class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ $page->title }}</a>
             @endforeach
         </div>
-        <div class=" border-t-1 border-[#332] my-3 pt-3 w-full flex flex-col items-center justify-center md:flex-row md:justify-between px-2">
+        <div class="border-t-1 border-[#332] my-3 pt-3 w-full flex flex-col items-center justify-center md:flex-row md:justify-between px-4">
             <p class="text-sm text-gray-600 dark:text-gray-400">&copy; {{ date('Y') }} The Guilded vice. All rights
                 reserved.</p>
             <p class="text-sm text-gray-600 dark:text-gray-400">Developed by <a href="https://abdursoft.com"
