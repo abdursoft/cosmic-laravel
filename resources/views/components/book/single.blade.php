@@ -1,7 +1,7 @@
 <!-- content body  -->
 <div class="app">
     <div class="gate" id="gate">
-        <h1 class="text-2xl md:text-3xl">Issue <?php echo $issue->id; ?></h1>
+        <h1 class="text-2xl md:text-3xl">Issue <?php echo $issue->issue_index; ?></h1>
         <p>Tap “Start” to enable sound. Swipe or use arrows to turn pages.</p><button class="btn"
             id="startBtn">Start</button>
         <p class="hint {{$demo == 1 ? 'hidden' : ''}}">Replace images in /pages and sounds in /audio &amp; /sfx.</p>
@@ -70,7 +70,9 @@
 
         let magazine = '';
 
-        data.forEach((page, i) => {
+        let sortPage = data.sort((a, b) => a.page - b.page);
+
+        sortPage.forEach((page, i) => {
             images.push(page.url);
             PAGES.push({
                 img: page.url,
@@ -105,6 +107,7 @@
                     current = page;
                     if (typeof isStart !== 'undefined' && isStart) {
                         console.log(`\n Current page ${current}`);
+                        console.log(`\n Playing page `, PAGES[current - 1]);
                         setPageTurn();
                         playAudioByBMG(current);
                         playAudioByPage(current);
