@@ -188,7 +188,7 @@ class IssueController extends Controller
         $dir       = end($directory);
 
         // Helper: build URL
-        $makeUrl = fn($folder, $file, $dir) => asset("storage/issues/$dir/$folder/$file");
+        $makeUrl = fn($folder, $file, $dir) => asset("storage/issues/$dir/$folder/$file")."?time=".time();
 
         // Helper: extract all numbers from filename
         $extractNumbers = function ($file) {

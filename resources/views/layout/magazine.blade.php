@@ -333,7 +333,30 @@
             font-size: 12px;
             color: var(--ui-dim)
         }
-    </style>
+
+        .currentPage:focus{
+            outline: none;
+        }
+
+        .nextIssue{
+            position: absolute;
+            top: 18%;
+            left: 50%;
+            display: none;
+            transform: translate(-50%, -50%);
+            background: rgb(182, 74, 11);
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgb(98 223 255 / .25);
+            z-index: 1000;
+            text-transform: uppercase;
+        }
+
+        </style>
 
     {{-- add page flip js  --}}
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

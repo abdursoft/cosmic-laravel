@@ -10,6 +10,7 @@
         <div class="topbar">
             <div class="leftFlex" style="display:flex;align-items:center;gap:8px">
                 <div class="pill">Audio ON</div>
+                <div class="pill" style="cursor: pointer;background:#62DFFF;color:#000;" onclick="movePage()">Back to PG 1</div>
             </div>
             <div class="ctrls"><label>Music <input id="musicVol" class="range" type="range" min="0"
                         max="1" step="0.01" value="0.6"></label><label>SFX <input id="sfxVol"
@@ -20,11 +21,12 @@
                     style="padding:8px 12px;font-weight:600;background:rgba(255,255,255,.06)"></button></div>
         </div>
         <div class="page-wrap" id="viewport">
-            <div class="index" id="idx"><span class="currentPage"></span> / <span class="totalPage"></span></div>
+            <div class="index" id="idx"><input type="text" onkeyup="dynamicPage(this)" style="border: none;width:20px;text-align:center;" class="currentPage"> / <span class="totalPage"></span></div>
             <div class="relative" id="bookContainer">
                 <div id="magazine">
                 </div>
             </div>
+            <div class="nextIssue">Next ISSUE</div>
         </div>
         <div class="bottombar">
             <div class="hint">Keyboard: ← / → • Touch: swipe • Click: arrows</div>
@@ -79,7 +81,7 @@
                 scene: "",
                 sfx: i === 0 ? ["wind.wav"] : [],
             })
-            document.querySelector('.currentPage').textContent = 1;
+            document.querySelector('.currentPage').value = 1;
             document.querySelector('.totalPage').textContent = images.length - 1;
 
             magazine += `<div class='cover'><img src='${page.url}' /></div>`;
@@ -115,7 +117,13 @@
                         playGFXByPage(current);
                         console.log(`Page ${current} end \n`);
                     }
-                    document.querySelector('.currentPage').textContent = current;
+                    document.querySelector('.currentPage').value = current;
+
+                    if(current == PAGES.length){
+                        document.querySelector('.nextIssue').style.display = 'block';
+                    }else{
+                        document.querySelector('.nextIssue').style.display = 'none';
+                    }
                 }
             }
         });
@@ -436,6 +444,17 @@
         }
     }
 
+    function movePage(page=1){
+        $('#magazine').turn('page', page);
+    }
+
+    function dynamicPage(input) {
+        let val = parseInt(input.value);
+        if (isNaN(val) || (demo && val > maxPage)) return;
+        val = clamp(val, 1, PAGES.length);
+        $('#magazine').turn('page', val);
+    }
+
     function getPageEvent(page) {
         return sfxList.find(sfx => sfx.page === page) || null
     };
@@ -477,11 +496,11 @@
             if (musicHowl) {
                 musicHowl.volume(musicMuted ? 0 : parseFloat(musicVol.value))
             }
-            if (gfxHowls instanceof Howl) gfxHowls.volume(musicMuted ? 0 : parseFloat(musicVol.value));
             if (bmgHowl instanceof Howl) bmgHowl.volume(musicMuted ? 0 : parseFloat(musicVol.value));
         });
         sfxVol.addEventListener("input", () => {
             const v = sfxMuted ? 0 : parseFloat(sfxVol.value);
+            if (gfxHowls instanceof Howl) gfxHowls.volume(v);
             if (sfxHowls) {
                 if (Array.isArray(sfxHowls)) {
                     sfxHowls.forEach((h) => h.volume(v))
