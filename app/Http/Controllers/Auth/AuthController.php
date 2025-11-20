@@ -17,6 +17,25 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        $request->validate([
+            'cf-turnstile-response' => 'required',
+        ]);
+        
+        $response = Http::asForm()->post(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+            [
+                'secret' => env('CLOUDFLARE_TURNSTILE_SECRET_KEY'),
+                'response' => $request->input('cf-turnstile-response'),
+                'remoteip' => $request->ip(),
+            ]
+        );
+
+        if (!$response->json('success')) {
+            return back()
+                ->withErrors(['turnstile' => 'Bot verification failed. Try again.'])
+                ->withInput();
+        }
+
         // Logic for handling login
         $credentials = $request->only('email', 'password');
         if (auth()->attempt($credentials, $request->boolean('remember'))) {

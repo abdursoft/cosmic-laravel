@@ -26,14 +26,11 @@
                         class="flex flex-col relative h-70 md:h-85 lg:h-95 w-full md:1/3 lg:w-1/3 2xl:w-1/4 my-2 overflow-hidden p-3">
                         <a href="{{ route(auth()->user()->role == 'admin' ? 'admin.issues.read' : 'user.issue.read', $issue->id) }}"
                             class="w-full h-70 md:h-85 lg:h-95 rounded-[12px] overflow-hidden">
-                            <div class="w-full h-full shadow-md text-gray-800 relative overflow-hidden">
-                                <img src="{{ Storage::url($issue->thumbnail) }}" loading="lazy" alt=""
-                                    class="absolute w-full h-full">
-
+                            <div class="w-full h-full shadow-md text-gray-800 relative overflow-hidden" style="background: url('{{ Storage::url($issue->thumbnail) }}') no-repeat center;background-size:cover;">
                                 <div
                                     class="w-full text-white bg-[rgba(0,0,0,0.7)] absolute z-2 bottom-0 flex items-center justify-between px-2 py-3">
                                     <h2 class="text-xl line-clamp-1">
-                                        {{ $issue->title . $issue->isArchive() }}
+                                        {{ substr($issue->title,0,23) . $issue->isArchive() }}
                                     </h2>
                                     <h2><span class="{{ $issue->isNew() ? 'text-green-600' : 'text-yellow-600' }}">Issue
                                             #{{ $issue->issue_index > 9 ? $issue->issue_index : '0' . $issue->issue_index }}</span>
@@ -57,8 +54,7 @@
                 @if ($issue->isArchive())
                     <a href="{{ route(auth()->user()->role == 'admin' ? 'admin.issues.read' : 'user.issue.read', $issue->id) }}"
                         class="flex flex-col p-5 w-full md:w-1/3">
-                        <div class="w-full h-full rounded-lg overflow-hidden shadow-2xl flex flex-col">
-                            <img src="{{ Storage::url($issue->thumbnail) }}" alt="{{ $issue->title }}">
+                        <div class="w-full h-full shadow-md text-gray-800 relative overflow-hidden" style="background: url('{{ Storage::url($issue->thumbnail) }}') no-repeat center;background-size:cover;">
                             <div class="p-2 flex items-center justify-between flex-1 bg-gray-700">
                                 <h2 class="text-xl line-clamp-1">{{ $issue->title }}</h2>
                                 <h2 class="text-xl text-orange-600">#Issue

@@ -371,14 +371,16 @@
             if (sfxHowls instanceof Howl) {
                 sfxHowls.stop()
             }
-            sfxHowls = new Howl({
-                src: audioData?.url,
-                loop: CONTINUOUS_MUSIC,
-                volume: parseFloat(musicVol.value),
-                html5: !0,
-                mute: musicMuted
-            });
-            sfxHowls.play();
+            setTimeout(()=>{
+                sfxHowls = new Howl({
+                    src: audioData?.url,
+                    loop: CONTINUOUS_MUSIC,
+                    volume: parseFloat(musicVol.value),
+                    html5: !0,
+                    mute: musicMuted
+                });
+                sfxHowls.play();
+            },2000)
             currentSFXData = audioData
         }
     }
@@ -420,20 +422,22 @@
             if (gfxHowls instanceof Howl) {
                 gfxHowls.stop()
             }
-            gfxHowls = new Howl({
-                src: audioData?.url,
-                loop: CONTINUOUS_MUSIC,
-                volume: parseFloat(musicVol.value),
-                html5: !0,
-                mute: musicMuted
-            });
-            gfxHowls.play();
+            setTimeout(()=>{
+                gfxHowls = new Howl({
+                    src: audioData?.url,
+                    loop: CONTINUOUS_MUSIC,
+                    volume: parseFloat(musicVol.value),
+                    html5: !0,
+                    mute: musicMuted
+                });
+                gfxHowls.play();
+            },5000);
             currentGFXData = audioData
         }
     }
 
     function setPageTurn() {
-        let pageTurnSrc = "{{ asset('storage/issues/' . $path . '/sfx/pageturn.mp3') }}";
+        let pageTurnSrc = "{{ asset('audio/pageturn.mp3') }}";
 
         if (pageTurnSrc) {
             pageTurnHowl = new Howl({

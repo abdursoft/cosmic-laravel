@@ -8,6 +8,7 @@
         <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">Login</h2>
         <form method="POST" action="{{ route('auth.login') }}">
             @csrf
+
             <div class="mb-4">
                 <label for="email" class="block text-sm font-medium text-gray-700"> Email</label>
                 <input type="email" id="email" name="email" required autofocus
@@ -38,6 +39,9 @@
                     </a>
                 </div>
             </div>
+            <div class="cf-turnstile"
+                data-sitekey="{{ env('CLOUDFLARE_TURNSTILE_SITE_KEY') }}">
+            </div>
             <div>
                 <button type="submit"
                         class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
@@ -54,6 +58,7 @@
 </div>
 @endsection
 @section('scripts')
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const emailInput = document.getElementById('email');
