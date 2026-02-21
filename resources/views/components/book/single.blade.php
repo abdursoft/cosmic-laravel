@@ -4,13 +4,15 @@
         <h1 class="text-2xl md:text-3xl">Issue <?php echo $issue->issue_index; ?></h1>
         <p>Tap “Start” to enable sound. Swipe or use arrows to turn pages.</p><button class="btn"
             id="startBtn">Start</button>
-        <p class="hint {{$demo == 1 ? 'hidden' : ''}}">Replace images in /pages and sounds in /audio &amp; /sfx.</p>
+        <p class="hint {{ $demo == 1 ? 'hidden' : '' }}">Replace images in /pages and sounds in /audio &amp; /sfx.</p>
     </div>
     <div class="book" id="book">
         <div class="topbar">
             <div class="leftFlex" style="display:flex;align-items:center;gap:8px">
                 <div class="pill">Audio ON</div>
-                <div class="pill" style="cursor: pointer;background:#62DFFF;color:#000;" onclick="movePage()">Back to PG 1</div>
+                <div class="pill">{{$issue?->title}}</div>
+                <div class="pill" style="cursor: pointer;background:#62DFFF;color:#000;" onclick="movePage()">Back to
+                    PG 1</div>
             </div>
             <div class="ctrls"><label>Music <input id="musicVol" class="range" type="range" min="0"
                         max="1" step="0.01" value="0.6"></label><label>SFX <input id="sfxVol"
@@ -21,7 +23,9 @@
                     style="padding:8px 12px;font-weight:600;background:rgba(255,255,255,.06)"></button></div>
         </div>
         <div class="page-wrap" id="viewport">
-            <div class="index" id="idx"><input type="text" onkeyup="dynamicPage(this)" style="border: none;width:20px;text-align:center;" class="currentPage"> / <span class="totalPage"></span></div>
+            <div class="index" id="idx"><input type="text" onkeyup="dynamicPage(this)"
+                    style="border: none;width:20px;text-align:center;" class="currentPage"> / <span
+                    class="totalPage"></span></div>
             <div class="relative" id="bookContainer">
                 <div id="magazine">
                 </div>
@@ -32,13 +36,14 @@
             <div class="hint">Keyboard: ← / → • Touch: swipe • Click: arrows</div>
             <div class="nav">
                 <button id="prevBtn" class="relative" aria-label="Previous">⟵</button>
-                <button class="btn closeBtn relative" style="display:{{$demo == 1 ? 'none' : 'block'}}" onclick="closeBook()">
+                <button class="btn closeBtn relative" style="display:{{ $demo == 1 ? 'none' : 'block' }}"
+                    onclick="closeBook()">
                     Close
                     book</button>
                 <button id="nextBtn" aria-label="Next">⟶</button>
             </div>
             <div class="pill"><a href="javascript:void(0);" onclick="closeBook()" class="btn topClose"
-                    style="text-decoration:none;background:rgba(255,255,255,.06);color:#fff;padding:8px;border-radius:14px;text-align:center;font-size:13px;font-weight:400;display:{{$demo == 1 ? 'none' : ''}}">Close
+                    style="text-decoration:none;background:rgba(255,255,255,.06);color:#fff;padding:8px;border-radius:14px;text-align:center;font-size:13px;font-weight:400;display:{{ $demo == 1 ? 'none' : '' }}">Close
                     book</a>
                 <div id="sceneLabel">Scene: default</div>
             </div>
@@ -52,12 +57,14 @@
     let current = 0;
     let musicHowl = null;
     let pageTurnHowl = null;
-    let bmgHowl=null;
+    let bmgHowl = null;
     let sfxHowls = [];
     let gfxHowls = [];
     let musicMuted = false,
         sfxMuted = !1;
     let PAGES = [];
+    let slightDelay = [];
+    let slowDelay = [];
     let images = ["{{ asset('storage/issues/' . $path . '/cover.jpg') }}"];
     let pageFlip = undefined;
     let viewport = undefined;
@@ -65,9 +72,10 @@
     let isStart = false;
     let prevAction = false;
     let isClickable = true;
-    let demo = `{{$demo ?? 0}}`;
+    let demo = `{{ $demo ?? 0 }}`;
 
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'pages','demo' => $demo ?? false]) }}").then((res) => res.json()).then((
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'pages', 'demo' => $demo ?? false]) }}").then((res) =>
+        res.json()).then((
         data) => {
 
         let magazine = '';
@@ -95,17 +103,17 @@
             elevation: 50,
             duration: 1000,
             when: {
-                turning: function(e, page){
-                    if((current + 1) >= maxPage && demo && prevAction){
+                turning: function(e, page) {
+                    if ((current + 1) >= maxPage && demo && prevAction) {
                         message("Demo Simulation", "Max 6 pages allowed for trail");
-                        $('#magazine').turn('disable',true);
-                    }else{
-                        $('#magazine').turn('disable',false);
+                        $('#magazine').turn('disable', true);
+                    } else {
+                        $('#magazine').turn('disable', false);
                     }
                     e.preventDefault();
                     return false;
                 },
-                turned: function (e, page) {
+                turned: function(e, page) {
                     current = page;
                     if (typeof isStart !== 'undefined' && isStart) {
                         console.log(`\n Current page ${current}`);
@@ -119,9 +127,9 @@
                     }
                     document.querySelector('.currentPage').value = current;
 
-                    if(current == PAGES.length){
+                    if (current == PAGES.length) {
                         document.querySelector('.nextIssue').style.display = 'block';
-                    }else{
+                    } else {
                         document.querySelector('.nextIssue').style.display = 'none';
                     }
                 }
@@ -130,13 +138,13 @@
 
 
         $(window).bind('keydown', function(e) {
-            if (e.keyCode == 37){
+            if (e.keyCode == 37) {
                 $('#magazine').turn('previous');
                 prevAction = false;
             }
 
-            if (e.keyCode == 39){
-                if(current >= maxPage && demo){
+            if (e.keyCode == 39) {
+                if (current >= maxPage && demo) {
                     return false;
                 }
                 $('#magazine').turn('next');
@@ -185,19 +193,32 @@
     const CONTINUOUS_MUSIC = !0;
     let audioList = sfxList = [];
     let gfxList = bmgList = [];
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'audio', 'demo' => $demo ?? false]) }}").then((res) => res.json()).then((
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'audio', 'demo' => $demo ?? false]) }}").then((res) =>
+        res.json()).then((
         data) => {
         audioList = data;
     }).catch((err) => console.error("Error fetching audio list:", err));
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'sfx', 'demo' => $demo ?? false]) }}").then((res) => res.json()).then((data) => {
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'sfx', 'demo' => $demo ?? false]) }}").then((res) =>
+        res.json()).then((data) => {
         sfxList = data;
     });
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'gfx', 'demo' => $demo ?? false]) }}").then((res) => res.json()).then((data) => {
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'gfx', 'demo' => $demo ?? false]) }}").then((res) =>
+        res.json()).then((data) => {
         gfxList = data;
     });
-    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'bmg', 'demo' => $demo ?? false]) }}").then((res) => res.json()).then((data) => {
+    fetch("{{ route('issue.scan', ['id' => $issue->id, 'type' => 'bmg', 'demo' => $demo ?? false]) }}").then((res) =>
+        res.json()).then((data) => {
         bmgList = data;
     });
+
+    fetch("/storage/issues/{{ $path }}/json/index.json").then((res) => res.json()).then((data) => {
+        slightDelay = data;
+    });
+
+    fetch("/storage/issues/{{ $path }}/json/delay.json").then((res) => res.json()).then((data) => {
+        slowDelay = data;
+    });
+
     const gate = document.getElementById("gate");
     const startBtn = document.getElementById("startBtn");
     const book = document.getElementById("book");
@@ -231,11 +252,11 @@
     });
 
     nextBtn.addEventListener("click", () => {
-        if(current >= maxPage && demo){
+        if (current >= maxPage && demo) {
             message("Demo Simulation", "Max 6 pages allowed for trail");
             return false;
         }
-        if(isClickable){
+        if (isClickable) {
             $('#magazine').turn('next');
             isClickable = false;
             prevAction = true;
@@ -256,7 +277,7 @@
             // First priority: check if array explicitly contains the page
             if (ad.pages.includes(page)) {
                 return true;
-            }else if (ad.pages.length == 2) {
+            } else if (ad.pages.length == 2) {
                 const [start, end] = ad.pages;
                 return page >= start && page <= end;
             }
@@ -270,24 +291,60 @@
             return;
         }
 
-        console.log('bmg',audioData)
+        if(page != current) return;
 
-        if (audioData && currentBMGAudioData && currentBMGAudioData.url == audioData?.url && bmgHowl && bmgHowl.playing()) {
+        console.log('bmg', audioData)
+
+        if (audioData && currentBMGAudioData && currentBMGAudioData.url == audioData?.url && bmgHowl && bmgHowl
+            .playing()) {
             console.log("Audio already playing for this range, skipping restart.");
+            if(findDelay('bmg',page)){
+                bmgHowl.pause();
+                setTimeout(bmgHowl.play(),5000);
+            }
             return
         }
         if (bmgHowl instanceof Howl) {
             bmgHowl.stop();
         }
 
-        bmgHowl = new Howl({
-            src: audioData.url,
-            loop: CONTINUOUS_MUSIC,
-            volume: parseFloat(musicVol.value),
-            html5: !0,
-            mute: musicMuted
-        });
-        bmgHowl.play();
+        if (findDelay('bmg', page)) {
+            setTimeout(() => {
+                bmgHowl = new Howl({
+                    src: audioData.url,
+                    volume: parseFloat(sfxVol.value),
+                    html5: !0,
+                    mute: musicMuted
+                });
+                bmgHowl.play();
+            }, 5000)
+        } else {
+            bmgHowl = new Howl({
+                src: audioData.url,
+                volume: parseFloat(sfxVol.value),
+                html5: !0,
+                mute: musicMuted
+            });
+            bmgHowl.play();
+        }
+
+        if(repeatDelay('bmg',page) && current == page && bmgHowl instanceof Howl){
+                bmgHowl.loop(false);
+                bmgHowl.once('end', function() {
+                    if(bmgHowl instanceof Howl) bmgHowl.pause();
+                    setTimeout(() => {
+                        currentBMGAudioData = null;
+                        bmgHowl = null;
+                        playAudioByBMG(page);
+                        if(bmgHowl instanceof Howl) bmgHowl.play();
+                    }, 3000); // 2000 ms delay before replay
+                });
+            }else{
+              if(!bmgHowl.loop()){
+                bmgHowl.loop(true);
+              }
+            }
+
         currentBMGAudioData = audioData
     }
 
@@ -298,7 +355,7 @@
             // First priority: check if array explicitly contains the page
             if (ad.pages.includes(page)) {
                 return true;
-            }else if (ad.pages.length == 2) {
+            } else if (ad.pages.length == 2) {
                 const [start, end] = ad.pages;
                 return page >= start && page <= end;
             }
@@ -313,9 +370,10 @@
             }
         }
 
-        console.log('bgm',audioData)
+        console.log('bgm', audioData)
 
-        if (audioData && currentAudioData && currentAudioData.url == audioData?.url && musicHowl && musicHowl.playing()) {
+        if (audioData && currentAudioData && currentAudioData.url == audioData?.url && musicHowl && musicHowl
+        .playing()) {
             console.log("Audio already playing for this range, skipping restart.");
             return
         }
@@ -352,7 +410,7 @@
             return false;
         });
 
-        console.log('sfx',audioData)
+        console.log('sfx', audioData)
 
         if (!audioData) {
             if (sfxHowls instanceof Howl) {
@@ -362,25 +420,62 @@
             }
         }
 
+        if(page != current) return;
+
 
         if (audioData && currentSFXData && currentSFXData.url === audioData?.url && sfxHowls && sfxHowls.playing()) {
             console.log("SFX Audio already playing for this range, skipping restart.");
+            if(findDelay('sfx',page)){
+                sfxHowls.pause();
+                setTimeout(sfxHowls.play(),5000);
+            }
             return;
         }
         if (audioData) {
             if (sfxHowls instanceof Howl) {
                 sfxHowls.stop()
             }
-            setTimeout(()=>{
+
+            if (findDelay('sfx', page)) {
+                console.log('sfx delay')
+                setTimeout(() => {
+                    sfxHowls = new Howl({
+                        src: audioData?.url,
+                        volume: parseFloat(sfxVol.value),
+                        html5: !0,
+                        mute: musicMuted
+                    });
+                    sfxHowls.play();
+                }, 5000)
+            } else {
+                console.log('sfx')
                 sfxHowls = new Howl({
                     src: audioData?.url,
-                    loop: CONTINUOUS_MUSIC,
-                    volume: parseFloat(musicVol.value),
+                    volume: parseFloat(sfxVol.value),
                     html5: !0,
                     mute: musicMuted
                 });
                 sfxHowls.play();
-            },2000)
+            }
+
+            if(repeatDelay('sfx',page) && sfxHowls instanceof Howl){
+                sfxHowls.loop(false);
+                sfxHowls.once('end', function() {
+                    if(sfxHowls instanceof Howl) sfxHowls.pause();
+                    setTimeout(() => {
+                        currentSFXData = null;
+                        sfxHowls = null;
+                        playSFXByPage(page);
+                        if(sfxHowls instanceof Howl) sfxHowls.play();
+                    }, 3000); // 2000 ms delay before replay
+                });
+            }else{
+              if(!sfxHowls.loop()){
+                sfxHowls.loop(true);
+                console.log('sfx loop set');
+              }
+            }
+
             currentSFXData = audioData
         }
     }
@@ -404,7 +499,7 @@
             return false;
         });
 
-        console.log('gfx',audioData)
+        console.log('gfx', audioData)
 
         if (!audioData) {
             if (gfxHowls instanceof Howl) {
@@ -414,24 +509,59 @@
             }
         }
 
+        if(page != current) return;
+
+
         if (audioData && currentGFXData && currentGFXData.url === audioData?.url && gfxHowls && gfxHowls.playing()) {
             console.log("GFX Audio already playing for this range, skipping restart.");
+            if(findDelay('bmg',page)){
+                gfxHowls.pause();
+                setTimeout(gfxHowls.play(),5000);
+            }
             return;
         }
         if (audioData) {
             if (gfxHowls instanceof Howl) {
                 gfxHowls.stop()
             }
-            setTimeout(()=>{
+
+            if (findDelay('gfx', page)) {
+                setTimeout(() => {
+                    gfxHowls = new Howl({
+                        src: audioData?.url,
+                        volume: parseFloat(sfxVol.value),
+                        html5: !0,
+                        mute: musicMuted
+                    });
+                    gfxHowls.play();
+                }, 5000);
+            } else {
                 gfxHowls = new Howl({
                     src: audioData?.url,
-                    loop: CONTINUOUS_MUSIC,
-                    volume: parseFloat(musicVol.value),
+                    volume: parseFloat(sfxVol.value),
                     html5: !0,
                     mute: musicMuted
                 });
                 gfxHowls.play();
-            },5000);
+            }
+
+            if(repeatDelay('gfx',page) && current == page && gfxHowls instanceof Howl){
+                gfxHowls.loop(false);
+                gfxHowls.once('end', function() {
+                    if(gfxHowls instanceof Howl) gfxHowls.pause();
+                    setTimeout(() => {
+                        currentGFXData = null;
+                        gfxHowls = null;
+                        playGFXByPage(page);
+                        if(gfxHowls instanceof Howl) gfxHowls.play();
+                    }, 3000); // 2000 ms delay before replay
+                });
+            }else{
+              if(!gfxHowls.loop()){
+                gfxHowls.loop(true);
+              }
+            }
+
             currentGFXData = audioData
         }
     }
@@ -448,7 +578,7 @@
         }
     }
 
-    function movePage(page=1){
+    function movePage(page = 1) {
         $('#magazine').turn('page', page);
     }
 
@@ -500,15 +630,15 @@
             if (musicHowl) {
                 musicHowl.volume(musicMuted ? 0 : parseFloat(musicVol.value))
             }
-            if (bmgHowl instanceof Howl) bmgHowl.volume(musicMuted ? 0 : parseFloat(musicVol.value));
         });
         sfxVol.addEventListener("input", () => {
             const v = sfxMuted ? 0 : parseFloat(sfxVol.value);
             if (gfxHowls instanceof Howl) gfxHowls.volume(v);
+            if (bmgHowl instanceof Howl) bmgHowl.volume(v);
             if (sfxHowls) {
                 if (Array.isArray(sfxHowls)) {
                     sfxHowls.forEach((h) => h.volume(v))
-                }else{
+                } else {
                     if (sfxHowls instanceof Howl) sfxHowls.volume(v);
                 }
             }
@@ -522,7 +652,7 @@
             if (bmgHowl instanceof Howl) bmgHowl.mute(musicMuted);
             if (gfxHowls instanceof Howl) gfxHowls.mute(musicMuted);
 
-            if (sfxHowls instanceof Howl)  sfxHowls.mute(musicMuted);
+            if (sfxHowls instanceof Howl) sfxHowls.mute(musicMuted);
             muteAll.textContent = musicMuted ? "Unmute" : "Mute"
         })
     }
@@ -531,7 +661,18 @@
         window.history.back();
     }
 
-    function message(title,message){
+    function findDelay(type, page) {
+        const list = slightDelay?.[type] ?? [];
+        return list.includes(page);
+    }
+
+    function repeatDelay(type, page) {
+        const list = slowDelay?.[type] ?? [];
+        console.log("Repeat delay find "+ list.includes(page));
+        return list.includes(page);
+    }
+
+    function message(title, message) {
         Swal.fire({
             title: title,
             text: message,

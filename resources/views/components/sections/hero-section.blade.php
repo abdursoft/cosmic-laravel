@@ -25,7 +25,7 @@
     </div>
 
     <!-- Demo slider -->
-    <h2 class="text-xl md:text-2xl text-center text-red-600 my-6 uppercase px-5">The Worlds Only BDSM Magazine That You Can Hear</h2>
+    <h2 class="text-xl md:text-2xl text-center text-red-600 my-6 uppercase px-5">The Worlds Only BDSM Magazine That You Can Hear <span class="text-white">- And Listen To</span></h2>
     @include('components.partials.video')
 
     <!-- Features -->

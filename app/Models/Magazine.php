@@ -20,7 +20,8 @@ class Magazine extends Model
         'archive_days',
         'archive_access',
         'publish_date',
-        'publish_status'
+        'publish_status',
+        'intro_image'
     ];
 
     /**

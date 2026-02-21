@@ -29,6 +29,7 @@ class MagazineController extends Controller
             'sub_title'      => 'nullable|string|max:255',
             'description'    => 'nullable|string',
             'thumbnail'      => 'nullable|file|mimes:jpg,jpeg,png,webp',
+            'intro_image'    => 'nullable|file|mimes:jpg,jpeg,png,webp',
             'package_id'     => 'nullable|exists:packages,id',
             'archive_access' => 'nullable',
             'archive_days'   => 'nullable',
@@ -36,6 +37,11 @@ class MagazineController extends Controller
             'publish_status' => 'nullable|in:scheduled,published',
             'is_archive'     => 'nullable',
         ]);
+
+        if ($request->hasFile('intro_image')) {
+            $thumbnail              = Storage::disk('public')->put('magazines', $request->file('intro_image'));
+            $validated['intro_image'] = $thumbnail;
+        }
 
         if ($request->hasFile('thumbnail')) {
             $thumbnail              = Storage::disk('public')->put('magazines', $request->file('thumbnail'));
@@ -69,6 +75,7 @@ class MagazineController extends Controller
             'sub_title'      => 'sometimes|string|max:255',
             'description'    => 'nullable|string',
             'thumbnail'      => 'nullable|file|mimes:jpg,jpeg,png,webp',
+            'intro_image'    => 'nullable|file|mimes:jpg,jpeg,png,webp',
             'package_id'     => 'nullable|exists:packages,id',
             'archive_access' => 'nullable',
             'archive_days'   => 'nullable',
@@ -85,6 +92,13 @@ class MagazineController extends Controller
                 $validated['thumbnail'] = Storage::disk('public')->put('magazines', $request->file('thumbnail'));
                 if ($magazine->thumbnail) {
                     Storage::disk('public')->delete($magazine->thumbnail);
+                }
+            }
+
+            if ($request->hasFile('intro_image')) {
+                $validated['intro_image'] = Storage::disk('public')->put('magazines', $request->file('intro_image'));
+                if ($magazine->intro_image) {
+                    Storage::disk('public')->delete($magazine->intro_image);
                 }
             }
 

@@ -169,3 +169,5 @@ Route::get('magazines/{magazine}/issues', [IssueController::class, 'showIssues']
 
 // page routes
 Route::get('page/{id}/{slug}', [PageController::class, 'publicPage'])->name('public.page');
+
+Route::get('issue', [IssueController::class, 'active']);

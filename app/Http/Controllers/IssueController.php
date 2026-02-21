@@ -341,4 +341,12 @@ class IssueController extends Controller
         $demo   = false;
         return view('issue', compact('issue', 'path','demo'));
     }
+
+    public function active(){
+        $issues = Issue::get();
+        foreach($issues as $issue){
+            $issue->is_archive = 0;
+            $issue->save();
+        }
+    }
 }

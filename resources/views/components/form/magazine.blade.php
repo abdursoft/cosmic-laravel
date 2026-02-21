@@ -95,6 +95,15 @@
                     @enderror
                 </div>
             </div>
+            <div class="w-full mt-4">
+                <label for="intro" class="block text-sm font-medium text-gray-700"> Intro Image</label>
+                <input type="file" id="intro" name="intro_image"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm @error('thumbnail') border-red-500 @enderror text-slate-800"
+                    value="{{ old('intro') }}">
+                @error('intro')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
+            </div>
 
             <div class="flex justify-between my-1 gap-3 mb-20">
                 <div class=" w-full">
