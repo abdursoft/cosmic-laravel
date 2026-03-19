@@ -50,7 +50,7 @@
 @endsection
 
 
-@section('scripts')
+@push('scripts')
 <script src="{{asset('js/axios.js')}}"></script>
 <script src="{{asset('js/sweet.js')}}"></script>
 <script>
@@ -109,4 +109,4 @@
     }
 </script>
 
-@endsection
+@endpush
