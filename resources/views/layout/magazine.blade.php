@@ -200,6 +200,15 @@
             object-fit: contain;
         }
 
+        .cover video {
+            width: 100%;
+            height: 100%;
+            max-width: 1200px !important;
+            position: absolute;
+            object-fit: contain;
+            aspect-ratio: 21/9;
+        }
+
         @media (max-width:600px) {
             .bottombar {
                 flex-direction: column;

@@ -10,10 +10,14 @@
                 {{ $magazine->title ?? '' }}
             </div>
             <div class="flex items-center justify-center md:justify-end gap-2">
+                <a href="{{route('magazine.content.preview', ['magazine' => $magazine->id, 'type' => 'giff'])}}" class="cursor-pointer bg-teal-600 text-white px-3 py-2 rounded-md btn"
+                    >Giff</a>
                 <button class="cursor-pointer bg-gray-600 text-white px-3 py-2 rounded-md btn btn-active"
                     onclick="toggleMagazine('activeMagazine',this)">Active</button>
                 <button class="cursor-pointer bg-gray-600 text-white px-3 py-2 rounded-md btn"
                     onclick="toggleMagazine('inActiveMagazine',this)">Archive</button>
+                <a href="{{route('magazine.content.preview', ['magazine' => $magazine->id, 'type' => 'video'])}}" class="cursor-pointer bg-orange-600 text-white px-3 py-2 rounded-md btn"
+                    >Video</a>
             </div>
         </div>
 
@@ -67,7 +71,66 @@
         </div>
     </div>
 
+</div>
+    <div id="enter">
+        <div class="innerEnter" src="{{Storage::url($magazine->intro_image)}}" alt="{{ $magazine->title }} intro image"></div>
+        <button onclick="toggleEnter()">Enter</button>
+    </div>
+
     <style>
+        #enter{
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            top: 0;
+            left: 0;
+            z-index: 9;
+            padding: 15px;
+            cursor: grabbing;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 56, 0.7);
+            background-blend-mode: darken;
+        }
+
+        .innerEnter{
+            width: 100%;
+            max-width: 1200px;
+            height: 89%;
+            max-height: 100vh;
+            border-radius: 20px;
+            background:url('{{ Storage::url($magazine->intro_image) }}') no-repeat center;
+            background-size: contain;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #enter button{
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            max-width: 260px;
+            font-size: 28px;
+            border-radius: 10px;
+            font-weight: bold;
+            padding: 7px 12px;
+            background: #171614;
+            color: #fff;
+            text-align: center;
+            text-emphasis: circle;
+            text-transform: uppercase;
+            cursor: pointer;
+
+            &:hover{
+                background: #fff;
+                color: #171614;
+                transition: ease-in-out 0.5s;
+            }
+        }
+
         .btn-active {
             background: rgb(230, 39, 39);
             transition: ease-in-out 0.5s;
@@ -85,6 +148,16 @@
             $(button).addClass('btn-active');
             $(`#${id}`).css('display', 'flex');
         }
+
+        $("#enter").on('scroll', (e) => {
+            e.preventDefault();
+        })
+
+        function toggleEnter(){
+            $("#enter").css({display:'none'});
+        }
     </script>
+
+    </div>
 
 @endsection

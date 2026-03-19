@@ -59,6 +59,13 @@ class Magazine extends Model
         return $this->hasMany(IssueSequence::class);
     }
 
+    /**
+     * Relationship with magazine contents
+     */
+    public function contents(){
+        return $this->hasMany(MagazinContent::class, 'magazine_id');
+    }
+
 
     /**
      * check model is archive access

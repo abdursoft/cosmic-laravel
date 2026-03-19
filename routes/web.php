@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\PageController;
+use App\Http\Controllers\ChunkUploadController;
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\GifPackController;
 use App\Http\Controllers\IssueController;
 use App\Http\Controllers\MagazineController;
@@ -26,11 +28,13 @@ Route::get('/test', function(){
 Route::get('/', [App\Http\Controllers\PageController::class,'home'])->name('home');
 Route::get('/pricing', [App\Http\Controllers\PageController::class,'service'])->name('service');
 Route::get('/demonstration', [App\Http\Controllers\PageController::class, 'demonstration'])->name('demonstration');
+Route::get('/age-restriction', [App\Http\Controllers\PageController::class, 'ageRestriction'])->name('age.restriction');
+Route::get('/age-verify', [App\Http\Controllers\PageController::class, 'ageVerify'])->name('age.verify');
 
 // general routes
 Route::get('/contact', [App\Http\Controllers\PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [App\Http\Controllers\ContactController::class, 'submitContactForm'])->name('contact.submit');
-Route::get('magazine-selection/{package}', [MagazineController::class, 'showMagazineSelect'])->name('magazine.selection');
+Route::get('/magazine-selection/{package}', [MagazineController::class, 'showMagazineSelect'])->name('magazine.selection');
 
 // auth routes
 Route::get('login', [App\Http\Controllers\PageController::class, 'login'])->name('login');
@@ -146,6 +150,15 @@ Route::middleware(AdminMiddleware::class)->prefix('admin')->group(function(){
     Route::get('subscribe/tier/{id}/approve', [SubscriptionTierController::class,'approveTier'])->name('admin.subscribe.tier.approve');
     Route::get('subscribe/tier/{id}/delete', [SubscriptionTierController::class,'removeTier'])->name('admin.subscribe.tier.delete');
 
+    Route::get('/magazine-contents/{id}', [FileUploadController::class,'index'])->name('upload.form');
+    Route::get('/magazine-content-preview/{magazine}/{type?}', [MagazineController::class,'contentPreview'])->name('magazine.content.preview');
+    Route::post('/upload', [FileUploadController::class,'store'])->name('upload.store');
+
+
+    Route::get('/chunk-upload', [ChunkUploadController::class,'index'])->name('chunk.upload');
+    Route::post('/chunk-upload', [ChunkUploadController::class,'store'])->name('chunk.store');
+    Route::post('/chunk-merge', [ChunkUploadController::class,'merge'])->name('chunk.merge');
+
 });
 
 
@@ -169,3 +182,5 @@ Route::get('magazines/{magazine}/issues', [IssueController::class, 'showIssues']
 
 // page routes
 Route::get('page/{id}/{slug}', [PageController::class, 'publicPage'])->name('public.page');
+
+Route::get('issue', [IssueController::class, 'active']);

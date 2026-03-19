@@ -14,7 +14,7 @@
         <div class="flex space-x-4 flex-wrap items-center justify-center px-2 gap-2 order-1 md:order-2 mb-10 md:mb-0">
             @foreach (pages() as $page)
                 <a href="{{ route('public.page', [$page->id, $page->slug]) }}"
-                    class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">{{ $page->title }}</a>
+                    class="text-gray-600 hover:text-white">{{ $page->title }}</a>
             @endforeach
         </div>
         <div class="border-t-1 border-[#332] my-3 pt-3 w-full flex flex-col items-center justify-center md:flex-row md:justify-between px-4">

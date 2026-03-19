@@ -1,13 +1,3 @@
-@section('styles')
-	 <!--Regular Datatables CSS-->
-	 <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-	 <!--Responsive Extension Datatables CSS-->
-	 <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
-
-     {{-- datatable css  --}}
-     <link rel="stylesheet" href="{{asset('css/data-table.css')}}">
-@endSection
-
 <!--Container-->
 <div class="w-full text-slate-800">
 <h2 class="text-xl md:text-3xl my-3">Subscriptions Tier overview</h2>
@@ -28,14 +18,14 @@
                     <tr>
                         <td>{{ $tier->user->name }}</td>
                         <td>{{ $tier->sub_id }}</td>
-                        <td>{{ $tier->status }}</td>
+                        <td>{{ ucfirst($tier->status) }}</td>
                         <td>{{ date('Y-m-d', strtotime($tier->created_at)) }}</td>
                         <td class="hidden">
                             <div class="flex items-center gap-3">
-                                <a href="{{route('user.subscribe.tier.cancel',$tier->id)}}" class="py-2 px-3 rounded-md @php echo $tier->status != 'canceled' ? '' : 'hidden' @endphp bg-red-600 text-white">
+                                <a href="{{route('user.subscribe.tier.cancel',$tier->id)}}" class="rounded-[16px] px-2 py-1 text-sm @php echo $tier->status != 'canceled' ? '' : 'hidden' @endphp bg-red-600 text-white">
                                     Cancel
                                 </a>
-                                <a target="_blank" href="{{$tier->payment_url}}" class="py-2 px-3 rounded-md @php echo $tier->payment_url != '' ? '' : 'hidden' @endphp bg-green-600 text-white">
+                                <a target="_blank" href="{{$tier->payment_url}}" class="rounded-[16px] px-2 py-1 text-sm @php echo $tier->payment_url != '' ? '' : 'hidden' @endphp bg-green-600 text-white">
                                     Pay
                                 </a>
                             </div>
@@ -49,10 +39,7 @@
 </div>
 <!--/container-->
 
-@section('scripts')
-	<!--Datatables -->
-	<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-	<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+@push('scripts')
 	<script>
 		$(document).ready(function() {
 
@@ -64,4 +51,4 @@
 		} );
 
 	</script>
-@endsection
+@endpush

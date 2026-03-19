@@ -1,18 +1,8 @@
-@section('styles')
-	 <!--Regular Datatables CSS-->
-	 <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-	 <!--Responsive Extension Datatables CSS-->
-	 <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
-
-     {{-- datatable css  --}}
-     <link rel="stylesheet" href="{{asset('css/data-table.css')}}">
-@endSection
-
 <!--Container-->
 <div class="w-full text-slate-800">
-<h2 class="text-xl md:text-3xl my-3">Gif Package Overview</h2>
+<h2 class="text-xl md:text-3xl text-gray-100 my-3 px-2">Gif Package Overview</h2>
     <!--Card-->
-        <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow bg-white">
+        <div id='recipients' class="w-full py-4 px-2 mt-6 lg:mt-0 rounded shadow">
         <table id="example" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
             <thead>
                 <tr>
@@ -45,10 +35,7 @@
 <!--/container-->
 
 
-@section('scripts')
-	<!--Datatables -->
-	<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-	<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+@push('scripts')
 	<script>
 		$(document).ready(function() {
 
@@ -60,4 +47,4 @@
 		} );
 
 	</script>
-@endsection
+@endpush

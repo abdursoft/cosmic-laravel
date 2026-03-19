@@ -128,4 +128,18 @@ class MagazineController extends Controller
         $session = Cookie::get('purchase_session');
         return view ('magazine-selection',compact('package','session'));
     }
+
+    /**
+     * Magazine content preview
+     */
+    public function contentPreview($magazine, $type='giff'){
+        $magazines = Magazine::with(['contents' => function($con) use ($type){
+            if($type == 'giff'){
+                return $con->whereIn('ext', ['giff','png','jpeg','jpg'])->get();
+            } 
+            return $con->whereIn('ext', ['mp4','webm','ogg'])->get();
+        }])->find($magazine);
+
+        return view('auth.admin.content', compact('magazines', 'type'));
+    }
 }

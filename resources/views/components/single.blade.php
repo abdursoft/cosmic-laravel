@@ -133,7 +133,6 @@
                     }
                     document.querySelector('.currentPage').value = current;
                     playVideo();
-
                     if (current == PAGES.length) {
                         document.querySelector('.nextIssue').style.display = 'block';
                     } else {
@@ -664,6 +663,7 @@
         })
     }
 
+
     function playVideo(){
         const video = document.querySelector(`.video-${current - 1}`);
         if(video){
@@ -691,6 +691,7 @@
     function repeatDelay(type, page) {
         const list = slowDelay?.[type] ?? [];
         console.log("Repeat delay find "+ list.includes(page));
+        console.log(slowDelay);
         return list.includes(page);
     }
 

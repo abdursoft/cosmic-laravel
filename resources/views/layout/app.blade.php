@@ -10,8 +10,9 @@
         @yield('meta')
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap" rel="stylesheet">
 
         <!-- Styles / Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -37,7 +38,7 @@
         <script src="{{asset('js/sweet.js')}}"></script>
 
     </head>
-    <body class="bg-[#262323]">
+    <body class="bg-[#262323] nunito">
         {{-- load header component --}}
         @include('components.headers.header')
 
@@ -46,7 +47,7 @@
 
         {{-- load body components --}}
         <div class="flex flex-col items-center justify-center w-full">
-            <div class="w-full">
+            <div class="w-full pb-[70px]">
                 @yield('content')
             </div>
         </div>

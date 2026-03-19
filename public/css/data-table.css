@@ -1,10 +1,14 @@
 /*Overrides for Tailwind CSS */
+.dataTables_wrapper{
+    padding: 15px 5px;
+    border-radius: 10px;
+    background-color: #090e2263;
+    color: white;
+}
 
 /*Form fields*/
 .dataTables_wrapper select,
 .dataTables_wrapper .dataTables_filter input {
-    color: #4a5568;
-    /*text-gray-700*/
     padding-left: 1rem;
     /*pl-4*/
     padding-right: 1rem;
@@ -12,22 +16,40 @@
     padding-top: .5rem;
     /*pl-2*/
     padding-bottom: .5rem;
+    outline: 0px;;
     /*pl-2*/
     line-height: 1.25;
     /*leading-tight*/
     border-width: 2px;
     /*border-2*/
     border-radius: .25rem;
-    border-color: #edf2f7;
+    border-color: #2f3a46b9;
     /*border-gray-200*/
-    background-color: #edf2f7;
+    background-color: #647d9642;
     /*bg-gray-200*/
+    border-radius: 8px;
+    color: #fff;
+}
+
+.dataTables_length label, 
+.dataTables_filter label,
+.dataTables_info,
+.dataTables_paginate
+{
+    color: #fff !important;
+}
+
+/*table rows*/
+table.dataTable tr{
+    background-color: #16253fb6 !important;
+    color: #fff;
 }
 
 /*Row Hover*/
 table.dataTable.hover tbody tr:hover,
 table.dataTable.display tbody tr:hover {
-    background-color: #ebf4ff;
+    background-color: #3e4955 !important;
+    color: #fff;
     /*bg-indigo-100*/
 }
 
@@ -51,7 +73,7 @@ table.dataTable.display tbody tr:hover {
     /*font-bold*/
     border-radius: .25rem;
     /*rounded*/
-    background: #667eea !important;
+    background: #1c2447d7 !important;
     /*bg-indigo-500*/
     border: 1px solid transparent;
     /*border border-transparent*/
@@ -59,18 +81,10 @@ table.dataTable.display tbody tr:hover {
 
 /*Pagination Buttons - Hover */
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    color: #fff !important;
-    /*text-white*/
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06);
-    /*shadow*/
+    box-shadow: 0 1px 3px rgba(0,0,0,.1);
     font-weight: 700;
-    /*font-bold*/
     border-radius: .25rem;
-    /*rounded*/
-    background: #667eea !important;
-    /*bg-indigo-500*/
-    border: 1px solid transparent;
-    /*border border-transparent*/
+    background: #10152bcc !important;
 }
 
 /*Add padding to bottom border */

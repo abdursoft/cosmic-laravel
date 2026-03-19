@@ -3,10 +3,10 @@
     <div class="w-full flex bg-[#262323] text-white min-h-screen flex-col px-3 md:px-6 lg:px-11 lg:flex-row py-30">
         <div class="w-full lg:w-1/2 flex flex-col lg:flex-row items-center justify-center lg:justify-end pr-0 lg:pr-12">
             <img src="{{ asset('images/open.jpg') }}" loading="lazy" alt="Hero Image"
-                class="w-full h-full max-w-[700px] rounded-[25px] shadow-lg" data-aos="fade-up">
+                class="w-full h-full lg:max-h-[90%] max-w-[700px] rounded-[25px] shadow-lg" data-aos="fade-up">
         </div>
         <div class="w-full lg:w-1/2 flex items-center justify-start p-2 md:p-8">
-            <div class="w-full md:p-4 max-w-[700px]">
+            <div class="w-full md:p-4 max-w-[700px]" data-aos="fade-down">
                 <h1 class="text-2xl lg:text-4xl font-md mb-4 text-white">
                     <strong>Three worlds. Three obsessions.<br />Which will you claim first?</strong>
                 </h1>

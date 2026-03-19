@@ -1,18 +1,8 @@
-@section('styles')
-	 <!--Regular Datatables CSS-->
-	 <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-	 <!--Responsive Extension Datatables CSS-->
-	 <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
-
-     {{-- datatable css  --}}
-     <link rel="stylesheet" href="{{asset('css/data-table.css')}}">
-@endSection
-
 <!--Container-->
 <div class="w-full text-slate-800">
-<h2 class="text-xl md:text-3xl my-3">Subscriptions Tier overview</h2>
+<h2 class="text-xl md:text-3xl my-3 px-2 text-gray-100">Subscriptions Tier overview</h2>
     <!--Card-->
-        <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow bg-white">
+        <div id='recipients' class="w-full py-4 px-2 mt-6 lg:mt-0 rounded shadow">
         <table id="example" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
             <thead>
                 <tr>
@@ -28,14 +18,14 @@
                     <tr>
                         <td>{{ $tier->user->name }}</td>
                         <td>{{ $tier->package->name }}</td>
-                        <td>{{ $tier->status }}</td>
+                        <td><span class="rounded-xl px-2 py-2 text-sm shadow-md blur-20 bg-opacity-5 @if($tier->status == 'active') text-green-600 bg-green-400/20 @elseif($tier->status == 'canceled') text-red-600 bg-red-500/20 @else text-yellow-600 bg-yellow-400/20 @endif">{{ ucfirst($tier->status) }}</span></td>
                         <td>{{ date('Y-m-d', strtotime($tier->created_at)) }}</td>
                         <td>
                             <div class="flex items-center gap-3">
-                                <a href="{{route('admin.subscribe.tier.delete',$tier->id)}}" class="py-2 px-3 rounded-md @php echo $tier->status != 'canceled' ? '' : 'hidden' @endphp bg-red-600 text-white">
+                                <a href="{{route('admin.subscribe.tier.delete',$tier->id)}}" class="rounded-[16px] px-2 py-1 text-sm @php echo $tier->status != 'canceled' ? '' : 'hidden' @endphp bg-red-600 text-white" onclick="return confirm('Are you sure, You want to delete this tier?')">
                                     Delete
                                 </a>
-                                <a href="{{route('admin.subscribe.tier.approve',$tier->id)}}" class="py-2 px-3 rounded-md @php echo $tier->status == 'pending' ? '' : 'hidden' @endphp bg-green-600 text-white">
+                                <a href="{{route('admin.subscribe.tier.approve',$tier->id)}}" class="rounded-[16px] px-2 py-1 text-sm @php echo $tier->status == 'pending' ? '' : 'hidden' @endphp bg-green-600 text-white">
                                     Approve
                                 </a>
                             </div>
@@ -49,10 +39,7 @@
 </div>
 <!--/container-->
 
-@section('scripts')
-	<!--Datatables -->
-	<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-	<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+@push('scripts')
 	<script>
 		$(document).ready(function() {
 
@@ -64,4 +51,4 @@
 		} );
 
 	</script>
-@endsection
+@endpush

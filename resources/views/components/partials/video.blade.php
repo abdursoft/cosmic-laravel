@@ -1,5 +1,5 @@
 <!-- video player -->
-<div class="w-full max-w-5xl mx-auto px-2 md:px-4">
+<div class="w-full max-w-5xl mx-auto px-2 md:px-4" data-aos="fade-in" data-aos-delay="300">
     <div class="relative rounded-2xl overflow-hidden shadow-lg">
         <div id="player"></div>
     </div>

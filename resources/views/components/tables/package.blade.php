@@ -1,18 +1,8 @@
-@section('styles')
-	 <!--Regular Datatables CSS-->
-	 <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-	 <!--Responsive Extension Datatables CSS-->
-	 <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
-
-     {{-- datatable css  --}}
-     <link rel="stylesheet" href="{{asset('css/data-table.css')}}">
-@endSection
-
 <!--Container-->
 <div class="w-full text-slate-800">
-<h2 class="text-xl md:text-3xl my-3">Subscription packages</h2>
+<h2 class="text-xl md:text-3xl my-3 px-2 text-gray-100">Subscription packages</h2>
     <!--Card-->
-        <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow bg-white">
+        <div id='recipients' class="w-full py-4 px-2 mt-6 lg:mt-0 rounded shadow">
         <table id="example" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
             <thead>
                 <tr>
@@ -29,13 +19,13 @@
                     <tr>
                         <td>{{$key+1}}</td>
                         <td>{{$package->name}}</td>
-                        <td>{{$package->type}}</td>
-                        <td>{{$package->status}}</td>
+                        <td>{{ ucfirst($package->type)}}</td>
+                        <td><span class="rounded-xl px-2 py-2 text-sm shadow-md blur-20 bg-opacity-5 @if($package->status == 'active') text-green-600 bg-green-400/20 @elseif($package->status == 'canceled') text-red-600 bg-red-500/20 @else text-yellow-600 bg-yellow-400/20 @endif">{{ ucfirst($package->status) }}</span></td>
                         <td>${{$package->price}}</td>
                         <td>
                             <div class="flex items-center gap-3">
-                                <a href="{{ route('admin.package.edit',$package->id) }}" class="p-3 rounded-md bg-green-600 text-white">Edit</a>
-                                <a href="{{ route('admin.package.delete',$package->id) }}" class="p-3 bg-red-600 text-white rounded-md">Delete</a>
+                                <a href="{{ route('admin.package.edit',$package->id) }}" class="rounded-[16px] px-2 py-1 text-sm  bg-green-600 text-white">Edit</a>
+                                <a href="{{ route('admin.package.delete',$package->id) }}" class="rounded-[16px] px-2 py-1 text-sm bg-red-600 text-white" onclick="return confirm('Are you sure, You want to delete this package?')">Delete</a>
                             </div>
                         </td>
                     </tr>
@@ -47,10 +37,7 @@
 </div>
 <!--/container-->
 
-@section('scripts')
-	<!--Datatables -->
-	<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-	<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+@push('scripts')
 	<script>
 		$(document).ready(function() {
 
@@ -62,4 +49,4 @@
 		} );
 
 	</script>
-@endsection
+@endpush

@@ -1,18 +1,8 @@
-@section('styles')
-	 <!--Regular Datatables CSS-->
-	 <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-	 <!--Responsive Extension Datatables CSS-->
-	 <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
-
-     {{-- datatable css  --}}
-     <link rel="stylesheet" href="{{asset('css/data-table.css')}}">
-@endSection
-
 <!--Container-->
 <div class="w-full text-slate-800">
 <h2 class="text-xl md:text-3xl my-3">Subscriptions overview</h2>
     <!--Card-->
-        <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow bg-white">
+        <div id='recipients' class="w-full p-4 mt-6 lg:mt-0 rounded shadow">
         <table id="example" class="stripe hover w-full" style="width:100%; padding-top: 1em;  padding-bottom: 1em;">
             <thead>
                 <tr>
@@ -34,13 +24,13 @@
                         <td>{{ date('Y-m-d', strtotime($subscription->created_at)) }}</td>
                         <td>
                             <div class="flex items-center gap-3">
-                                <a href="{{route('user.subscribe.cancel',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status !== 'canceled' ? '' : 'hidden' @endphp bg-red-600 text-white">
+                                <a href="{{route('user.subscribe.cancel',$subscription->id)}}" class="rounded-[16px] px-2 py-1 text-sm @php echo $subscription->status !== 'canceled' ? '' : 'hidden' @endphp bg-red-600 text-white">
                                     Cancel
                                 </a>
-                                <a href="{{route('user.subscribe.tier',$subscription->id)}}" class="py-2 px-3 rounded-md @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-teal-600 text-white">
+                                <a href="{{route('user.subscribe.tier',$subscription->id)}}" class="rounded-[16px] px-2 py-1 text-sm @php echo $subscription->status == 'active' ? '' : 'hidden' @endphp bg-teal-600 text-white">
                                     Manage
                                 </a>
-                                <a href="{{route('user.magazines',$subscription->id)}}" class="py-2 px-3 rounded-md hidden bg-green-600 text-white">
+                                <a href="{{route('user.magazines',$subscription->id)}}" class="rounded-[16px] px-2 py-1 text-sm hidden bg-green-600 text-white">
                                     Magazines
                                 </a>
                             </div>
@@ -54,10 +44,7 @@
 </div>
 <!--/container-->
 
-@section('scripts')
-	<!--Datatables -->
-	<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-	<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+@push('scripts')
 	<script>
 		$(document).ready(function() {
 
@@ -69,4 +56,4 @@
 		} );
 
 	</script>
-@endsection
+@endpush

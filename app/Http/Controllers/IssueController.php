@@ -197,13 +197,18 @@ class IssueController extends Controller
             return array_map('intval', $matches[0]);
         };
 
+        $extension = function ($file) {
+            return pathinfo($file, PATHINFO_EXTENSION);
+        };
+
         $patterns = [
             'pages' => [
                 'dir'       => 'pages',
-                'regex'     => '/^\d+\.(jpg|png|gif|webp)$/i',
+                'regex'     => '/^\d+\.(mp4|jpeg|jpg|png|gif|webp|webm)$/i',
                 'formatter' => fn($m, $f, $d) => [
                     'page' => (int) preg_replace('/\D/', '', pathinfo($f, PATHINFO_FILENAME)),
                     'file' => $f,
+                    'ext'  => $extension($f),
                     'url'  => $makeUrl('pages', $f, $d),
                 ],
             ],
@@ -260,6 +265,7 @@ class IssueController extends Controller
             if (preg_match($p['regex'], $file)) {
                 $result[] = $p['formatter']([], $file, $dir);
             }
+            
         }
 
         return $result;
@@ -340,5 +346,13 @@ class IssueController extends Controller
         $path   = end($path);
         $demo   = false;
         return view('issue', compact('issue', 'path','demo'));
+    }
+
+    public function active(){
+        $issues = Issue::get();
+        foreach($issues as $issue){
+            $issue->is_archive = 0;
+            $issue->save();
+        }
     }
 }

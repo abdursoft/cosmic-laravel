@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\ContactMessage;
@@ -11,6 +12,8 @@ use App\Models\UserGif;
 use App\Models\UserMagazine;
 use App\Models\UserSubscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Session;
 
 class PageController extends Controller
 {
@@ -53,7 +56,8 @@ class PageController extends Controller
     }
 
     // Demonstration page
-    public function demonstration(){
+    public function demonstration()
+    {
         return view('typeset');
     }
 
@@ -92,19 +96,33 @@ class PageController extends Controller
         return view('auth.users.dashboard', compact('subscriptions'));
     }
 
+    // age verify page
+    public function ageVerify()
+    {
+        Cookie::queue('age_verified', true, 60 * 24 * 30); // Set cookie for 30 days
+        return redirect()->route('home');
+    }
+
+    // age restriction page
+    public function ageRestriction()
+    {
+        return view('age');
+    }
+
     /**
      * User purchase magazine
      */
-    public function userMagazines(Request $request){
-        $magIds = UserMagazine::where('user_id',$request->user()->id)->where('status','active')->distinct()->get('magazine_id');
+    public function userMagazines(Request $request)
+    {
+        $magIds = UserMagazine::where('user_id', $request->user()->id)->where('status', 'active')->distinct()->get('magazine_id');
 
         $magazines = [];
-        foreach($magIds as $id){
-            $mag = Magazine::where('id',$id->magazine_id)->first();
-            if($mag->status === 'active' && $mag->publish_status === 'published'){
+        foreach ($magIds as $id) {
+            $mag = Magazine::where('id', $id->magazine_id)->first();
+            if ($mag->status === 'active' && $mag->publish_status === 'published') {
                 $magazines[] = $mag;
             }
         }
-        return view('auth.users.magazine-list',compact('magazines'));
+        return view('auth.users.magazine-list', compact('magazines'));
     }
 }
